@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="action_settings">Settings</string>
+    <string-array name="headers">
+        <item>Date</item>
+        <item>Sugar</item>
+        <item>Extra</item>
+    </string-array>
+    <string name="input_date">Date</string>
+    <string name="input_sugar">Sugar</string>
+    <string name="input_extra">Extra</string>
+</resources>

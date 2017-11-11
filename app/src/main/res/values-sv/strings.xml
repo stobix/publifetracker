@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="input_date">Datum</string>
+    <string name="input_sugar">Socker</string>
+    <string name="input_extra">Övrigt</string>
+    <string name="dateFormat">yyyy dd/MM kk:mm</string>
+</resources>

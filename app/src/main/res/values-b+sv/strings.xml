@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Min napp</string>
+    <string name="action_settings">Inställningar</string>
+    <string-array name="headers">
+        <item>Datum</item>
+        <item>Socker</item>
+        <item>Extra</item>
+    </string-array>
+</resources>
