@@ -19,11 +19,11 @@ import static android.arch.persistence.room.ColumnInfo.INTEGER;
 @Entity(tableName="sugar_entries")
 public class SugarEntry implements Parcelable{
 
-    public SugarEntry(int uid, Date date,int sugarLevel,String extra){
+    SugarEntry(int uid, Date date,int sugarLevel,String extra){
         this(uid,date.getTime(),sugarLevel,extra);
     }
 
-    public SugarEntry(int uid, long epochTimestamp,int sugarLevel,String extra){
+    SugarEntry(int uid, long epochTimestamp,int sugarLevel,String extra){
         this.uid=uid;
         this.epochTimestamp=epochTimestamp;
         this.sugarLevel=sugarLevel;
@@ -31,17 +31,17 @@ public class SugarEntry implements Parcelable{
     }
 
     @PrimaryKey
-    public int uid;
+    int uid;
 
     @ColumnInfo(name = "timestamp", typeAffinity = INTEGER)
-    // FIXME Can't make this a java.sql.Timestamp or java.util.Date lest the compiler comlains
-    public long epochTimestamp;
+    // FIXME Can't make this a java.sql.Timestamp or java.util.Date lest the compiler complains
+    long epochTimestamp;
 
     @ColumnInfo(name = "sugar")
-    public int sugarLevel;
+    int sugarLevel;
 
     @ColumnInfo(name = "extra")
-    public String extra;
+    String extra;
 
     @Override
     public int describeContents() {
@@ -56,7 +56,7 @@ public class SugarEntry implements Parcelable{
         parcel.writeString(extra);
     }
 
-    public SugarEntry(Parcel in) {
+    SugarEntry(Parcel in) {
         //this(in.readInt(),in.readInt(),in.readLong(),in.readString());
         this.uid=in.readInt();
         this.sugarLevel=in.readInt();

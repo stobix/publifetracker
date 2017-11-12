@@ -26,21 +26,6 @@ import java.util.Random;
 
 import static android.util.Log.d;
 
-/*
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import android.view.ViewGroup;
-import android.widget.TextClock;
-import android.widget.TextView;
-import de.codecrafters.tableview.TableView;
-import de.codecrafters.tableview.TableDataAdapter;
-
-import android.content.Context;
-import static java.lang.String.format;
-*/
-
-
-
     public class MainActivity extends AppCompatActivity implements DatePickerFragment.ClickedListener {
 
     // Used to load the 'native-lib' library on application startup.
@@ -49,10 +34,6 @@ import static java.lang.String.format;
     }
 
         Random random = new Random();
-
-        private static final String[][] DATA_TO_SHOW = {
-                { "This", "is", "a", "test" },
-                { "and", "a", null, "test" } };
 
         private String rndStr() {
             byte[] foo=new byte[30];
@@ -74,50 +55,21 @@ import static java.lang.String.format;
             return d;
         }
 
-
-        private final LoL[] DATA_TO_ALSO_SHOW_BUT_COOLER =
-                {
-                        new LoL(rndDat(), rndSgr(), rndStr()),
-                        new LoL(rndDat(), rndSgr(), rndStr()),
-                        new LoL(rndDat(), rndSgr(), rndStr()),
-                        new LoL(rndDat(), rndSgr(), rndStr()),
-                        new LoL(rndDat(), rndSgr(), rndStr()),
-                        new LoL(rndDat(), rndSgr(), rndStr()),
-                        new LoL(rndDat(), rndSgr(), rndStr()),
-                        new LoL(rndDat(), rndSgr(), rndStr()),
-                        new LoL(rndDat(), rndSgr(), rndStr()),
-                        new LoL(rndDat(), rndSgr(), rndStr()),
-                        new LoL(rndDat(), rndSgr(), rndStr()),
-                        new LoL(rndDat(), rndSgr(), rndStr()),
-                        new LoL(rndDat(), rndSgr(), rndStr())
-                };
-
-
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             d("DB", "onCreate: Doing stuff");
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            Toolbar toolbar = findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
 
-            FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+            FloatingActionButton fab = findViewById(R.id.fab);
             fab.setOnClickListener( view ->
                             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                                     .setAction("Action", null).show());
 
 
-            // Example of a call to a native method
-            //TextView tv = (TextView) findViewById(R.id.sample_text);
-            //tv.setText(stringFromJNI());
-
-
-            //TODO convert this to List<SugarEntry>
             Context c = this;
-            /*
-            SortableLolFnissTableView tableView = (SortableLolFnissTableView) findViewById(R.id.tableView);
-            tableView.setDataAdapter(new LoLFnissTableDataAdapter(c, DATA_TO_ALSO_SHOW_BUT_COOLER));
-            */
 
             Handler db_data_handler = new Handler(){
                 @Override
@@ -126,12 +78,12 @@ import static java.lang.String.format;
                     Bundle b = msg.getData();
                     ArrayList<SugarEntry> arrayEntries=b.getParcelableArrayList("entries");
                     d("DB","Async received "+arrayEntries.size()+" entries, putting into table");
-                    SugarEntry[] entries=(SugarEntry[])arrayEntries.toArray(new SugarEntry[arrayEntries.size()]);
+                    SugarEntry[] entries= arrayEntries.toArray(new SugarEntry[arrayEntries.size()]);
                     for(SugarEntry e:entries){
                         d("DB","Entry: "+e.uid+" "+e.epochTimestamp+" "+e.sugarLevel+" "+e.extra);
                     }
                     d("DB","Converted to array");
-                    SortableSugarEntryTableView tableView = (SortableSugarEntryTableView) findViewById(R.id.tableView) ;
+                    SortableSugarEntryTableView tableView = findViewById(R.id.tableView);
                     d("DB","tableView found");
                     SugarEntryTableDataAdapter adapter = new SugarEntryTableDataAdapter(c,entries);
                     d("DB","data adapter created");
@@ -158,6 +110,7 @@ import static java.lang.String.format;
 
                 List<SugarEntry> entries = dao.getAll();
                 d("DB","Entries:"+entries.size());
+                // TODO remove this line at some point, when entry adding functionality is present
                 dao.insert(new SugarEntry(entries.size()+1,rndDat(),rndSgr(),rndStr()));
                 entries = dao.getAll();
 
@@ -172,21 +125,10 @@ import static java.lang.String.format;
                 bundle.putParcelableArrayList("entries", arrayEntries);
                 msg.setData(bundle);
                 db_data_handler.sendMessage(msg);
-                //db_data_handler.sendEmptyMessage(0);
             };
 
             Thread dbInitThread = new Thread(initiateDB);
             dbInitThread.start();
-
-
-            /*
-            TableView<String[]> tableView = (TableView<String[]>) findViewById(R.id.tableView);
-            tableView.setDataAdapter(new SimpleTableDataAdapter(this, DATA_TO_SHOW));
-            */
-            /*
-            List<SugarEntry> l = new List<SugarEntry>();
-            l.add( new SugarEntry(rndDat(), rndSgr(), rndStr());
-            */
 
         }
 
@@ -230,11 +172,10 @@ import static java.lang.String.format;
 
         @Override
         public void gotTheStuff(int year, int month, int day) {
-            EditText t = (EditText) findViewById(R.id.editText2);
+            EditText t = findViewById(R.id.editText2);
             if(t!=null) {
                 String s = year+" "+month+" "+day;
                 d("CALLBACK",s);
-                // FIXME varför funkar inte setText‽‽‽‽‽‽‽‽‽‽‽‽‽‽‽‽‽☃☃☃☃őűüĵŋ ±⩻⪑
                 t.setText(s, TextView.BufferType.NORMAL);
             }
         }
