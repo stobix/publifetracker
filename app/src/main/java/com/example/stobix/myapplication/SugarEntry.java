@@ -51,17 +51,21 @@ public class SugarEntry implements Parcelable{
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(uid);
-        parcel.writeInt(sugarLevel);
         parcel.writeLong(epochTimestamp);
+        parcel.writeInt(sugarLevel);
         parcel.writeString(extra);
     }
 
-    SugarEntry(Parcel in) {
-        //this(in.readInt(),in.readInt(),in.readLong(),in.readString());
-        this.uid=in.readInt();
-        this.sugarLevel=in.readInt();
-        this.epochTimestamp=in.readLong();
-        this.extra=in.readString();
+    private SugarEntry(Parcel in) {
+        // Since the call to this needs to be first for whatever reason, I can't
+        // assign these values to variables before sending them to the main
+        // constructor.
+
+        // IMPORTANT: These calls need to be in the same order as in writeToParcel above!
+        this(   in.readInt(), // uid
+                in.readLong(), // timestamp
+                in.readInt(), // sugar
+                in.readString()); // extra
     }
 
     public static final Parcelable.Creator<SugarEntry> CREATOR
