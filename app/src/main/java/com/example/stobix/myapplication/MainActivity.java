@@ -55,6 +55,23 @@ import static android.util.Log.d;
             return d;
         }
 
+        // Made static to prevent memory issues, since lint complained about the anonymous class instance.
+        // See https://stackoverflow.com/questions/11407943/this-handler-class-should-be-static-or-leaks-might-occur-incominghandler
+        private static class DBHandler extends Handler{
+            final Context context;
+            final SortableSugarEntryTableView tableView;
+            DBHandler(Context outer_context,SortableSugarEntryTableView view){
+                context=outer_context;
+                tableView=view;
+            }
+            @Override
+            public void handleMessage(Message msg) {
+                Bundle b = msg.getData();
+                ArrayList<SugarEntry> arrayEntries=b.getParcelableArrayList("entries");
+                tableView.setDataAdapter(new SugarEntryTableDataAdapter(context,arrayEntries));
+            }
+        }
+
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             d("DB", "onCreate: Doing stuff");
@@ -69,18 +86,7 @@ import static android.util.Log.d;
                                     .setAction("Action", null).show());
 
 
-            Context c = this;
-
-            Handler db_data_handler = new Handler(){
-                @Override
-                public void handleMessage(Message msg) {
-                    Bundle b = msg.getData();
-                    ArrayList<SugarEntry> arrayEntries=b.getParcelableArrayList("entries");
-                    SortableSugarEntryTableView tableView = findViewById(R.id.tableView);
-                    SugarEntryTableDataAdapter adapter = new SugarEntryTableDataAdapter(c,arrayEntries);
-                    tableView.setDataAdapter(adapter);
-                }
-            };
+            Handler db_data_handler = new DBHandler(this,findViewById(R.id.tableView));
 
             /*
             Runnable initiateDB = new Runnable(){
