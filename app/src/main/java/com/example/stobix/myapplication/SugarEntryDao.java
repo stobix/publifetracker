@@ -19,6 +19,8 @@ public interface SugarEntryDao {
     @Query("Select * from sugar_entries where timestamp between :firstDate and :secondDate")
     List<SugarEntry> getBetweenEpochs(long firstDate,long secondDate);
     @Insert
+    void insert(SugarEntry sugarEntry);
+    @Insert
     void insertAll(SugarEntry... sugarEntries);
 
     @Delete

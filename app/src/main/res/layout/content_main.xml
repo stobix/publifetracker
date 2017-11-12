@@ -77,7 +77,7 @@
 
         app:layout_constraintStart_toEndOf="@+id/editText3" />
 
-    <com.example.stobix.myapplication.SortableLolFnissTableView
+    <com.example.stobix.myapplication.SortableSugarEntryTableView
         android:id="@+id/tableView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

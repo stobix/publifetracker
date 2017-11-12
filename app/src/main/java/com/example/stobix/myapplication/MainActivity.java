@@ -2,8 +2,11 @@ package com.example.stobix.myapplication;
 
 import android.app.FragmentTransaction;
 import android.arch.persistence.room.Room;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
@@ -16,6 +19,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -88,6 +92,7 @@ import static java.lang.String.format;
                         new LoL(rndDat(), rndSgr(), rndStr())
                 };
 
+
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             d("DB", "onCreate: Doing stuff");
@@ -105,26 +110,75 @@ import static java.lang.String.format;
             // Example of a call to a native method
             //TextView tv = (TextView) findViewById(R.id.sample_text);
             //tv.setText(stringFromJNI());
+
+
+            //TODO convert this to List<SugarEntry>
+            Context c = this;
+            /*
+            SortableLolFnissTableView tableView = (SortableLolFnissTableView) findViewById(R.id.tableView);
+            tableView.setDataAdapter(new LoLFnissTableDataAdapter(c, DATA_TO_ALSO_SHOW_BUT_COOLER));
+            */
+
+            Handler db_data_handler = new Handler(){
+                @Override
+                public void handleMessage(Message msg) {
+                    d("DB","Got message!");
+                    Bundle b = msg.getData();
+                    ArrayList<SugarEntry> arrayEntries=b.getParcelableArrayList("entries");
+                    d("DB","Async received "+arrayEntries.size()+" entries, putting into table");
+                    SugarEntry[] entries=(SugarEntry[])arrayEntries.toArray(new SugarEntry[arrayEntries.size()]);
+                    for(SugarEntry e:entries){
+                        d("DB","Entry: "+e.uid+" "+e.epochTimestamp+" "+e.sugarLevel+" "+e.extra);
+                    }
+                    d("DB","Converted to array");
+                    SortableSugarEntryTableView tableView = (SortableSugarEntryTableView) findViewById(R.id.tableView) ;
+                    d("DB","tableView found");
+                    SugarEntryTableDataAdapter adapter = new SugarEntryTableDataAdapter(c,entries);
+                    d("DB","data adapter created");
+                    tableView.setDataAdapter(adapter);
+                    d("DB","stuff inserted");
+                }
+            };
+
+            /*
+            Runnable initiateDB = new Runnable(){
+                public void run() {
+
+                }
+            }
+            */
             Runnable initiateDB = () -> {
                 SugarEntryDatabase db =
                         Room.databaseBuilder(
                                 getApplicationContext(),
                                 SugarEntryDatabase.class,
                                 "sugarApp").build();
+
                 SugarEntryDao dao = db.userDao();
+
                 List<SugarEntry> entries = dao.getAll();
+                d("DB","Entries:"+entries.size());
+                dao.insert(new SugarEntry(entries.size()+1,rndDat(),rndSgr(),rndStr()));
+                entries = dao.getAll();
+
+
                 for(SugarEntry e:entries){
                     d("DB",e.extra);
                 }
                 d("DB","Done!");
+                Message msg=db_data_handler.obtainMessage();
+                Bundle bundle=new Bundle();
+                ArrayList<SugarEntry> arrayEntries=new ArrayList<>(entries);
+                bundle.putParcelableArrayList("entries", arrayEntries);
+                msg.setData(bundle);
+                db_data_handler.sendMessage(msg);
+                //db_data_handler.sendEmptyMessage(0);
             };
 
             Thread dbInitThread = new Thread(initiateDB);
             dbInitThread.start();
 
 
-            /*
-            */
             /*
             TableView<String[]> tableView = (TableView<String[]>) findViewById(R.id.tableView);
             tableView.setDataAdapter(new SimpleTableDataAdapter(this, DATA_TO_SHOW));
@@ -133,9 +187,6 @@ import static java.lang.String.format;
             List<SugarEntry> l = new List<SugarEntry>();
             l.add( new SugarEntry(rndDat(), rndSgr(), rndStr());
             */
-            //TODO convert this to List<SugarEntry>
-            SortableLolFnissTableView tableView = (SortableLolFnissTableView) findViewById(R.id.tableView);
-            tableView.setDataAdapter(new LoLFnissTableDataAdapter(this, DATA_TO_ALSO_SHOW_BUT_COOLER));
 
         }
 

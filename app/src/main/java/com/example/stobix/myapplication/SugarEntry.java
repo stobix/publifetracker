@@ -6,6 +6,8 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import static android.arch.persistence.room.ColumnInfo.BLOB;
 import static android.arch.persistence.room.ColumnInfo.INTEGER;
@@ -15,13 +17,14 @@ import static android.arch.persistence.room.ColumnInfo.INTEGER;
  */
 
 @Entity(tableName="sugar_entries")
-public class SugarEntry {
+public class SugarEntry implements Parcelable{
 
-    public SugarEntry(Date date,int sugarLevel,String extra){
-        this(date.getTime(),sugarLevel,extra);
+    public SugarEntry(int uid, Date date,int sugarLevel,String extra){
+        this(uid,date.getTime(),sugarLevel,extra);
     }
 
-    public SugarEntry(long epochTimestamp,int sugarLevel,String extra){
+    public SugarEntry(int uid, long epochTimestamp,int sugarLevel,String extra){
+        this.uid=uid;
         this.epochTimestamp=epochTimestamp;
         this.sugarLevel=sugarLevel;
         this.extra=extra;
@@ -39,5 +42,37 @@ public class SugarEntry {
 
     @ColumnInfo(name = "extra")
     public String extra;
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(uid);
+        parcel.writeInt(sugarLevel);
+        parcel.writeLong(epochTimestamp);
+        parcel.writeString(extra);
+    }
+
+    public SugarEntry(Parcel in) {
+        //this(in.readInt(),in.readInt(),in.readLong(),in.readString());
+        this.uid=in.readInt();
+        this.sugarLevel=in.readInt();
+        this.epochTimestamp=in.readLong();
+        this.extra=in.readString();
+    }
+
+    public static final Parcelable.Creator<SugarEntry> CREATOR
+            = new Parcelable.Creator<SugarEntry>() {
+        public SugarEntry createFromParcel(Parcel in) {
+            return new SugarEntry(in);
+        }
+
+         public SugarEntry[] newArray(int size) {
+             return new SugarEntry[size];
+         }
+    };
 
 }
