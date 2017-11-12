@@ -1,16 +1,10 @@
 package com.example.stobix.myapplication;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
-import android.view.View;
 import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import java.util.Calendar;
 
@@ -33,24 +27,13 @@ public class DatePickerFragment extends DialogFragment
         return new DatePickerDialog(getActivity(), this, year, month, day);
     }
 
-    public interface ClickedListener {
-        public void gotTheStuff(int year,int month,int day);
-    }
-
-    ClickedListener c;
-
-    @Override
-    public void onAttach(Activity a){
-        super.onAttach(a);
-        try{
-            c = (ClickedListener) a;
-        }  catch (ClassCastException e){
-            throw new ClassCastException("the revolution has not yet happened");
-        }
+    public interface DatePickerHandler {
+        void handleDate(int year,int month,int day);
     }
 
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        c.gotTheStuff(year,month,day);
+        DatePickerHandler datePickerHandler = (DatePickerHandler) getActivity();
+        datePickerHandler.handleDate(year,month,day);
         // Do something with the date chosen by the user
     }
 }

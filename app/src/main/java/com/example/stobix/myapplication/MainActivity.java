@@ -1,9 +1,7 @@
 package com.example.stobix.myapplication;
 
-import android.app.FragmentTransaction;
 import android.arch.persistence.room.Room;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -12,7 +10,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,7 +23,7 @@ import java.util.Random;
 
 import static android.util.Log.d;
 
-    public class MainActivity extends AppCompatActivity implements DatePickerFragment.ClickedListener {
+    public class MainActivity extends AppCompatActivity implements DatePickerFragment.DatePickerHandler {
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -74,7 +71,6 @@ import static android.util.Log.d;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
-            d("DB", "onCreate: Doing stuff");
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
             Toolbar toolbar = findViewById(R.id.toolbar);
@@ -146,7 +142,7 @@ import static android.util.Log.d;
             return super.onOptionsItemSelected(item);
         }
 
-        public void showNosePickerDialog(View view) {
+        public void showDatePicker(View view) {
 
             // TODO https://developer.android.com/guide/components/fragments.html#EventCallbacks
             DialogFragment newFragment = new DatePickerFragment();
@@ -161,12 +157,17 @@ import static android.util.Log.d;
         public native String stringFromJNI();
 
         @Override
-        public void gotTheStuff(int year, int month, int day) {
+        public void handleDate(int year, int month, int day) {
             EditText t = findViewById(R.id.editText2);
             if(t!=null) {
                 String s = year+" "+month+" "+day;
-                d("CALLBACK",s);
                 t.setText(s, TextView.BufferType.NORMAL);
             }
         }
+        // TODO Implement one of these, and call it after the date is set.
+/*
+        @Override
+        public void handleTime(int hour, int minute, int second) {
+        }
+        */
     }
