@@ -20,15 +20,11 @@ import static java.lang.String.format;
 
 public class SugarEntryTableDataAdapter extends TableDataAdapter<SugarEntry> {
     public SugarEntryTableDataAdapter(Context context, ArrayList<SugarEntry> entries) {
-        this(context, (SugarEntry[])entries.toArray());
-    }
-    SugarEntryTableDataAdapter(Context context,SugarEntry[] entries){
-        super(context,entries);
+        super(context, entries);
     }
 
     @Override
     public View getCellView(int rowIndex, int columnIndex, ViewGroup parentView) {
-        d("DB","Processing "+columnIndex+" "+rowIndex);
         SugarEntry currRow = getRowData(rowIndex);
         View renderedView = null;
         switch(columnIndex) {
@@ -38,19 +34,14 @@ public class SugarEntryTableDataAdapter extends TableDataAdapter<SugarEntry> {
                 Date myDate=new Date(currRow.epochTimestamp);
                 String myDateString = df.format(formatString,myDate).toString();
                 renderedView = renderString(myDateString);
-                d("DB render","0 "+rowIndex);
                 break;
             case 1:
-                d("DB render","1 "+rowIndex);
-                //renderedView = renderString(format("%.1f",currRow.sugarLevel));
                 renderedView = renderString(format("%.1f",currRow.sugarLevel/10f));
                 break;
             case 2:
-                d("DB render","2 "+rowIndex);
                 renderedView = renderString(currRow.extra);
                 break;
             default:
-                d("DB render","default "+rowIndex);
                 break;
         }
         return renderedView;
@@ -59,7 +50,6 @@ public class SugarEntryTableDataAdapter extends TableDataAdapter<SugarEntry> {
         final TextView textView = new TextView(getContext());
         textView.setText(value);
         textView.setPadding(20, 10, 20, 10);
-        //textView.setTextSize(TEXT_SIZE);
         return textView;
     }
 }

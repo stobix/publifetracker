@@ -74,21 +74,11 @@ import static android.util.Log.d;
             Handler db_data_handler = new Handler(){
                 @Override
                 public void handleMessage(Message msg) {
-                    d("DB","Got message!");
                     Bundle b = msg.getData();
                     ArrayList<SugarEntry> arrayEntries=b.getParcelableArrayList("entries");
-                    d("DB","Async received "+arrayEntries.size()+" entries, putting into table");
-                    SugarEntry[] entries= arrayEntries.toArray(new SugarEntry[arrayEntries.size()]);
-                    for(SugarEntry e:entries){
-                        d("DB","Entry: "+e.uid+" "+e.epochTimestamp+" "+e.sugarLevel+" "+e.extra);
-                    }
-                    d("DB","Converted to array");
                     SortableSugarEntryTableView tableView = findViewById(R.id.tableView);
-                    d("DB","tableView found");
-                    SugarEntryTableDataAdapter adapter = new SugarEntryTableDataAdapter(c,entries);
-                    d("DB","data adapter created");
+                    SugarEntryTableDataAdapter adapter = new SugarEntryTableDataAdapter(c,arrayEntries);
                     tableView.setDataAdapter(adapter);
-                    d("DB","stuff inserted");
                 }
             };
 
@@ -109,16 +99,10 @@ import static android.util.Log.d;
                 SugarEntryDao dao = db.userDao();
 
                 List<SugarEntry> entries = dao.getAll();
-                d("DB","Entries:"+entries.size());
                 // TODO remove this line at some point, when entry adding functionality is present
                 dao.insert(new SugarEntry(entries.size()+1,rndDat(),rndSgr(),rndStr()));
                 entries = dao.getAll();
 
-
-                for(SugarEntry e:entries){
-                    d("DB",e.extra);
-                }
-                d("DB","Done!");
                 Message msg=db_data_handler.obtainMessage();
                 Bundle bundle=new Bundle();
                 ArrayList<SugarEntry> arrayEntries=new ArrayList<>(entries);
