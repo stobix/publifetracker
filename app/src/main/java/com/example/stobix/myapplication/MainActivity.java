@@ -23,23 +23,24 @@ import java.util.Random;
 
 import static android.util.Log.d;
 
-    public class MainActivity extends AppCompatActivity implements DatePickerFragment.DatePickerHandler {
+    public class MainActivity extends AppCompatActivity
+            implements DatePickerFragment.DatePickerHandler, TimePickerFragment.TimePickerHandler {
 
-    // Used to load the 'native-lib' library on application startup.
-    static {
-        System.loadLibrary("native-lib");
-    }
+        // Used to load the 'native-lib' library on application startup.
+        static {
+            System.loadLibrary("native-lib");
+        }
 
         Random random = new Random();
 
         private String rndStr() {
-            byte[] foo=new byte[30];
+            byte[] foo = new byte[30];
             random.nextBytes(foo);
             return String.format("%s", foo);
         }
 
         private int rndSgr() {
-            return random.nextInt(300)+10;
+            return random.nextInt(300) + 10;
         }
 
         private Date rndDat() {
@@ -48,24 +49,26 @@ import static android.util.Log.d;
             d.setHours(random.nextInt(24));
             d.setMonth(random.nextInt(12));
             d.setDate(random.nextInt(31));
-            d.setYear(random.nextInt(2)+115);
+            d.setYear(random.nextInt(2) + 115);
             return d;
         }
 
-        // Made static to prevent memory issues, since lint complained about the anonymous class instance.
+        // Made static (i.e. no outer scope references) to prevent memory issues, since lint complained about the anonymous class instance.
         // See https://stackoverflow.com/questions/11407943/this-handler-class-should-be-static-or-leaks-might-occur-incominghandler
-        private static class DBHandler extends Handler{
+        private static class DBHandler extends Handler {
             final Context context;
             final SortableSugarEntryTableView tableView;
-            DBHandler(Context outer_context,SortableSugarEntryTableView view){
-                context=outer_context;
-                tableView=view;
+
+            DBHandler(Context outer_context, SortableSugarEntryTableView view) {
+                context = outer_context;
+                tableView = view;
             }
+
             @Override
             public void handleMessage(Message msg) {
                 Bundle b = msg.getData();
-                ArrayList<SugarEntry> arrayEntries=b.getParcelableArrayList("entries");
-                tableView.setDataAdapter(new SugarEntryTableDataAdapter(context,arrayEntries));
+                ArrayList<SugarEntry> arrayEntries = b.getParcelableArrayList("entries");
+                tableView.setDataAdapter(new SugarEntryTableDataAdapter(context, arrayEntries));
             }
         }
 
@@ -77,12 +80,12 @@ import static android.util.Log.d;
             setSupportActionBar(toolbar);
 
             FloatingActionButton fab = findViewById(R.id.fab);
-            fab.setOnClickListener( view ->
-                            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show());
+            fab.setOnClickListener(view ->
+                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show());
 
 
-            Handler db_data_handler = new DBHandler(this,findViewById(R.id.tableView));
+            Handler db_data_handler = new DBHandler(this, findViewById(R.id.tableView));
 
             /*
             Runnable initiateDB = new Runnable(){
@@ -102,12 +105,12 @@ import static android.util.Log.d;
 
                 List<SugarEntry> entries = dao.getAll();
                 // TODO remove this line at some point, when entry adding functionality is present
-                dao.insert(new SugarEntry(entries.size()+1,rndDat(),rndSgr(),rndStr()));
+                dao.insert(new SugarEntry(entries.size() + 1, rndDat(), rndSgr(), rndStr()));
                 entries = dao.getAll();
 
-                Message msg=db_data_handler.obtainMessage();
-                Bundle bundle=new Bundle();
-                ArrayList<SugarEntry> arrayEntries=new ArrayList<>(entries);
+                Message msg = db_data_handler.obtainMessage();
+                Bundle bundle = new Bundle();
+                ArrayList<SugarEntry> arrayEntries = new ArrayList<>(entries);
                 bundle.putParcelableArrayList("entries", arrayEntries);
                 msg.setData(bundle);
                 db_data_handler.sendMessage(msg);
@@ -149,6 +152,11 @@ import static android.util.Log.d;
             newFragment.show(getSupportFragmentManager(), "datePicker");
         }
 
+        public void showTimePicker(View view) {
+
+            DialogFragment newFragment = new TimePickerFragment();
+            newFragment.show(getSupportFragmentManager(), "timePicker");
+        }
 
         /**
          * A native method that is implemented by the 'native-lib' native library,
@@ -159,15 +167,19 @@ import static android.util.Log.d;
         @Override
         public void handleDate(int year, int month, int day) {
             EditText t = findViewById(R.id.editText2);
-            if(t!=null) {
-                String s = year+" "+month+" "+day;
+            if (t != null) {
+                String s = year + " " + month + " " + day;
                 t.setText(s, TextView.BufferType.NORMAL);
             }
         }
-        // TODO Implement one of these, and call it after the date is set.
-/*
+
         @Override
-        public void handleTime(int hour, int minute, int second) {
+        public void handleTime(int hour, int minute) {
+            EditText t = findViewById(R.id.editText2);
+            if (t != null) {
+                String s = hour + " " + minute;
+                t.setText(s, TextView.BufferType.NORMAL);
+            }
+
         }
-        */
     }

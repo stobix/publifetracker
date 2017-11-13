@@ -17,6 +17,7 @@
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toStartOf="parent"
+        android:onClick="showDatePicker"
         app:srcCompat="@mipmap/ic_launcher_foreground" />
     <!--
         tools:layout_editor_absoluteX="0dp"
@@ -32,7 +33,7 @@
         android:hint="@string/input_date"
         android:imeOptions="actionNext"
         android:inputType="datetime"
-        android:onClick="showDatePicker"
+        android:onClick="showTimePicker"
         android:singleLine="true"
 
         android:visibility="visible"
