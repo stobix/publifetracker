@@ -17,40 +17,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import static android.util.Log.d;
 
     public class MainActivity extends AppCompatActivity
             implements DatePickerFragment.DatePickerHandler, TimePickerFragment.TimePickerHandler {
 
+        // TODO Find out how to safely remove support for native libs. I'll probably never use it.
         // Used to load the 'native-lib' library on application startup.
         static {
             System.loadLibrary("native-lib");
-        }
-
-        Random random = new Random();
-
-        private String rndStr() {
-            byte[] foo = new byte[30];
-            random.nextBytes(foo);
-            return String.format("%s", foo);
-        }
-
-        private int rndSgr() {
-            return random.nextInt(300) + 10;
-        }
-
-        private Date rndDat() {
-            Date d = new Date();
-            d.setMinutes(random.nextInt(60));
-            d.setHours(random.nextInt(24));
-            d.setMonth(random.nextInt(12));
-            d.setDate(random.nextInt(31));
-            d.setYear(random.nextInt(2) + 115);
-            return d;
         }
 
         // Made static (i.e. no outer scope references) to prevent memory issues, since lint complained about the anonymous class instance.
@@ -68,7 +45,8 @@ import static android.util.Log.d;
             public void handleMessage(Message msg) {
                 Bundle b = msg.getData();
                 ArrayList<SugarEntry> arrayEntries = b.getParcelableArrayList("entries");
-                tableView.setDataAdapter(new SugarEntryTableDataAdapter(context, arrayEntries));
+                if(arrayEntries!=null)
+                    tableView.setDataAdapter(new SugarEntryTableDataAdapter(context, arrayEntries));
             }
         }
 
@@ -105,8 +83,8 @@ import static android.util.Log.d;
 
                 List<SugarEntry> entries = dao.getAll();
                 // TODO remove this line at some point, when entry adding functionality is present
-                dao.insert(new SugarEntry(entries.size() + 1, rndDat(), rndSgr(), rndStr()));
-                entries = dao.getAll();
+                // dao.insert(new SugarEntry(entries.size() + 1, rndDat(), rndSgr(), rndStr()));
+                // entries = dao.getAll();
 
                 Message msg = db_data_handler.obtainMessage();
                 Bundle bundle = new Bundle();
