@@ -24,12 +24,6 @@ import static android.util.Log.d;
     public class MainActivity extends AppCompatActivity
             implements DatePickerFragment.DatePickerHandler, TimePickerFragment.TimePickerHandler {
 
-        // TODO Find out how to safely remove support for native libs. I'll probably never use it.
-        // Used to load the 'native-lib' library on application startup.
-        static {
-            System.loadLibrary("native-lib");
-        }
-
         // Made static (i.e. no outer scope references) to prevent memory issues, since lint complained about the anonymous class instance.
         // See https://stackoverflow.com/questions/11407943/this-handler-class-should-be-static-or-leaks-might-occur-incominghandler
         private static class DBHandler extends Handler {
@@ -136,11 +130,6 @@ import static android.util.Log.d;
             newFragment.show(getSupportFragmentManager(), "timePicker");
         }
 
-        /**
-         * A native method that is implemented by the 'native-lib' native library,
-         * which is packaged with this application.
-         */
-        public native String stringFromJNI();
 
         @Override
         public void handleDate(int year, int month, int day) {
