@@ -17,13 +17,36 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import static android.util.Log.d;
 
     public class MainActivity extends AppCompatActivity
             implements DatePickerFragment.DatePickerHandler, TimePickerFragment.TimePickerHandler {
 
+        Random random = new Random();
+
+        private String rndStr() {
+            byte[] foo=new byte[30];
+            random.nextBytes(foo);
+            return String.format("%s", foo);
+        }
+
+        private int rndSgr() {
+            return random.nextInt(300)+10;
+        }
+
+        private Date rndDat() {
+            Date d = new Date();
+            d.setMinutes(random.nextInt(60));
+            d.setHours(random.nextInt(24));
+            d.setMonth(random.nextInt(12));
+            d.setDate(random.nextInt(31));
+            d.setYear(random.nextInt(2)+115);
+            return d;
+        }
         // Made static (i.e. no outer scope references) to prevent memory issues, since lint complained about the anonymous class instance.
         // See https://stackoverflow.com/questions/11407943/this-handler-class-should-be-static-or-leaks-might-occur-incominghandler
         private static class DBHandler extends Handler {
@@ -77,8 +100,9 @@ import static android.util.Log.d;
 
                 List<SugarEntry> entries = dao.getAll();
                 // TODO remove this line at some point, when entry adding functionality is present
-                // dao.insert(new SugarEntry(entries.size() + 1, rndDat(), rndSgr(), rndStr()));
-                // entries = dao.getAll();
+                dao.insert(new SugarEntry(entries.size() + 1, rndDat(), rndSgr(), rndStr()));
+                entries = dao.getAll();
+                d("LOL","Entries"+entries.size());
 
                 Message msg = db_data_handler.obtainMessage();
                 Bundle bundle = new Bundle();

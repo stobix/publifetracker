@@ -6,6 +6,8 @@ import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Date;
+
 import static android.arch.persistence.room.ColumnInfo.INTEGER;
 
 /**
@@ -20,6 +22,10 @@ public class SugarEntry implements Parcelable{
         this.epochTimestamp=epochTimestamp;
         this.sugarLevel=sugarLevel;
         this.extra=extra;
+    }
+
+    SugarEntry(int uid, Date date, int sugarLevel, String extra){
+        this(uid,date.getTime(),sugarLevel,extra);
     }
 
     @PrimaryKey
