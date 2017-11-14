@@ -1,15 +1,11 @@
 package com.example.stobix.myapplication;
 
-import java.util.Date;
-
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import static android.arch.persistence.room.ColumnInfo.BLOB;
 import static android.arch.persistence.room.ColumnInfo.INTEGER;
 
 /**
@@ -18,10 +14,6 @@ import static android.arch.persistence.room.ColumnInfo.INTEGER;
 
 @Entity(tableName="sugar_entries")
 public class SugarEntry implements Parcelable{
-
-    SugarEntry(int uid, Date date,int sugarLevel,String extra){
-        this(uid,date.getTime(),sugarLevel,extra);
-    }
 
     SugarEntry(int uid, long epochTimestamp,int sugarLevel,String extra){
         this.uid=uid;
@@ -48,6 +40,14 @@ public class SugarEntry implements Parcelable{
         return 0;
     }
 
+    private SugarEntry(Parcel parcel) {
+        // IMPORTANT: These calls need to be in the same order as in writeToParcel below!
+        this(   parcel.readInt(), // uid
+                parcel.readLong(), // timestamp
+                parcel.readInt(), // sugar
+                parcel.readString()); // extra
+    }
+
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(uid);
@@ -56,22 +56,10 @@ public class SugarEntry implements Parcelable{
         parcel.writeString(extra);
     }
 
-    private SugarEntry(Parcel in) {
-        // Since the call to this needs to be first for whatever reason, I can't
-        // assign these values to variables before sending them to the main
-        // constructor.
-
-        // IMPORTANT: These calls need to be in the same order as in writeToParcel above!
-        this(   in.readInt(), // uid
-                in.readLong(), // timestamp
-                in.readInt(), // sugar
-                in.readString()); // extra
-    }
-
     public static final Parcelable.Creator<SugarEntry> CREATOR
             = new Parcelable.Creator<SugarEntry>() {
-        public SugarEntry createFromParcel(Parcel in) {
-            return new SugarEntry(in);
+        public SugarEntry createFromParcel(Parcel parcel) {
+            return new SugarEntry(parcel);
         }
 
          public SugarEntry[] newArray(int size) {

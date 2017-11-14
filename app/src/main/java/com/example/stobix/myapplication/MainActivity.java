@@ -118,16 +118,11 @@ import static android.util.Log.d;
         }
 
         public void showDatePicker(View view) {
-
-            // TODO https://developer.android.com/guide/components/fragments.html#EventCallbacks
-            DialogFragment newFragment = new DatePickerFragment();
-            newFragment.show(getSupportFragmentManager(), "datePicker");
+            new DatePickerFragment().show(getSupportFragmentManager(), "datePicker");
         }
 
         public void showTimePicker(View view) {
-
-            DialogFragment newFragment = new TimePickerFragment();
-            newFragment.show(getSupportFragmentManager(), "timePicker");
+            new TimePickerFragment().show(getSupportFragmentManager(), "timePicker");
         }
 
 

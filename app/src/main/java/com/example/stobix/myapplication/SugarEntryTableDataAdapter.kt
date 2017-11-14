@@ -5,20 +5,19 @@ import android.text.format.DateFormat
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-
 import java.util.ArrayList
 import java.util.Date
-
 import de.codecrafters.tableview.TableDataAdapter
-
 import android.util.Log.d
-import java.lang.String as JString
 
 /**
  * Created by stobix on 11/11/17.
  */
 
-class SugarEntryTableDataAdapter(context: Context, entries: ArrayList<SugarEntry>) : TableDataAdapter<SugarEntry>(context, entries) {
+class SugarEntryTableDataAdapter(
+        context: Context,
+        entries: ArrayList<SugarEntry>
+) : TableDataAdapter<SugarEntry>(context, entries) {
 
     override fun getCellView(rowIndex: Int, columnIndex: Int, parentView: ViewGroup): View {
         val currRow = getRowData(rowIndex)
@@ -29,10 +28,10 @@ class SugarEntryTableDataAdapter(context: Context, entries: ArrayList<SugarEntry
                 val myDateString = DateFormat.format(formatString, myDate).toString()
                 renderString(myDateString)
             }
-            1 ->  renderString(JString.format("%.1f", currRow.sugarLevel / 10f))
+            1 ->  renderString(String.format("%.1f", currRow.sugarLevel / 10f))
             2 ->  renderString(currRow.extra)
-            else -> renderString("")
-            }
+            else -> renderString("N/A")
+        }
     }
 
     private fun renderString(value: String): View {
