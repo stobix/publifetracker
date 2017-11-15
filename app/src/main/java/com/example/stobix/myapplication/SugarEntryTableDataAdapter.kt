@@ -12,6 +12,7 @@ import android.util.Log.d
 
 /**
  * Created by stobix on 11/11/17.
+ *
  */
 
 class SugarEntryTableDataAdapter(
@@ -29,7 +30,7 @@ class SugarEntryTableDataAdapter(
                 renderString(myDateString)
             }
             1 ->  renderString(String.format("%.1f", currRow.sugarLevel / 10f))
-            2 ->  renderString(currRow.extra)
+            2 ->  renderString(currRow.extra ?: "")
             else -> renderString("N/A")
         }
     }

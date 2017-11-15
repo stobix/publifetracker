@@ -15,6 +15,7 @@ import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 
 /**
  * Created by stobix on 11/11/17.
+ *
  */
 
 public class SortableSugarEntryTableView extends SortableTableView<SugarEntry> {
@@ -53,11 +54,16 @@ public class SortableSugarEntryTableView extends SortableTableView<SugarEntry> {
         setColumnModel(tableColumnWeightModel);
 
         setColumnComparator(0, (a,b) -> {
-            long x=a.epochTimestamp-b.epochTimestamp;
+            long x= a.getEpochTimestamp() - b.getEpochTimestamp();
             return (x>0)?1:(x<0)?-1:0;
         });
-        setColumnComparator(1, (a,b) -> a.sugarLevel-b.sugarLevel);
-        setColumnComparator(2, (a,b) -> a.extra.compareTo(b.extra));
+        setColumnComparator(1, (a,b) -> a.getSugarLevel() - b.getSugarLevel());
+        setColumnComparator(2, (a,b) -> {
+                    if(a.getExtra()== null) return 1;
+                    else if(b.getExtra() == null) return -1;
+                    else return a.getExtra().compareTo(b.getExtra());
+                }
+        );
     }
 
 }
