@@ -25,14 +25,14 @@ import android.arch.persistence.room.ColumnInfo.INTEGER
 
     By setting a default value for all constructor parameters, I get an empty constructor for free.
     */
-class SugarEntry constructor(
+data class SugarEntry constructor(
         @PrimaryKey var uid: Int=0, // TODO Should this even have a default value?
         @ColumnInfo(name = "timestamp", typeAffinity = INTEGER) var epochTimestamp: Long=0, // TODO Should this be a nullable in the database?
         @ColumnInfo(name = "sugar") var sugarLevel: Int=-1, // TODO Should this be a nullable in the database?
         @ColumnInfo(name = "extra") var extra: String?=null
 ) : Parcelable {
 
-    constructor(uid: Int, date: Date?, sugarLevel: Int, extra: String?) : this(uid, date?.time ?: 0L, sugarLevel, extra) {}
+    constructor(uid: Int, date: Date?, sugarLevel: Int, extra: String?) : this(uid, date?.time ?: 0L, sugarLevel, extra)
 
     // The rest of this file describes how to destruct a SugarEntry into a Parcel,
     // and how to get it back.
