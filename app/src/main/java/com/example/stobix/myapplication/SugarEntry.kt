@@ -37,9 +37,7 @@ data class SugarEntry constructor(
     // The rest of this file describes how to destruct a SugarEntry into a Parcel,
     // and how to get it back.
 
-    override fun describeContents(): Int {
-        return 0
-    }
+    override fun describeContents(): Int = 0
 
     // IMPORTANT: These calls need to be in the same order as in writeToParcel below!
     private constructor(parcel: Parcel) : this(
@@ -57,13 +55,7 @@ data class SugarEntry constructor(
     }
 
     companion object CREATOR: Parcelable.Creator<SugarEntry> {
-            override fun createFromParcel(parcel: Parcel): SugarEntry {
-                return SugarEntry(parcel)
-            }
-
-            override fun newArray(size: Int): Array<SugarEntry?> {
-                return arrayOfNulls(size)
-            }
+            override fun createFromParcel(parcel: Parcel): SugarEntry = SugarEntry(parcel)
+            override fun newArray(size: Int): Array<SugarEntry?> = arrayOfNulls(size)
     }
-
 }
