@@ -13,7 +13,7 @@
         android:layout_width="48dp"
         android:layout_height="50dp"
         app:layout_constraintBottom_toTopOf="@+id/tableView"
-        app:layout_constraintEnd_toStartOf="@+id/editText2"
+        app:layout_constraintEnd_toStartOf="@+id/dateEditText"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,7 +25,7 @@
         /> -->
 
     <EditText
-        android:id="@+id/editText2"
+        android:id="@+id/dateEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -39,7 +39,7 @@
         android:visibility="visible"
 
         app:layout_constraintBottom_toTopOf="@+id/tableView"
-        app:layout_constraintEnd_toStartOf="@+id/editText3"
+        app:layout_constraintEnd_toStartOf="@+id/sugarEditText"
 
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintHorizontal_weight="1"
@@ -47,7 +47,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/editText3"
+        android:id="@+id/sugarEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -58,13 +58,13 @@
         android:visibility="visible"
 
         app:layout_constraintBottom_toTopOf="@+id/tableView"
-        app:layout_constraintEnd_toStartOf="@+id/editText4"
+        app:layout_constraintEnd_toStartOf="@+id/extraEditText"
 
         app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintStart_toEndOf="@+id/editText2" />
+        app:layout_constraintStart_toEndOf="@+id/dateEditText" />
 
     <EditText
-        android:id="@+id/editText4"
+        android:id="@+id/extraEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="@string/input_extra"
@@ -76,7 +76,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_weight="1"
 
-        app:layout_constraintStart_toEndOf="@+id/editText3" />
+        app:layout_constraintStart_toEndOf="@+id/sugarEditText" />
 
     <com.example.stobix.myapplication.SortableSugarEntryTableView
         android:id="@+id/tableView"
@@ -84,7 +84,7 @@
         android:layout_height="wrap_content"
         android:visibility="visible"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText2"
+        app:layout_constraintTop_toBottomOf="@+id/dateEditText"
         app:tableView_columnCount="4"
         tools:layout_editor_absoluteX="0dp" />
 

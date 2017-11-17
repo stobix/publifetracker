@@ -7,20 +7,19 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-
 import static android.util.Log.d;
 
     public class MainActivity extends AppCompatActivity
@@ -89,6 +88,7 @@ import static android.util.Log.d;
                 }
             }
             */
+
             Runnable initiateDB = () -> {
                 SugarEntryDatabase db =
                         Room.databaseBuilder(
@@ -115,6 +115,29 @@ import static android.util.Log.d;
             Thread dbInitThread = new Thread(initiateDB);
             dbInitThread.start();
 
+
+
+            EditText datumText = findViewById(R.id.dateEditText);
+            d("muh","loltext");
+
+            datumText.addTextChangedListener(new TextWatcher() {
+
+                public void afterTextChanged(Editable s) {
+
+                    d("Event handling","(Changed) Received ");
+                    // you can call or do what you want with your EditText here
+                    //datumText. ...
+
+                }
+
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    d("Event handling","(Before Changed) Received ");
+                }
+
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    d("Event handling","(After Changed) Received ");
+                }
+            });
         }
 
         // TODO Add a method for adding an entry to the database
@@ -152,7 +175,7 @@ import static android.util.Log.d;
 
         @Override
         public void handleDate(int year, int month, int day) {
-            EditText t = findViewById(R.id.editText2);
+            EditText t = findViewById(R.id.dateEditText);
             if (t != null) {
                 String s = year + " " + month + " " + day;
                 t.setText(s, TextView.BufferType.NORMAL);
@@ -161,7 +184,7 @@ import static android.util.Log.d;
 
         @Override
         public void handleTime(int hour, int minute) {
-            EditText t = findViewById(R.id.editText2);
+            EditText t = findViewById(R.id.dateEditText);
             if (t != null) {
                 String s = hour + " " + minute;
                 t.setText(s, TextView.BufferType.NORMAL);
