@@ -41,5 +41,4 @@ class SugarEntryTableDataAdapter(
         textView.setPadding(20, 10, 20, 10)
         return textView
     }
-
 }

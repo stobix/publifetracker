@@ -1,5 +1,6 @@
 package com.example.stobix.myapplication;
 
+import android.annotation.SuppressLint;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ import static android.util.Log.d;
             return random.nextInt(300)+10;
         }
 
+        @SuppressWarnings("deprecation")
         private Date rndDat() {
             Date d = new Date();
             d.setMinutes(random.nextInt(60));
@@ -47,21 +49,53 @@ import static android.util.Log.d;
             d.setYear(random.nextInt(2)+115);
             return d;
         }
+
+        protected int sugarIndex ;
+
+        SugarEntry createNewTempEntry(){
+            d("TempEntry","Create");
+            SugarEntry s=new SugarEntry();
+            s.setUid(sugarIndex);
+            return s;
+        }
+
+        void submitSugarEntry(SugarEntry s){
+            if(s.getEpochTimestamp()!=0L){
+                if(s.getUid() != 0){
+                    d("TempEntry","Submit");
+                    // when successful:
+                    // sugarIndex++;
+                    // s.setUid(sugarIndex) or createNewTempEntry()
+                }
+            }
+        }
+
+        public void setSugarIndex(int sugarIndex) {
+            d("TempEntry","Setting index to "+sugarIndex);
+            this.sugarIndex = sugarIndex;
+        }
+
+        public int getSugarIndex(){
+            return sugarIndex;
+        }
+
         // Made static (i.e. no outer scope references) to prevent memory issues, since lint complained about the anonymous class instance.
         // See https://stackoverflow.com/questions/11407943/this-handler-class-should-be-static-or-leaks-might-occur-incominghandler
         private static class DBHandler extends Handler {
-            final Context context;
+            final MainActivity context;
             final SortableSugarEntryTableView tableView;
 
-            DBHandler(Context outer_context, SortableSugarEntryTableView view) {
+            DBHandler(MainActivity outer_context, SortableSugarEntryTableView view) {
                 context = outer_context;
                 tableView = view;
             }
+
 
             @Override
             public void handleMessage(Message msg) {
                 Bundle b = msg.getData();
                 ArrayList<SugarEntry> arrayEntries = b.getParcelableArrayList("entries");
+                context.setSugarIndex(arrayEntries.size());
                 if(arrayEntries!=null)
                     tableView.setDataAdapter(new SugarEntryTableDataAdapter(context, arrayEntries));
             }
@@ -150,6 +184,11 @@ import static android.util.Log.d;
         }
 
 
+        /*
+           TODO Have something like a "class global" state/handler that receives a date or time to be inserted into the database after the user submits all fields.
+            Don't reset the date thing after submission.
+         */
+
         @Override
         public void handleDate(int year, int month, int day) {
             EditText t = findViewById(R.id.editText2);
@@ -157,6 +196,7 @@ import static android.util.Log.d;
                 String s = year + " " + month + " " + day;
                 t.setText(s, TextView.BufferType.NORMAL);
             }
+            showTimePicker(t);
         }
 
         @Override

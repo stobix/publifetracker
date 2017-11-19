@@ -73,6 +73,7 @@
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/tableView"
 
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_weight="1"
 
