@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/entryCreatorDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -17,7 +17,7 @@
         tools:layout_editor_absoluteY="16dp" />
 
     <EditText
-        android:id="@+id/editText5"
+        android:id="@+id/entryCreatorTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -27,7 +27,7 @@
         tools:layout_editor_absoluteY="62dp" />
 
     <EditText
-        android:id="@+id/editText7"
+        android:id="@+id/entryCreatorSugar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -39,7 +39,7 @@
         tools:layout_editor_absoluteY="108dp" />
 
     <EditText
-        android:id="@+id/editText8"
+        android:id="@+id/entryCreatorExtra"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"

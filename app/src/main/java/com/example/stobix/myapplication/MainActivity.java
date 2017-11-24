@@ -1,6 +1,8 @@
 package com.example.stobix.myapplication;
 
 import android.annotation.SuppressLint;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.os.Bundle;
@@ -75,6 +77,20 @@ import static android.util.Log.d;
             this.sugarIndex = sugarIndex;
         }
 
+        public void showEnterer() {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+            if (prev != null) {
+                ft.remove(prev);
+            }
+            ft.addToBackStack(null);
+
+            // Create and show the dialog.
+            SugarEntryCreationActivity newFragment = SugarEntryCreationActivity.Companion.newInstance(0,0);
+            newFragment.show(ft, "dialog");
+
+        }
+
         public int getSugarIndex(){
             return sugarIndex;
         }
@@ -110,8 +126,10 @@ import static android.util.Log.d;
 
             FloatingActionButton fab = findViewById(R.id.fab);
             fab.setOnClickListener(view ->
-                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show());
+                    showEnterer()
+                    //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                    //        .setAction("Action", null).show()
+            );
 
 
             Handler db_data_handler = new DBHandler(this, findViewById(R.id.tableView));
