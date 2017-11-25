@@ -86,9 +86,18 @@ import static android.util.Log.d;
             ft.addToBackStack(null);
 
             // Create and show the dialog.
-            SugarEntryCreationActivity newFragment = SugarEntryCreationActivity.Companion.newInstance(0,0);
+            SugarEntryCreationActivity newFragment = SugarEntryCreationActivity.Create.newInstance(0,0);
             newFragment.show(ft, "dialog");
+        }
 
+        public void closeEnterer() {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            Fragment closeMe = getFragmentManager().findFragmentByTag("dialog");
+            if (closeMe != null) {
+                d("SugarEntry(close)","closing");
+                ft.remove(closeMe);
+            } else d("SugarEntry(close)","null, not closing");
+            ft.addToBackStack(null);
         }
 
         public int getSugarIndex(){
