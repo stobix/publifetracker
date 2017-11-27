@@ -19,6 +19,8 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,7 +29,11 @@ import java.util.Random;
 import static android.util.Log.d;
 
     public class MainActivity extends AppCompatActivity
-            implements DatePickerFragment.DatePickerHandler, TimePickerFragment.TimePickerHandler {
+            implements
+            DatePickerFragment.DatePickerHandler,
+            TimePickerFragment.TimePickerHandler,
+            SugarEntryCreationActivity.OnSugarEntryEnteredHandler
+    {
 
         Random random = new Random();
 
@@ -77,7 +83,10 @@ import static android.util.Log.d;
             this.sugarIndex = sugarIndex;
         }
 
+        public int getSugarIndex(){ return sugarIndex; }
+
         public void showEnterer() {
+            d("SugarEntry show","weeeee");
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             Fragment prev = getFragmentManager().findFragmentByTag("dialog");
             if (prev != null) {
@@ -86,13 +95,17 @@ import static android.util.Log.d;
             ft.addToBackStack(null);
 
             // Create and show the dialog.
-            SugarEntryCreationActivity newFragment = SugarEntryCreationActivity.Companion.newInstance(0,0);
+            SugarEntryCreationActivity newFragment = SugarEntryCreationActivity.Companion.newInstance(currMaxUID);
             newFragment.show(ft, "dialog");
 
         }
 
-        public int getSugarIndex(){
-            return sugarIndex;
+
+
+        @Override
+        public void onSugarEntryEntered(@NotNull SugarEntry s) {
+            dao.insert(s);
+            // TODO "Add to database!"
         }
 
         // Made static (i.e. no outer scope references) to prevent memory issues, since lint complained about the anonymous class instance.
@@ -116,6 +129,9 @@ import static android.util.Log.d;
                     tableView.setDataAdapter(new SugarEntryTableDataAdapter(context, arrayEntries));
             }
         }
+
+        private SugarEntryDao dao;
+        private int currMaxUID;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -148,13 +164,14 @@ import static android.util.Log.d;
                                 SugarEntryDatabase.class,
                                 "sugarApp").build();
 
-                SugarEntryDao dao = db.userDao();
+                dao = db.userDao();
 
                 List<SugarEntry> entries = dao.getAll();
                 // TODO remove this line at some point, when entry adding functionality is present
                 dao.insert(new SugarEntry(entries.size() + 1, rndDat(), rndSgr(), rndStr()));
                 entries = dao.getAll();
                 d("LOL","Entries"+entries.size());
+                currMaxUID=entries.size();
 
                 Message msg = db_data_handler.obtainMessage();
                 Bundle bundle = new Bundle();

@@ -1,5 +1,6 @@
 package com.example.stobix.myapplication
 
+import android.annotation.SuppressLint
 import android.app.DialogFragment
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -15,27 +16,34 @@ import java.util.*
  * Created by stobix on 11/19/17.
  */
 
-class SugarEntryCreationActivity() : DialogFragment(), DatePickerFragment.DatePickerHandler, TimePickerFragment.TimePickerHandler {
+class SugarEntryCreationActivity
+@SuppressLint("ValidFragment") constructor
+(
+        var entry: SugarEntry = SugarEntry()
+) : DialogFragment( ), DatePickerFragment.DatePickerHandler, TimePickerFragment.TimePickerHandler {
+
+    //constructor() :  this(SugarEntry())
 
 
-    private var entry: SugarEntry = SugarEntry()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        d("SugarEntry create","weeeee");
         super.onCreate(savedInstanceState)
-        entry = SugarEntry()
-        entry.uid = savedInstanceState?.getInt("uid") ?: throw Error("uid not provided in bundle!")
-        entry.epochTimestamp = savedInstanceState.getLong("timestamp")
+        entry.uid = arguments.getInt("uid")
+        entry.epochTimestamp = arguments.getLong("timestamp")
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val v = inflater?.inflate(R.layout.activity_sugar_entry_creation, container, false)
         if (v != null) {
             val dateV: TextView= v.findViewById(R.id.entryCreatorDate)
-            val timeV: TextView= v.findViewById(R.id.entryCreatorDate)
+            val timeV: TextView= v.findViewById(R.id.entryCreatorTime)
             val date = Date(entry.epochTimestamp)
-            dateV.text=""+date.year+date.month+date.day
-            timeV.text=""+date.hours+date.minutes+date.seconds
+            val dateText=""+(1900+date.year)+"/"+date.month+"/"+date.day
+            val timeText=""+date.hours+":"+date.minutes+":"+date.seconds
+            dateV.text=dateText
+            timeV.text=timeText
             return v
         } else throw Error("could not create view")
     }
@@ -45,10 +53,11 @@ class SugarEntryCreationActivity() : DialogFragment(), DatePickerFragment.DatePi
         fun onSugarEntryEntered(s: SugarEntry);
     }
 
-    fun onSubmit(){
+    fun onSubmit(v: View){
         TODO("Check entry, Submit entry, Create new entry")
-        //val onSugarEntryHandler = activity as OnSugarEntryEnteredHandler
-        //onSugarEntryHandler.onSugarEntryEntered(entry)
+
+        val onSugarEntryHandler = activity as OnSugarEntryEnteredHandler
+        onSugarEntryHandler.onSugarEntryEntered(entry)
     }
 
     fun onSubmitAndClose(){
@@ -75,7 +84,8 @@ class SugarEntryCreationActivity() : DialogFragment(), DatePickerFragment.DatePi
     // ...
 
     companion object{
-        fun newInstance(uid: Int, timestamp: Long = Date().time) : SugarEntryCreationActivity{
+        fun newInstance(uid: Int) = newInstance(uid,Date().time)
+        fun newInstance(uid: Int, timestamp: Long ) : SugarEntryCreationActivity{
             val s = SugarEntryCreationActivity()
             val args = Bundle()
             d("EntryCreation","Called with uid:"+uid+" timestamp:"+timestamp)

@@ -1,88 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context="com.example.stobix.myapplication.SugarEntryCreationActivity" >
 
     <EditText
         android:id="@+id/entryCreatorDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
         android:inputType="date"
         android:singleLine="true"
         android:text="@string/input_date"
-        tools:layout_editor_absoluteX="7dp"
-        tools:layout_editor_absoluteY="16dp" />
+        app:layout_constraintBottom_toTopOf="@+id/entryCreatorTime"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/entryCreatorTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
         android:ems="10"
         android:inputType="time"
         android:singleLine="true"
-        tools:layout_editor_absoluteX="7dp"
-        tools:layout_editor_absoluteY="62dp" />
+        app:layout_constraintBottom_toTopOf="@+id/entryCreatorSugar"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
         android:id="@+id/entryCreatorSugar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:ems="10"
         android:inputType="numberDecimal"
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:text="@string/input_sugar"
-        tools:layout_editor_absoluteX="7dp"
-        tools:layout_editor_absoluteY="108dp" />
+        app:layout_constraintBottom_toTopOf="@+id/entryCreatorExtra"
+        tools:layout_editor_absoluteX="7dp" />
 
     <EditText
         android:id="@+id/entryCreatorExtra"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:selectAllOnFocus="true"
         android:text="Extra"
-        tools:layout_editor_absoluteX="7dp"
-        tools:layout_editor_absoluteY="154dp" />
+        app:layout_constraintBottom_toTopOf="@+id/spinner"
+        tools:layout_editor_absoluteX="7dp" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/entryAddClose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
         android:text="Add and close"
-        tools:layout_editor_absoluteX="238dp"
-        tools:layout_editor_absoluteY="447dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerView" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/entryAdd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
         android:text="Add"
-        tools:layout_editor_absoluteX="148dp"
-        tools:layout_editor_absoluteY="447dp" />
+        android:onClick="onSubmit"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/entryAddClose"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerView" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/EntryClose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
         android:text="Close"
-        tools:layout_editor_absoluteX="60dp"
-        tools:layout_editor_absoluteY="447dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/entryAdd"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerView" />
 
     <Spinner
         android:id="@+id/spinner"
         android:layout_width="368dp"
         android:layout_height="wrap_content"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="256dp" />
+        app:layout_constraintBottom_toTopOf="@+id/recyclerView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
         android:layout_width="368dp"
         android:layout_height="151dp"
-        tools:layout_editor_absoluteX="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="288dp" />
 </android.support.constraint.ConstraintLayout>
