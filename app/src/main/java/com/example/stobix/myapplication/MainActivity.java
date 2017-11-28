@@ -1,16 +1,12 @@
 package com.example.stobix.myapplication;
 
-import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.arch.persistence.room.Room;
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -95,26 +91,52 @@ import static android.util.Log.d;
             ft.addToBackStack(null);
 
             // Create and show the dialog.
-            SugarEntryCreationActivity newFragment = SugarEntryCreationActivity.Companion.newInstance(currMaxUID);
+            SugarEntryCreationActivity newFragment = SugarEntryCreationActivity.Companion.newInstance(nextUID);
             newFragment.show(ft, "dialog");
 
         }
 
-
-
         @Override
         public void onSugarEntryEntered(@NotNull SugarEntry s) {
-            dao.insert(s);
-            // TODO "Add to database!"
+            nextUID++;
+            Handler db_data_handler = new InsertHandler(this, findViewById(R.id.tableView));
+            (new Thread(
+                    () -> {
+                        dao.insert(s);
+
+                        Message msg = db_data_handler.obtainMessage();
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable("entry", s);
+                        msg.setData(bundle);
+                        db_data_handler.sendMessage(msg);
+                    }
+            ) ).start();
+        }
+
+
+        private static class InsertHandler extends Handler {
+            final MainActivity context;
+            final SortableSugarEntryTableView tableView;
+
+            InsertHandler(MainActivity outer_context, SortableSugarEntryTableView view) {
+                context = outer_context;
+                tableView = view;
+            }
+            @Override
+            public void handleMessage(Message msg) {
+                Bundle b = msg.getData();
+                SugarEntry s = b.getParcelable("entry");
+                tableView.getDataAdapter().add(s);
+            }
         }
 
         // Made static (i.e. no outer scope references) to prevent memory issues, since lint complained about the anonymous class instance.
         // See https://stackoverflow.com/questions/11407943/this-handler-class-should-be-static-or-leaks-might-occur-incominghandler
-        private static class DBHandler extends Handler {
+        private static class UpdateHandler extends Handler {
             final MainActivity context;
             final SortableSugarEntryTableView tableView;
 
-            DBHandler(MainActivity outer_context, SortableSugarEntryTableView view) {
+            UpdateHandler(MainActivity outer_context, SortableSugarEntryTableView view) {
                 context = outer_context;
                 tableView = view;
             }
@@ -131,7 +153,7 @@ import static android.util.Log.d;
         }
 
         private SugarEntryDao dao;
-        private int currMaxUID;
+        private int nextUID;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -148,7 +170,7 @@ import static android.util.Log.d;
             );
 
 
-            Handler db_data_handler = new DBHandler(this, findViewById(R.id.tableView));
+            Handler db_data_handler = new UpdateHandler(this, findViewById(R.id.tableView));
 
             /*
             Runnable initiateDB = new Runnable(){
@@ -171,7 +193,7 @@ import static android.util.Log.d;
                 dao.insert(new SugarEntry(entries.size() + 1, rndDat(), rndSgr(), rndStr()));
                 entries = dao.getAll();
                 d("LOL","Entries"+entries.size());
-                currMaxUID=entries.size();
+                nextUID=entries.size()+1;
 
                 Message msg = db_data_handler.obtainMessage();
                 Bundle bundle = new Bundle();

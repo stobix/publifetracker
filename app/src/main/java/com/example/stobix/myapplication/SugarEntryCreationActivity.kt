@@ -8,6 +8,7 @@ import android.util.Log.d
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import java.util.*
 
@@ -16,7 +17,7 @@ import java.util.*
  * Created by stobix on 11/19/17.
  */
 
-class SugarEntryCreationActivity
+open class SugarEntryCreationActivity
 @SuppressLint("ValidFragment") constructor
 (
         var entry: SugarEntry = SugarEntry()
@@ -35,17 +36,28 @@ class SugarEntryCreationActivity
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        d("SugarEntry view","weeeee");
         val v = inflater?.inflate(R.layout.activity_sugar_entry_creation, container, false)
-        if (v != null) {
-            val dateV: TextView= v.findViewById(R.id.entryCreatorDate)
-            val timeV: TextView= v.findViewById(R.id.entryCreatorTime)
-            val date = Date(entry.epochTimestamp)
-            val dateText=""+(1900+date.year)+"/"+date.month+"/"+date.day
-            val timeText=""+date.hours+":"+date.minutes+":"+date.seconds
-            dateV.text=dateText
-            timeV.text=timeText
-            return v
-        } else throw Error("could not create view")
+
+        v ?:throw Error("could not create view")
+
+        val dateV: TextView= v.findViewById(R.id.entryCreatorDate)
+        val timeV: TextView= v.findViewById(R.id.entryCreatorTime)
+        val date = Date(entry.epochTimestamp)
+        val dateText=""+(1900+date.year)+"/"+date.month+"/"+date.day
+        val timeText=""+date.hours+":"+date.minutes+":"+date.seconds
+        dateV.text=dateText
+        timeV.text=timeText
+
+        val sugarV = v.findViewById<TextView>(R.id.entryCreatorSugar)
+        val extraV = v.findViewById<TextView>(R.id.entryCreatorExtra)
+
+        v.findViewById<Button>(R.id.entryAdd).setOnClickListener {onSubmit(dateV,timeV,sugarV,extraV)}
+        v.findViewById<Button>(R.id.entryClose).setOnClickListener { onClose() }
+        v.findViewById<Button>(R.id.entryAddClose).setOnClickListener { onSubmitAndClose(dateV,timeV,sugarV,extraV) }
+
+        return v
+
     }
 
     // Sending a full SugarEntry since I'm not sure what fields it will contain in the future.
@@ -53,14 +65,25 @@ class SugarEntryCreationActivity
         fun onSugarEntryEntered(s: SugarEntry);
     }
 
-    fun onSubmit(v: View){
-        TODO("Check entry, Submit entry, Create new entry")
+    fun onSubmit(dateV: TextView, timeV: TextView, sugarV: TextView, extraV: TextView) {
+        d("SugarEntry submit", "wee")
+        //TODO("Check entry, Submit entry, Create new entry")
+        entry.sugarLevel = try {
+            (java.lang.Float.valueOf(sugarV.text?.toString()?:"0")*10).toInt()
+        }
+        catch (_: Exception) {
+           0
+        }
+        entry.extra = extraV?.text?.toString()?:"N/A"
 
-        val onSugarEntryHandler = activity as OnSugarEntryEnteredHandler
-        onSugarEntryHandler.onSugarEntryEntered(entry)
+
+        d("SugarEntry submit", ""+entry.uid+" "+entry.epochTimestamp+" "+entry.sugarLevel+" "+entry.extra)
+
+
+        (activity as OnSugarEntryEnteredHandler).onSugarEntryEntered(entry)
     }
 
-    fun onSubmitAndClose(){
+    fun onSubmitAndClose(dateV: TextView, timeV: TextView, sugarV: TextView, extraV: TextView) {
         TODO("Check entry, Submit entry, Close view")
 
     }
