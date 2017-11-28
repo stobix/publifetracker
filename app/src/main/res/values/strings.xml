@@ -7,6 +7,10 @@
         <item>Extra</item>
     </string-array>
     <string name="input_date">Date</string>
+    <string name="input_time">Time</string>
     <string name="input_sugar">Sugar</string>
     <string name="input_extra">Extra</string>
+    <string name="button_add_close">Add and close</string>
+    <string name="button_close">Close</string>
+    <string name="button_add">Add</string>
 </resources>
