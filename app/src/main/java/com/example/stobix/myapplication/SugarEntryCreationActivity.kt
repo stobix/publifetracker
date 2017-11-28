@@ -18,10 +18,17 @@ import android.widget.TextView
 open class SugarEntryCreationActivity
 @SuppressLint("ValidFragment") constructor
 (
-) : DialogFragment( ), DatePickerFragment.DatePickerHandler, TimePickerFragment.TimePickerHandler {
+) : DialogFragment( )
+        ,DatePickerFragment.DatePickerHandler
+        ,TimePickerFragment.TimePickerHandler
+        ,SendResultAble
+{
 
     private var uid: Int=0
     private var date: DateHandler= DateHandler()
+    private var dateView: TextView? = null
+    private var timeView: TextView? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         d("SugarEntry create","weeeee")
@@ -30,27 +37,33 @@ open class SugarEntryCreationActivity
         date.timestamp = arguments.getLong("timestamp")
     }
 
+    override fun receiveResult(type: String, vararg results: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         d("SugarEntry view","weeeee")
         val v = inflater?.inflate(R.layout.activity_sugar_entry_creation, container, false)
 
         v ?:throw Error("could not create view")
 
-        val dateV: TextView= v.findViewById(R.id.entryCreatorDate)
-        val timeV: TextView= v.findViewById(R.id.entryCreatorTime)
+        dateView= v.findViewById(R.id.entryCreatorDate)
+        timeView= v.findViewById(R.id.entryCreatorTime)
 
         val dateText=""+date.year+"-"+date.month+"-"+date.day
         val timeText=""+date.hour+":"+date.minute // +s":"+date.second
-        dateV.text=dateText
-        timeV.text=timeText
+        dateView!!.text=dateText
+        timeView!!.text=timeText
 
+        dateView!!.setOnClickListener { (activity as MainActivity).showDatePicker() }
+        timeView!!.setOnClickListener { (activity as MainActivity).showTimePicker() }
 
         val sugarV = v.findViewById<TextView>(R.id.entryCreatorSugar)
         val extraV = v.findViewById<TextView>(R.id.entryCreatorExtra)
 
-        v.findViewById<Button>(R.id.entryAdd).setOnClickListener {onSubmit(dateV,timeV,sugarV,extraV)}
+        v.findViewById<Button>(R.id.entryAdd).setOnClickListener {onSubmit(sugarV,extraV)}
         v.findViewById<Button>(R.id.entryClose).setOnClickListener { onClose() }
-        v.findViewById<Button>(R.id.entryAddClose).setOnClickListener { onSubmitAndClose(dateV,timeV,sugarV,extraV) }
+        v.findViewById<Button>(R.id.entryAddClose).setOnClickListener { onSubmitAndClose(sugarV,extraV) }
 
         return v
 
@@ -61,16 +74,16 @@ open class SugarEntryCreationActivity
         fun onSugarEntryEntered(s: SugarEntry)
     }
 
-    private fun onSubmit(dateV: TextView, timeV: TextView, sugarV: TextView, extraV: TextView) {
-        handleSubmission(dateV, timeV, sugarV, extraV)
+    private fun onSubmit(sugarV: TextView, extraV: TextView) {
+        handleSubmission(sugarV, extraV)
         uid++
     }
 
-    private fun onSubmitAndClose(dateV: TextView, timeV: TextView, sugarV: TextView, extraV: TextView) {
-        handleSubmission(dateV, timeV, sugarV, extraV)
+    private fun onSubmitAndClose(sugarV: TextView, extraV: TextView) {
+        handleSubmission(sugarV, extraV)
     }
 
-    private fun handleSubmission(dateV: TextView, timeV: TextView, sugarV: TextView, extraV: TextView){
+    private fun handleSubmission(sugarV: TextView, extraV: TextView){
         val entry= SugarEntry(uid,date.timestamp)
         entry.sugarLevel = try {
             (java.lang.Float.valueOf(sugarV.text?.toString()?:"0")*10).toInt()
@@ -88,18 +101,18 @@ open class SugarEntryCreationActivity
     }
 
     override fun handleDate(year: Int, month: Int, day: Int) {
-        d("SugarEntry got date",""+year+"-"+month+"-"+day)
-        TODO("Add date to entry")
+        d("SugarEntry got date", "$year-$month-$day")
+        date.setDate(year,month,day)
+        val dateText="$year-$month-$day"
+        dateView!!.setText(dateText, TextView.BufferType.NORMAL)
     }
 
     override fun handleTime(hour: Int, minute: Int) {
-        TODO("Add time to entry")
+        d("SugarEntry got time", "$hour:$minute")
+        date.setTime(hour,minute)
+        val timeText="$hour:$minute"
+        timeView!!.setText(timeText, TextView.BufferType.NORMAL)
     }
-
-    // fun handleOtherStuff
-    // fun genericHandler(int value, string which)
-    // fun genericHandler(string value, string which)
-    // ...
 
     companion object{
         fun newInstance(uid: Int) = newInstance(uid,DateHandler().timestamp)

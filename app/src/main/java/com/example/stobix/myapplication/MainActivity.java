@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 
 import org.jetbrains.annotations.NotNull;
@@ -24,10 +25,13 @@ import static android.util.Log.d;
 
     public class MainActivity extends AppCompatActivity
             implements
-//            DatePickerFragment.DatePickerHandler,
- //           TimePickerFragment.TimePickerHandler,
+            DatePickerFragment.DatePickerHandler,
+            TimePickerFragment.TimePickerHandler,
+            //NumberPicker.NumberPickerHandler,
             SugarEntryCreationActivity.OnSugarEntryEnteredHandler
     {
+
+        private SugarEntryCreationActivity creationActivity;
 
         public void showEnterer() {
             d("SugarEntry show","weeeee");
@@ -38,11 +42,12 @@ import static android.util.Log.d;
             }
             ft.addToBackStack(null);
 
-            // Create and show the dialog.
-            SugarEntryCreationActivity newFragment = SugarEntryCreationActivity.Companion.newInstance(nextUID);
-            newFragment.show(ft, "dialog");
+            creationActivity = SugarEntryCreationActivity.Companion.newInstance(nextUID);
+            creationActivity.show(ft, "dialog");
 
         }
+
+
 
         @Override
         public void onSugarEntryEntered(@NotNull SugarEntry s) {
@@ -109,11 +114,7 @@ import static android.util.Log.d;
             setSupportActionBar(toolbar);
 
             FloatingActionButton fab = findViewById(R.id.fab);
-            fab.setOnClickListener(view ->
-                    showEnterer()
-                    //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    //        .setAction("Action", null).show()
-            );
+            fab.setOnClickListener(view -> showEnterer() );
 
 
             Handler db_data_handler = new UpdateHandler(this, findViewById(R.id.tableView));
@@ -168,34 +169,21 @@ import static android.util.Log.d;
             return super.onOptionsItemSelected(item);
         }
 
-        public void showDatePicker(View view) {
+        public void showDatePicker() {
             new DatePickerFragment().show(getSupportFragmentManager(), "datePicker");
         }
 
-        public void showTimePicker(View view) {
+        public void showTimePicker() {
             new TimePickerFragment().show(getSupportFragmentManager(), "timePicker");
         }
 
-
-        /*
         @Override
         public void handleDate(int year, int month, int day) {
-            EditText t = findViewById(R.id.editText2);
-            if (t != null) {
-                String s = year + " " + month + " " + day;
-                t.setText(s, TextView.BufferType.NORMAL);
-            }
-            showTimePicker(t);
+            creationActivity.handleDate(year,month,day);
         }
-
         @Override
         public void handleTime(int hour, int minute) {
-            EditText t = findViewById(R.id.editText2);
-            if (t != null) {
-                String s = hour + " " + minute;
-                t.setText(s, TextView.BufferType.NORMAL);
-            }
-
+            creationActivity.handleTime(hour, minute) ;
         }
-        */
+
     }
