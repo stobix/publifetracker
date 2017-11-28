@@ -29,14 +29,14 @@ open class SugarEntryCreationActivity
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        d("SugarEntry create","weeeee");
+        d("SugarEntry create","weeeee")
         super.onCreate(savedInstanceState)
         entry.uid = arguments.getInt("uid")
         entry.epochTimestamp = arguments.getLong("timestamp")
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        d("SugarEntry view","weeeee");
+        d("SugarEntry view","weeeee")
         val v = inflater?.inflate(R.layout.activity_sugar_entry_creation, container, false)
 
         v ?:throw Error("could not create view")
@@ -62,35 +62,32 @@ open class SugarEntryCreationActivity
 
     // Sending a full SugarEntry since I'm not sure what fields it will contain in the future.
     interface OnSugarEntryEnteredHandler {
-        fun onSugarEntryEntered(s: SugarEntry);
+        fun onSugarEntryEntered(s: SugarEntry)
     }
 
     fun onSubmit(dateV: TextView, timeV: TextView, sugarV: TextView, extraV: TextView) {
-        d("SugarEntry submit", "wee")
-        //TODO("Check entry, Submit entry, Create new entry")
+        handleSubmission(dateV, timeV, sugarV, extraV)
+        entry= SugarEntry(entry.uid+1,entry.epochTimestamp)
+    }
+
+    fun onSubmitAndClose(dateV: TextView, timeV: TextView, sugarV: TextView, extraV: TextView) {
+        handleSubmission(dateV, timeV, sugarV, extraV)
+    }
+
+    fun handleSubmission(dateV: TextView, timeV: TextView, sugarV: TextView, extraV: TextView){
         entry.sugarLevel = try {
             (java.lang.Float.valueOf(sugarV.text?.toString()?:"0")*10).toInt()
         }
         catch (_: Exception) {
-           0
+            0
         }
-        entry.extra = extraV?.text?.toString()?:"N/A"
-
-
+        entry.extra = extraV.text?.toString()?:"N/A"
         d("SugarEntry submit", ""+entry.uid+" "+entry.epochTimestamp+" "+entry.sugarLevel+" "+entry.extra)
-
-
         (activity as OnSugarEntryEnteredHandler).onSugarEntryEntered(entry)
     }
 
-    fun onSubmitAndClose(dateV: TextView, timeV: TextView, sugarV: TextView, extraV: TextView) {
-        TODO("Check entry, Submit entry, Close view")
-
-    }
-
     fun onClose(){
-        TODO("Forfeit entry, Close view")
-
+        TODO("Forfeit entry, Close view. Can I even do this?")
     }
 
     override fun handleDate(year: Int, month: Int, day: Int) {
