@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="dateType">0</integer>
-    <string name="dateFormat">yyyy dd/MM kk:mm</string>
+    <string name="dateTimeFormat">yyyy dd/MM kk:mm</string>
 </resources>

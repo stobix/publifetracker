@@ -8,7 +8,6 @@ import android.widget.TextView
 import java.util.ArrayList
 import java.util.Date
 import de.codecrafters.tableview.TableDataAdapter
-import android.util.Log.d
 
 /**
  * Created by stobix on 11/11/17.
@@ -24,7 +23,7 @@ class SugarEntryTableDataAdapter(
         val currRow = getRowData(rowIndex)
         return when (columnIndex) {
             0 -> {
-                val formatString = resources.getString(R.string.dateFormat)
+                val formatString = resources.getString(R.string.dateTimeFormat)
                 val myDate = Date(currRow.epochTimestamp)
                 val myDateString = DateFormat.format(formatString, myDate).toString()
                 renderString(myDateString)
