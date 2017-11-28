@@ -18,9 +18,7 @@ import android.widget.TextView;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import static android.util.Log.d;
 
@@ -30,29 +28,6 @@ import static android.util.Log.d;
             TimePickerFragment.TimePickerHandler,
             SugarEntryCreationActivity.OnSugarEntryEnteredHandler
     {
-
-        Random random = new Random();
-
-        private String rndStr() {
-            byte[] foo=new byte[30];
-            random.nextBytes(foo);
-            return String.format("%s", foo);
-        }
-
-        private int rndSgr() {
-            return random.nextInt(300)+10;
-        }
-
-        @SuppressWarnings("deprecation")
-        private Date rndDat() {
-            Date d = new Date();
-            d.setMinutes(random.nextInt(60));
-            d.setHours(random.nextInt(24));
-            d.setMonth(random.nextInt(12));
-            d.setDate(random.nextInt(31));
-            d.setYear(random.nextInt(2)+115);
-            return d;
-        }
 
         protected int sugarIndex ;
 
@@ -189,9 +164,6 @@ import static android.util.Log.d;
                 dao = db.userDao();
 
                 List<SugarEntry> entries = dao.getAll();
-                // TODO remove this line at some point, when entry adding functionality is present
-                dao.insert(new SugarEntry(entries.size() + 1, rndDat(), rndSgr(), rndStr()));
-                entries = dao.getAll();
                 d("LOL","Entries"+entries.size());
                 nextUID=entries.size()+1;
 
