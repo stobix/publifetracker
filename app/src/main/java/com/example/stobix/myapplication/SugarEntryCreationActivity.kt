@@ -3,14 +3,12 @@ package com.example.stobix.myapplication
 import android.annotation.SuppressLint
 import android.app.DialogFragment
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.util.Log.d
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import java.util.*
 
 /**
  * A dialog for creating an entry to the blood sugar database
@@ -20,19 +18,16 @@ import java.util.*
 open class SugarEntryCreationActivity
 @SuppressLint("ValidFragment") constructor
 (
-        var entry: SugarEntry = SugarEntry()
 ) : DialogFragment( ), DatePickerFragment.DatePickerHandler, TimePickerFragment.TimePickerHandler {
 
-    //constructor() :  this(SugarEntry())
-
-
-
+    private var uid: Int=0
+    private var date: DateHandler= DateHandler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         d("SugarEntry create","weeeee")
         super.onCreate(savedInstanceState)
-        entry.uid = arguments.getInt("uid")
-        entry.epochTimestamp = arguments.getLong("timestamp")
+        uid = arguments.getInt("uid")
+        date.timestamp = arguments.getLong("timestamp")
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -43,11 +38,12 @@ open class SugarEntryCreationActivity
 
         val dateV: TextView= v.findViewById(R.id.entryCreatorDate)
         val timeV: TextView= v.findViewById(R.id.entryCreatorTime)
-        val date = Date(entry.epochTimestamp)
-        val dateText=""+(1900+date.year)+"/"+date.month+"/"+date.day
-        val timeText=""+date.hours+":"+date.minutes+":"+date.seconds
+
+        val dateText=""+date.year+"-"+date.month+"-"+date.day
+        val timeText=""+date.hour+":"+date.minute // +s":"+date.second
         dateV.text=dateText
         timeV.text=timeText
+
 
         val sugarV = v.findViewById<TextView>(R.id.entryCreatorSugar)
         val extraV = v.findViewById<TextView>(R.id.entryCreatorExtra)
@@ -65,16 +61,17 @@ open class SugarEntryCreationActivity
         fun onSugarEntryEntered(s: SugarEntry)
     }
 
-    fun onSubmit(dateV: TextView, timeV: TextView, sugarV: TextView, extraV: TextView) {
+    private fun onSubmit(dateV: TextView, timeV: TextView, sugarV: TextView, extraV: TextView) {
         handleSubmission(dateV, timeV, sugarV, extraV)
-        entry= SugarEntry(entry.uid+1,entry.epochTimestamp)
+        uid++
     }
 
-    fun onSubmitAndClose(dateV: TextView, timeV: TextView, sugarV: TextView, extraV: TextView) {
+    private fun onSubmitAndClose(dateV: TextView, timeV: TextView, sugarV: TextView, extraV: TextView) {
         handleSubmission(dateV, timeV, sugarV, extraV)
     }
 
-    fun handleSubmission(dateV: TextView, timeV: TextView, sugarV: TextView, extraV: TextView){
+    private fun handleSubmission(dateV: TextView, timeV: TextView, sugarV: TextView, extraV: TextView){
+        val entry= SugarEntry(uid,date.timestamp)
         entry.sugarLevel = try {
             (java.lang.Float.valueOf(sugarV.text?.toString()?:"0")*10).toInt()
         }
@@ -86,11 +83,12 @@ open class SugarEntryCreationActivity
         (activity as OnSugarEntryEnteredHandler).onSugarEntryEntered(entry)
     }
 
-    fun onClose(){
+    private fun onClose(){
         TODO("Forfeit entry, Close view. Can I even do this?")
     }
 
     override fun handleDate(year: Int, month: Int, day: Int) {
+        d("SugarEntry got date",""+year+"-"+month+"-"+day)
         TODO("Add date to entry")
     }
 
@@ -104,7 +102,7 @@ open class SugarEntryCreationActivity
     // ...
 
     companion object{
-        fun newInstance(uid: Int) = newInstance(uid,Date().time)
+        fun newInstance(uid: Int) = newInstance(uid,DateHandler().timestamp)
         fun newInstance(uid: Int, timestamp: Long ) : SugarEntryCreationActivity{
             val s = SugarEntryCreationActivity()
             val args = Bundle()
