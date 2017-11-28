@@ -8,22 +8,18 @@
     tools:context="com.example.stobix.myapplication.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="48dp"
-        android:layout_height="50dp"
-        app:layout_constraintBottom_toTopOf="@+id/tableView"
-        app:layout_constraintEnd_toStartOf="@+id/editText2"
-        app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintStart_toStartOf="parent"
-        android:onClick="showDatePicker"
-        app:srcCompat="@mipmap/ic_launcher_foreground" />
     <!--
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp"
-        /> -->
-
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="48dp"
+            android:layout_height="50dp"
+            app:layout_constraintBottom_toTopOf="@+id/tableView"
+            app:layout_constraintEnd_toStartOf="@+id/editText2"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toStartOf="parent"
+            android:onClick="showDatePicker"
+            app:srcCompat="@mipmap/ic_launcher_foreground" />
     <EditText
         android:id="@+id/editText2"
         android:layout_width="0dp"
@@ -79,13 +75,14 @@
 
         app:layout_constraintStart_toEndOf="@+id/editText3" />
 
+-->
     <com.example.stobix.myapplication.SortableSugarEntryTableView
         android:id="@+id/tableView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="visible"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText2"
+        app:layout_constraintTop_toTopOf="parent"
         app:tableView_columnCount="4"
         tools:layout_editor_absoluteX="0dp" />
 
