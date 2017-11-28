@@ -24,8 +24,8 @@ import static android.util.Log.d;
 
     public class MainActivity extends AppCompatActivity
             implements
-            DatePickerFragment.DatePickerHandler,
-            TimePickerFragment.TimePickerHandler,
+//            DatePickerFragment.DatePickerHandler,
+ //           TimePickerFragment.TimePickerHandler,
             SugarEntryCreationActivity.OnSugarEntryEnteredHandler
     {
 
@@ -177,6 +177,7 @@ import static android.util.Log.d;
         }
 
 
+        /*
         @Override
         public void handleDate(int year, int month, int day) {
             EditText t = findViewById(R.id.editText2);
@@ -196,4 +197,5 @@ import static android.util.Log.d;
             }
 
         }
+        */
     }
