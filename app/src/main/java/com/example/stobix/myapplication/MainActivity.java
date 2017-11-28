@@ -29,33 +29,6 @@ import static android.util.Log.d;
             SugarEntryCreationActivity.OnSugarEntryEnteredHandler
     {
 
-        protected int sugarIndex ;
-
-        SugarEntry createNewTempEntry(){
-            d("TempEntry","Create");
-            SugarEntry s=new SugarEntry();
-            s.setUid(sugarIndex);
-            return s;
-        }
-
-        void submitSugarEntry(SugarEntry s){
-            if(s.getEpochTimestamp()!=0L){
-                if(s.getUid() != 0){
-                    d("TempEntry","Submit");
-                    // when successful:
-                    // sugarIndex++;
-                    // s.setUid(sugarIndex) or createNewTempEntry()
-                }
-            }
-        }
-
-        public void setSugarIndex(int sugarIndex) {
-            d("TempEntry","Setting index to "+sugarIndex);
-            this.sugarIndex = sugarIndex;
-        }
-
-        public int getSugarIndex(){ return sugarIndex; }
-
         public void showEnterer() {
             d("SugarEntry show","weeeee");
             FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -116,12 +89,10 @@ import static android.util.Log.d;
                 tableView = view;
             }
 
-
             @Override
             public void handleMessage(Message msg) {
                 Bundle b = msg.getData();
                 ArrayList<SugarEntry> arrayEntries = b.getParcelableArrayList("entries");
-                context.setSugarIndex(arrayEntries.size());
                 if(arrayEntries!=null)
                     tableView.setDataAdapter(new SugarEntryTableDataAdapter(context, arrayEntries));
             }
@@ -147,13 +118,6 @@ import static android.util.Log.d;
 
             Handler db_data_handler = new UpdateHandler(this, findViewById(R.id.tableView));
 
-            /*
-            Runnable initiateDB = new Runnable(){
-                public void run() {
-
-                }
-            }
-            */
             Runnable initiateDB = () -> {
                 SugarEntryDatabase db =
                         Room.databaseBuilder(
@@ -212,11 +176,6 @@ import static android.util.Log.d;
             new TimePickerFragment().show(getSupportFragmentManager(), "timePicker");
         }
 
-
-        /*
-           TODO Have something like a "class global" state/handler that receives a date or time to be inserted into the database after the user submits all fields.
-            Don't reset the date thing after submission.
-         */
 
         @Override
         public void handleDate(int year, int month, int day) {
