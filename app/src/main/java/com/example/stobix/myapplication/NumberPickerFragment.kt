@@ -5,8 +5,6 @@ import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.widget.NumberPicker
 
-import java.util.Calendar
-
 class NumberPickerFragment : DialogFragment(), NumberPickerDialog.OnNumberSetListener {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -17,7 +15,7 @@ class NumberPickerFragment : DialogFragment(), NumberPickerDialog.OnNumberSetLis
         fun handleNumber(number: Float)
     }
 
-    override fun onNumberSet(view: NumberPicker, number: Float){
+    override fun onNumberSet(view: NumberPickerDialog, number: Float){
         val datePickerHandler = activity as NumberPickerHandler
         datePickerHandler.handleNumber(number)
     }

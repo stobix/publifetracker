@@ -28,6 +28,7 @@ import static android.util.Log.d;
             DatePickerFragment.DatePickerHandler,
             TimePickerFragment.TimePickerHandler,
             //NumberPicker.NumberPickerHandler,
+            NumberPickerDialog.OnNumberSetListener,
             SugarEntryCreationActivity.OnSugarEntryEnteredHandler
     {
 
@@ -65,6 +66,7 @@ import static android.util.Log.d;
                     }
             ) ).start();
         }
+
 
 
         private static class InsertHandler extends Handler {
@@ -177,6 +179,10 @@ import static android.util.Log.d;
             new TimePickerFragment().show(getSupportFragmentManager(), "timePicker");
         }
 
+        public void showNumberPicker() {
+            new NumberPickerDialog(MainActivity.this,MainActivity.this).show();
+        }
+
         @Override
         public void handleDate(int year, int month, int day) {
             creationActivity.handleDate(year,month,day);
@@ -184,6 +190,12 @@ import static android.util.Log.d;
         @Override
         public void handleTime(int hour, int minute) {
             creationActivity.handleTime(hour, minute) ;
+        }
+
+        @Override
+        public void onNumberSet(@NotNull NumberPickerDialog view, float number) {
+            creationActivity.onNumberSet(view,number);
+
         }
 
     }

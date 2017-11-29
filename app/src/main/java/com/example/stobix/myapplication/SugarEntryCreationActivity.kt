@@ -8,7 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.NumberPicker
 import android.widget.TextView
+import com.example.stobix.myapplication.NumberPickerDialog.OnNumberSetListener
 
 /**
  * A dialog for creating an entry to the blood sugar database
@@ -22,12 +24,18 @@ open class SugarEntryCreationActivity
         ,DatePickerFragment.DatePickerHandler
         ,TimePickerFragment.TimePickerHandler
         ,SendResultAble
+        ,OnNumberSetListener
 {
+    override fun onNumberSet(view: NumberPickerDialog, number: Float) {
+        d("number set!","$number")
+        sugarView?.setText(number.toString(),TextView.BufferType.NORMAL)
+    }
 
     private var uid: Int=0
     private var date: DateHandler= DateHandler()
     private var dateView: TextView? = null
     private var timeView: TextView? = null
+    private var sugarView: TextView? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +57,7 @@ open class SugarEntryCreationActivity
 
         dateView= v.findViewById(R.id.entryCreatorDate)
         timeView= v.findViewById(R.id.entryCreatorTime)
+        sugarView= v.findViewById(R.id.entryCreatorSugar)
 
         val dateText=""+date.year+"-"+date.month+"-"+date.day
         val timeText=""+date.hour+":"+date.minute // +s":"+date.second
@@ -57,7 +66,7 @@ open class SugarEntryCreationActivity
 
         dateView!!.setOnClickListener { (activity as MainActivity).showDatePicker() }
         timeView!!.setOnClickListener { (activity as MainActivity).showTimePicker() }
-
+        sugarView!!.setOnClickListener{ (activity as MainActivity).showNumberPicker() }
         val sugarV = v.findViewById<TextView>(R.id.entryCreatorSugar)
         val extraV = v.findViewById<TextView>(R.id.entryCreatorExtra)
 
