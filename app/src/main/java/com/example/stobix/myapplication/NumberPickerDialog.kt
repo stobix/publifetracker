@@ -41,9 +41,9 @@ class NumberPickerDialog (
         heltalspicker.wrapSelectorWheel = false
 
         val decimalpicker: NumberPicker = this.findViewById(R.id.numberPickerDecimal)
-        decimalpicker.maxValue =  maxVal.substringAfter(".").toInt()
-        decimalpicker.minValue = minVal.substringAfter(".").toInt()
-        decimalpicker.value = defaultVal.substringAfter(".").toInt()
+        decimalpicker.maxValue =  9
+        decimalpicker.minValue = 0
+        decimalpicker.value = defaultVal.substringAfter(".").toInt()*10
         decimalpicker.wrapSelectorWheel = false
 
         ok.setOnClickListener {
