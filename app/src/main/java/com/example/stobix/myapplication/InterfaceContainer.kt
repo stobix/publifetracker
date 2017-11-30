@@ -16,3 +16,11 @@ interface Consumer<in T> {
 interface BiConsumer<in T,in V> {
     fun accept(t: T,v: V)
 }
+
+interface Function<in T, out R> {
+    fun apply(t: T): R
+}
+
+interface BiFunction<in T, in U, out R> {
+    fun apply(t: T, u: U): R
+}

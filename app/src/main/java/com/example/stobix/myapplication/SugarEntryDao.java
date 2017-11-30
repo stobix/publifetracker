@@ -4,11 +4,9 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
-import java.util.List;
+import android.arch.persistence.room.Update;
 
-/**
- * Created by stobix on 11/11/17.
- */
+import java.util.List;
 
 @Dao
 public interface SugarEntryDao {
@@ -18,6 +16,11 @@ public interface SugarEntryDao {
     List<SugarEntry> loadAllByIds(int[] userIds);
     @Query("Select * from sugar_entries where timestamp between :firstDate and :secondDate")
     List<SugarEntry> getBetweenEpochs(long firstDate,long secondDate);
+    @Query("Select max(uid) from sugar_entries")
+    int getMaxUID();
+
+    @Update
+    void update(SugarEntry sugarEntry);
     @Insert
     void insert(SugarEntry sugarEntry);
     @Insert

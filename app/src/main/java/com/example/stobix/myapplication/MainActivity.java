@@ -25,7 +25,6 @@ import static android.util.Log.d;
             implements
             DatePickerFragment.DatePickerHandler,
             TimePickerFragment.TimePickerHandler,
-            //NumberPicker.NumberPickerHandler,
             NumberPickerDialog.OnNumberSetListener,
             SugarEntryCreationActivity.OnSugarEntryEnteredHandler
     {
@@ -46,21 +45,27 @@ import static android.util.Log.d;
 
         }
 
-
-
         @Override
         public void onSugarEntryEntered(@NotNull SugarEntry s) {
             nextUID++;
             sugarEntryGeneralAction(s,
-                    (se) -> dao.insert(se),
-                    (se,dataAdapter) ->dataAdapter.add(se)
+                    (sugarEntry) -> dao.insert(sugarEntry),
+                    (sugarEntry,dataAdapter) ->dataAdapter.add(sugarEntry)
             );
         }
 
         public void sugarEntryDeleted(@NotNull SugarEntry s){
             sugarEntryGeneralAction(s,
                     (sugarEntry) -> dao.delete(sugarEntry),
-                    (sugarEntry,dataAdapter) -> dataAdapter.remove(sugarEntry));
+                    (sugarEntry,dataAdapter) -> dataAdapter.remove(sugarEntry)
+            );
+        }
+
+        public void sugarEntryChanged(@NotNull SugarEntry s){
+           sugarEntryGeneralAction(s,
+                   (sugarEntry) -> dao.update(sugarEntry),
+                   (sugarEntry, sugarEntryTableDataAdapter) -> {}
+                   );
         }
 
         public void sugarEntryGeneralAction(
@@ -87,37 +92,6 @@ import static android.util.Log.d;
             )).start();
         }
 
-        private static class DeleteHandler extends Handler {
-            final MainActivity context;
-            final SortableSugarEntryTableView tableView;
-
-            DeleteHandler(MainActivity outer_context, SortableSugarEntryTableView view) {
-                context = outer_context;
-                tableView = view;
-            }
-            @Override
-            public void handleMessage(Message msg) {
-                Bundle b = msg.getData();
-                SugarEntry s = b.getParcelable("entry");
-                tableView.getDataAdapter().remove(s);
-            }
-        }
-        private static class InsertHandler extends Handler {
-            final MainActivity context;
-            final SortableSugarEntryTableView tableView;
-
-            InsertHandler(MainActivity outer_context, SortableSugarEntryTableView view) {
-                context = outer_context;
-                tableView = view;
-            }
-            @Override
-            public void handleMessage(Message msg) {
-                Bundle b = msg.getData();
-                SugarEntry s = b.getParcelable("entry");
-                tableView.getDataAdapter().add(s);
-            }
-        }
-
         private static class EntryHandler extends Handler {
             final SortableSugarEntryTableView tableView;
             final BiConsumer<SugarEntry, TableDataAdapter<SugarEntry>> sf;
@@ -134,26 +108,6 @@ import static android.util.Log.d;
                 Bundle b = msg.getData();
                 SugarEntry s = b.getParcelable("entry");
                 sf.accept(s,tableView.getDataAdapter());
-            }
-        }
-
-        private static class EntriesHandler extends Handler {
-            final MainActivity context;
-            final SortableSugarEntryTableView tableView;
-            final Consumer<ArrayList<SugarEntry>> sf;
-
-            EntriesHandler(MainActivity outer_context, SortableSugarEntryTableView view, Consumer<ArrayList<SugarEntry>> database_fun) {
-                context = outer_context;
-                tableView = view;
-                sf = database_fun;
-            }
-
-            @Override
-            public void handleMessage(Message msg) {
-                Bundle b = msg.getData();
-                ArrayList<SugarEntry> s = b.getParcelableArrayList("entries");
-                if (s != null)
-                    sf.accept(s);
             }
         }
 
@@ -191,8 +145,17 @@ import static android.util.Log.d;
             FloatingActionButton fab = findViewById(R.id.fab);
             fab.setOnClickListener(view -> showEnterer() );
 
+            SortableSugarEntryTableView tv = findViewById(R.id.tableView);
 
-            Handler db_data_handler = new UpdateHandler(this, findViewById(R.id.tableView));
+            tv.addDataClickListener((row, sugarEntry) -> {
+                d("SugarEntry", "Row " + row + " got clicked!");
+                sugarEntryDeleted(sugarEntry);
+                //open some dialog, maybe the entry creation dialog, to change element,
+                // and let it call sugarEntryChanged(sugarEntry);
+            });
+
+
+            Handler db_data_handler = new UpdateHandler(this, tv);
 
             Runnable initiateDB = () -> {
                 SugarEntryDatabase db =
@@ -204,8 +167,11 @@ import static android.util.Log.d;
                 dao = db.userDao();
 
                 List<SugarEntry> entries = dao.getAll();
-                d("LOL","Entries"+entries.size());
-                nextUID=entries.size()+1;
+                d("LOL","Entries "+entries.size());
+
+                nextUID=dao.getMaxUID()+1;
+
+                d("LOL","Max UID: "+nextUID);
 
                 Message msg = db_data_handler.obtainMessage();
                 Bundle bundle = new Bundle();
