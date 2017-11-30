@@ -3,26 +3,23 @@ package com.example.stobix.myapplication;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.arch.persistence.room.Room;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
-import android.widget.NumberPicker;
-import android.widget.TextView;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+
+import de.codecrafters.tableview.TableDataAdapter;
 
 import static android.util.Log.d;
 
@@ -56,41 +53,25 @@ import static android.util.Log.d;
         @Override
         public void onSugarEntryEntered(@NotNull SugarEntry s) {
             nextUID++;
-            Handler db_data_handler = new InsertHandler(this, findViewById(R.id.tableView));
-            (new Thread(
-                    () -> {
-                        dao.insert(s);
-
-                        Message msg = db_data_handler.obtainMessage();
-                        Bundle bundle = new Bundle();
-                        bundle.putParcelable("entry", s);
-                        msg.setData(bundle);
-                        db_data_handler.sendMessage(msg);
-                    }
-            ) ).start();
+            sugarEntryGeneralAction(s,
+                    (se) -> dao.insert(se),
+                    (se,dataAdapter) ->dataAdapter.add(se)
+            );
         }
-
 
         public void sugarEntryDeleted(@NotNull SugarEntry s){
-            Handler db_data_handler = new DeleteHandler(this, findViewById(R.id.tableView));
-            (new Thread(
-                    () -> {
-                        dao.delete(s);
-
-                        Message msg = db_data_handler.obtainMessage();
-                        Bundle bundle = new Bundle();
-                        bundle.putParcelable("entry", s);
-                        msg.setData(bundle);
-                        db_data_handler.sendMessage(msg);
-
-                    }
-            )).start();
+            sugarEntryGeneralAction(s,
+                    (sugarEntry) -> dao.delete(sugarEntry),
+                    (sugarEntry,dataAdapter) -> dataAdapter.remove(sugarEntry));
         }
 
-        public void sugarEntryGeneralAction(@NotNull SugarEntry s, Consumer<SugarEntry> db_action, Consumer<SugarEntry> table_action){
-            Handler db_data_handler =
+        public void sugarEntryGeneralAction(
+                @NotNull SugarEntry s,
+                Consumer<SugarEntry> db_action,
+                BiConsumer<SugarEntry, TableDataAdapter<SugarEntry>> table_action
+        ){
+            Handler table_data_handler =
                     new EntryHandler(
-                            this,
                             findViewById(R.id.tableView),
                             table_action
                     );
@@ -98,11 +79,11 @@ import static android.util.Log.d;
                     () -> {
                         db_action.accept(s);
 
-                        Message msg = db_data_handler.obtainMessage();
+                        Message msg = table_data_handler.obtainMessage();
                         Bundle bundle = new Bundle();
                         bundle.putParcelable("entry", s);
                         msg.setData(bundle);
-                        db_data_handler.sendMessage(msg);
+                        table_data_handler.sendMessage(msg);
 
                     }
             )).start();
@@ -140,20 +121,21 @@ import static android.util.Log.d;
         }
 
         private static class EntryHandler extends Handler {
-            final MainActivity context;
             final SortableSugarEntryTableView tableView;
-            final Consumer<SugarEntry> sf;
+            final BiConsumer<SugarEntry, TableDataAdapter<SugarEntry>> sf;
 
-            EntryHandler(MainActivity outer_context, SortableSugarEntryTableView view, Consumer<SugarEntry> database_fun) {
-                context = outer_context;
+            EntryHandler(
+                    SortableSugarEntryTableView view,
+                    BiConsumer<SugarEntry, TableDataAdapter<SugarEntry>> table_fun) {
                 tableView = view;
-                sf = database_fun;
+                sf = table_fun;
             }
+
             @Override
             public void handleMessage(Message msg) {
                 Bundle b = msg.getData();
                 SugarEntry s = b.getParcelable("entry");
-                sf.accept(s);
+                sf.accept(s,tableView.getDataAdapter());
             }
         }
 
