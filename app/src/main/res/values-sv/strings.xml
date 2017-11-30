@@ -15,4 +15,8 @@
     <string name="input_time">Klockslag</string>
     <string name="button_close">Stäng</string>
     <string name="button_add">Lägg till</string>
+    <string name="number_picker_separator_comma">,</string>
+    <string name="decimal_point">,</string>
+    <string name="number_picker_cancel_button">Cancel</string>
+    <string name="number_picker_ok_button">Ok</string>
 </resources>

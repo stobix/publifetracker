@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Ok"
+        android:text="@string/number_picker_ok_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/numberPickerHeltal" />
 
@@ -40,7 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Cancel"
+        android:text="@string/number_picker_cancel_button"
         app:layout_constraintStart_toEndOf="@+id/numberPickerOkButton"
         app:layout_constraintTop_toBottomOf="@+id/numberPickerDecimal" />
 
@@ -49,9 +49,11 @@
         android:id="@+id/textView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="TextView"
+        android:layout_marginStart="12dp"
+        android:text="@string/number_picker_separator_comma"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textSize="24sp"
         app:layout_constraintStart_toEndOf="@+id/numberPickerHeltal"
-        app:layout_constraintTop_toBottomOf="@+id/numberPickerHeltal" />
+        tools:layout_editor_absoluteY="64dp" />
 
 </android.support.constraint.ConstraintLayout>

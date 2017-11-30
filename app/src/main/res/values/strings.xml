@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">LifeTracker</string>
     <string name="action_settings">Settings</string>
     <string-array name="headers">
         <item>Date</item>
@@ -13,4 +13,8 @@
     <string name="button_add_close">Add and close</string>
     <string name="button_close">Close</string>
     <string name="button_add">Add</string>
+    <string name="number_picker_separator_comma">.</string>
+    <string name="decimal_point">.</string>
+    <string name="number_picker_ok_button">Apply</string>
+    <string name="number_picker_cancel_button">Cancel</string>
 </resources>

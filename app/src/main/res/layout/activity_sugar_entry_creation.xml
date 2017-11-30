@@ -15,12 +15,15 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:inputType="date"
+        android:focusable="false"
+        android:clickable="true"
+        android:inputType="none"
         android:singleLine="true"
         android:text="@string/input_date"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="KeyboardInaccessibleWidget,TextFields" />
 
     <EditText
         android:id="@+id/entryCreatorTime"
@@ -29,8 +32,10 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:focusable="false"
+        android:clickable="true"
+        android:inputType="none"
         android:ems="10"
-        android:inputType="time"
         android:singleLine="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView2"
@@ -44,7 +49,9 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:inputType="numberDecimal"
+        android:focusable="false"
+        android:clickable="true"
+        android:inputType="none"
         android:selectAllOnFocus="true"
         android:singleLine="true"
         app:layout_constraintEnd_toEndOf="parent"
@@ -60,11 +67,12 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:inputType="text|textPersonName"
+        android:inputType="text"
         android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView4"
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorSugar"
+        tools:clickable="false"
         tools:text="@string/input_extra" />
 
     <Button
@@ -146,5 +154,6 @@
         android:text="@string/input_extra"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorExtra" />
+
 
 </android.support.constraint.ConstraintLayout>
