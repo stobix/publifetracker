@@ -59,7 +59,7 @@ open class SugarEntryCreationActivity
         timeView= v.findViewById(R.id.entryCreatorTime)
         sugarView= v.findViewById(R.id.entryCreatorSugar)
 
-        val dateText=""+date.year+"-"+date.month+"-"+date.day
+        val dateText="%d-%02d-%02d".format(date.year,date.month+1,date.day)
         val timeText=""+date.hour+":"+date.minute // +s":"+date.second
         dateView!!.text=dateText
         timeView!!.text=timeText
@@ -90,6 +90,7 @@ open class SugarEntryCreationActivity
 
     private fun onSubmitAndClose(sugarV: TextView, extraV: TextView) {
         handleSubmission(sugarV, extraV)
+        this.dismiss()
     }
 
     private fun handleSubmission(sugarV: TextView, extraV: TextView){
@@ -106,20 +107,21 @@ open class SugarEntryCreationActivity
     }
 
     private fun onClose(){
-        TODO("Forfeit entry, Close view. Can I even do this?")
+        this.dismiss()
     }
 
     override fun handleDate(year: Int, month: Int, day: Int) {
         d("SugarEntry got date", "$year-$month-$day")
         date.setDate(year,month,day)
-        val dateText="$year-$month-$day"
+        // Calendars use a 0-indexed gregorian/julian month for some reason!
+        val dateText="%d-%02d-%02d".format(year,month+1,day)
         dateView!!.setText(dateText, TextView.BufferType.NORMAL)
     }
 
     override fun handleTime(hour: Int, minute: Int) {
         d("SugarEntry got time", "$hour:$minute")
         date.setTime(hour,minute)
-        val timeText="$hour:$minute"
+        val timeText= "%02d:%02d".format(hour,minute)
         timeView!!.setText(timeText, TextView.BufferType.NORMAL)
     }
 
