@@ -8,7 +8,7 @@ import android.widget.NumberPicker
 import android.widget.NumberPicker.OnValueChangeListener
 
 class NumberPickerDialog (
-        val ctx: Context,
+        ctx: Context,
         val listener: OnNumberSetListener?,
         val defaultVal: String = "4.2",
         val minVal: String = "0.0",
@@ -47,8 +47,8 @@ class NumberPickerDialog (
         decimalpicker.wrapSelectorWheel = false
 
         ok.setOnClickListener {
-            val n : Float = (heltalspicker.value.toDouble()+decimalpicker.value.toDouble()/10.0).toFloat()
-            listener?.onNumberSet(this,n)
+            val n = heltalspicker.value.toDouble()+decimalpicker.value.toDouble()/10.0
+            listener?.onNumberSet(this,n.toFloat())
             this.dismiss()
         }
         ook.setOnClickListener {
