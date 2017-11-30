@@ -3,9 +3,11 @@ package com.example.stobix.myapplication;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.arch.persistence.room.Room;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static android.util.Log.d;
 
@@ -68,7 +71,58 @@ import static android.util.Log.d;
         }
 
 
+        public void sugarEntryDeleted(@NotNull SugarEntry s){
+            Handler db_data_handler = new DeleteHandler(this, findViewById(R.id.tableView));
+            (new Thread(
+                    () -> {
+                        dao.delete(s);
 
+                        Message msg = db_data_handler.obtainMessage();
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable("entry", s);
+                        msg.setData(bundle);
+                        db_data_handler.sendMessage(msg);
+
+                    }
+            )).start();
+        }
+
+        public void sugarEntryGeneralAction(@NotNull SugarEntry s, Consumer<SugarEntry> db_action, Consumer<SugarEntry> table_action){
+            Handler db_data_handler =
+                    new EntryHandler(
+                            this,
+                            findViewById(R.id.tableView),
+                            table_action
+                    );
+            (new Thread(
+                    () -> {
+                        db_action.accept(s);
+
+                        Message msg = db_data_handler.obtainMessage();
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable("entry", s);
+                        msg.setData(bundle);
+                        db_data_handler.sendMessage(msg);
+
+                    }
+            )).start();
+        }
+
+        private static class DeleteHandler extends Handler {
+            final MainActivity context;
+            final SortableSugarEntryTableView tableView;
+
+            DeleteHandler(MainActivity outer_context, SortableSugarEntryTableView view) {
+                context = outer_context;
+                tableView = view;
+            }
+            @Override
+            public void handleMessage(Message msg) {
+                Bundle b = msg.getData();
+                SugarEntry s = b.getParcelable("entry");
+                tableView.getDataAdapter().remove(s);
+            }
+        }
         private static class InsertHandler extends Handler {
             final MainActivity context;
             final SortableSugarEntryTableView tableView;
@@ -84,6 +138,45 @@ import static android.util.Log.d;
                 tableView.getDataAdapter().add(s);
             }
         }
+
+        private static class EntryHandler extends Handler {
+            final MainActivity context;
+            final SortableSugarEntryTableView tableView;
+            final Consumer<SugarEntry> sf;
+
+            EntryHandler(MainActivity outer_context, SortableSugarEntryTableView view, Consumer<SugarEntry> database_fun) {
+                context = outer_context;
+                tableView = view;
+                sf = database_fun;
+            }
+            @Override
+            public void handleMessage(Message msg) {
+                Bundle b = msg.getData();
+                SugarEntry s = b.getParcelable("entry");
+                sf.accept(s);
+            }
+        }
+
+        private static class EntriesHandler extends Handler {
+            final MainActivity context;
+            final SortableSugarEntryTableView tableView;
+            final Consumer<ArrayList<SugarEntry>> sf;
+
+            EntriesHandler(MainActivity outer_context, SortableSugarEntryTableView view, Consumer<ArrayList<SugarEntry>> database_fun) {
+                context = outer_context;
+                tableView = view;
+                sf = database_fun;
+            }
+
+            @Override
+            public void handleMessage(Message msg) {
+                Bundle b = msg.getData();
+                ArrayList<SugarEntry> s = b.getParcelableArrayList("entries");
+                if (s != null)
+                    sf.accept(s);
+            }
+        }
+
 
         // Made static (i.e. no outer scope references) to prevent memory issues, since lint complained about the anonymous class instance.
         // See https://stackoverflow.com/questions/11407943/this-handler-class-should-be-static-or-leaks-might-occur-incominghandler
