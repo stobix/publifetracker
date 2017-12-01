@@ -277,13 +277,13 @@ import static android.util.Log.d;
 
         @Override
         public void onNumberSet(@NotNull NumberPickerDialog view, float number) {
-            creationActivity.onNumberSet(view,number);
+            creationActivity.onNumberSet(number);
 
         }
 
         @Override
         public void onNumberClear(@NotNull NumberPickerDialog view) {
-            creationActivity.onNumberClear(view);
+            creationActivity.onNumberClear();
 
         }
 
