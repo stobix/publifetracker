@@ -29,114 +29,21 @@ import static android.util.Log.d;
             SugarEntryCreationActivity.OnSugarEntryEnteredHandler
     {
 
+        // Used to handle callback "bleed through"
         private SugarEntryCreationActivity creationActivity;
 
-        public void showEnterer() {
-            d("SugarEntry show","weeeee");
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            Fragment prev = getFragmentManager().findFragmentByTag("dialog");
-            if (prev != null) {
-                ft.remove(prev);
-            }
-            ft.addToBackStack(null);
+        // Since the table view ref never changes,
+        // we can just assign it to this variable once instead of doing a lengthy lookup
+        // each time in each function.
+        private SortableSugarEntryTableView tableView;
 
-            creationActivity = SugarEntryCreationActivity.Companion.newInstance(nextUID);
-            creationActivity.show(ft, "dialog");
-
-        }
-
-        @Override
-        public void onSugarEntryEntered(@NotNull SugarEntry s) {
-            nextUID++;
-            sugarEntryGeneralAction(s,
-                    (sugarEntry) -> dao.insert(sugarEntry),
-                    (sugarEntry,dataAdapter) -> dataAdapter.add(sugarEntry)
-            );
-        }
-
-        public void sugarEntryDeleted(@NotNull SugarEntry s){
-            sugarEntryGeneralAction(s,
-                    (sugarEntry) -> dao.delete(sugarEntry),
-                    (sugarEntry,dataAdapter) -> dataAdapter.remove(sugarEntry)
-            );
-        }
-
-        public void sugarEntryChanged(@NotNull SugarEntry s){
-           sugarEntryGeneralAction(s,
-                   (sugarEntry) -> dao.update(sugarEntry),
-                   (sugarEntry, sugarEntryTableDataAdapter) -> {}
-                   );
-        }
-
-        public void sugarEntryGeneralAction(
-                @NotNull SugarEntry s,
-                Consumer<SugarEntry> db_action,
-                BiConsumer<SugarEntry, TableDataAdapter<SugarEntry>> table_action
-        ){
-            Handler table_data_handler =
-                    new EntryHandler(
-                            findViewById(R.id.tableView),
-                            table_action
-                    );
-
-            (new Thread(
-                    () -> {
-                        db_action.accept(s);
-
-                        Message msg = table_data_handler.obtainMessage();
-                        Bundle bundle = new Bundle();
-                        bundle.putParcelable("entry", s);
-                        msg.setData(bundle);
-                        table_data_handler.sendMessage(msg);
-
-                    }
-
-            )).start();
-        }
-
-
-        private static class EntryHandler extends Handler {
-            final SortableSugarEntryTableView tableView;
-            final BiConsumer<SugarEntry, TableDataAdapter<SugarEntry>> sf;
-
-            EntryHandler(
-                    SortableSugarEntryTableView view,
-                    BiConsumer<SugarEntry, TableDataAdapter<SugarEntry>> table_fun) {
-                tableView = view;
-                sf = table_fun;
-            }
-
-            @Override
-            public void handleMessage(Message msg) {
-                Bundle b = msg.getData();
-                SugarEntry s = b.getParcelable("entry");
-                sf.accept(s,tableView.getDataAdapter());
-            }
-        }
-
-
-        // Made static (i.e. no outer scope references) to prevent memory issues, since lint complained about the anonymous class instance.
-        // See https://stackoverflow.com/questions/11407943/this-handler-class-should-be-static-or-leaks-might-occur-incominghandler
-        private static class UpdateHandler extends Handler {
-            final MainActivity context;
-            final SortableSugarEntryTableView tableView;
-
-            UpdateHandler(MainActivity outer_context, SortableSugarEntryTableView view) {
-                context = outer_context;
-                tableView = view;
-            }
-
-            @Override
-            public void handleMessage(Message msg) {
-                Bundle b = msg.getData();
-                ArrayList<SugarEntry> arrayEntries = b.getParcelableArrayList("entries");
-                if(arrayEntries!=null)
-                    tableView.setDataAdapter(new SugarEntryTableDataAdapter(context, arrayEntries));
-            }
-        }
-
+        // Used for all data base related operatoins once initiated in onCreate
         private SugarEntryDao dao;
+
+        // Used to keep track of the next UID that a SugarEntry can have to not
+        // crash the data base on insertion.
         private int nextUID;
+
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -144,21 +51,22 @@ import static android.util.Log.d;
             setContentView(R.layout.activity_main);
             Toolbar toolbar = findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
+            tableView = findViewById(R.id.tableView);
 
             FloatingActionButton fab = findViewById(R.id.fab);
-            fab.setOnClickListener(view -> showEnterer() );
+            fab.setOnClickListener(view -> showSugarEntryCreationDialog() );
 
-            SortableSugarEntryTableView tv = findViewById(R.id.tableView);
+            SortableSugarEntryTableView tv = tableView;
 
             tv.addDataClickListener((row, sugarEntry) -> {
-                d("SugarEntry", "Row " + row + " got clicked!");
-                sugarEntryDeleted(sugarEntry);
+                // TODO
                 //open some dialog, maybe the entry creation dialog, to change element,
                 // and let it call sugarEntryChanged(sugarEntry);
+                sugarEntryDeleted(sugarEntry);
             });
 
 
-            Handler db_data_handler = new UpdateHandler(this, tv);
+            Handler db_data_handler = new DataLoadHandler(this, tv);
 
             Runnable initiateDB = () -> {
                 SugarEntryDatabase db =
@@ -189,8 +97,6 @@ import static android.util.Log.d;
 
         }
 
-        // TODO Add a method for adding an entry to the database
-
         @Override
         public boolean onCreateOptionsMenu(Menu menu) {
             // Inflate the menu; this adds items to the action bar if it is present.
@@ -212,6 +118,141 @@ import static android.util.Log.d;
 
             return super.onOptionsItemSelected(item);
         }
+
+        // Show the dialog for creating a SugarEntry
+        public void showSugarEntryCreationDialog() {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+            if (prev != null) {
+                ft.remove(prev);
+            }
+            ft.addToBackStack(null);
+
+            creationActivity = SugarEntryCreationActivity.Creator.newInstance(nextUID);
+            creationActivity.show(ft, "dialog");
+
+        }
+
+        // Called from the sugar entry dialog when the user clicks 'add'
+        @Override
+        public void onSugarEntryEntered(@NotNull SugarEntry s) {
+            nextUID++;
+            sugarEntryGeneralAction(s,
+                    (sugarEntry) -> dao.insert(sugarEntry),
+                    (sugarEntry,dataAdapter) -> dataAdapter.add(sugarEntry)
+            );
+        }
+
+        /*
+
+        Old function call temporarily added for instructional reasons:
+        public void sugarEntryDeleted(@NotNull SugarEntry s){
+            sugarEntryGeneralAction(s,
+                    new Consumer<SugarEntry>() {
+                        @Override
+                        public void accept(SugarEntry sugarEntry) {
+                            dao.delete(sugarEntry);
+                        }
+                    },
+                    new BiConsumer<SugarEntry, TableDataAdapter<SugarEntry>>() {
+                        @Override
+                        public void accept(SugarEntry sugarEntry, TableDataAdapter<SugarEntry> dataAdapter) {
+                            dataAdapter.remove(sugarEntry);
+                        }
+                    }
+            );
+        }
+        */
+
+        // Called when the user has selected a sugar entry for deletion.
+        public void sugarEntryDeleted(@NotNull SugarEntry s){
+            sugarEntryGeneralAction(s,
+                    (sugarEntry) -> dao.delete(sugarEntry),
+                    (sugarEntry,dataAdapter) -> dataAdapter.remove(sugarEntry)
+            );
+        }
+
+        // Called when the user has changed a sugar entry and pressed 'submit changes'
+        public void sugarEntryChanged(@NotNull SugarEntry s){
+           sugarEntryGeneralAction(s,
+                   (sugarEntry) -> dao.update(sugarEntry),
+                   (sugarEntry, sugarEntryTableDataAdapter) -> {}
+                   );
+        }
+
+
+        // An abstraction of all data base followed by table adapter related consumer
+        // actions that can be performed on a SugarEntry.
+        public void sugarEntryGeneralAction(
+                @NotNull SugarEntry s,
+                Consumer<SugarEntry> db_action,
+                BiConsumer<SugarEntry, TableDataAdapter<SugarEntry>> table_action
+        ){
+            Handler table_data_handler =
+                    new EntryHandler(
+                            tableView,
+                            table_action
+                    );
+
+            (new Thread(
+                    () -> {
+                        db_action.accept(s);
+
+                        Message msg = table_data_handler.obtainMessage();
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable("entry", s);
+                        msg.setData(bundle);
+                        table_data_handler.sendMessage(msg);
+
+                    }
+
+            )).start();
+        }
+
+
+        // Made static (i.e. no outer scope references) to prevent memory issues, since lint complained about the anonymous class instance.
+        // See https://stackoverflow.com/questions/11407943/this-handler-class-should-be-static-or-leaks-might-occur-incominghandler
+        private static class EntryHandler extends Handler {
+            final SortableSugarEntryTableView tableView;
+            final BiConsumer<SugarEntry, TableDataAdapter<SugarEntry>> sf;
+
+            EntryHandler(
+                    SortableSugarEntryTableView view,
+                    BiConsumer<SugarEntry, TableDataAdapter<SugarEntry>> table_fun) {
+                tableView = view;
+                sf = table_fun;
+            }
+
+            @Override
+            public void handleMessage(Message msg) {
+                Bundle b = msg.getData();
+                SugarEntry s = b.getParcelable("entry");
+                sf.accept(s,tableView.getDataAdapter());
+            }
+        }
+
+
+        // Made static (i.e. no outer scope references) to prevent memory issues, since lint complained about the anonymous class instance.
+        // See https://stackoverflow.com/questions/11407943/this-handler-class-should-be-static-or-leaks-might-occur-incominghandler
+        private static class DataLoadHandler extends Handler {
+            final MainActivity context;
+            final SortableSugarEntryTableView tableView;
+
+            DataLoadHandler(MainActivity outer_context, SortableSugarEntryTableView view) {
+                context = outer_context;
+                tableView = view;
+            }
+
+            @Override
+            public void handleMessage(Message msg) {
+                Bundle b = msg.getData();
+                ArrayList<SugarEntry> arrayEntries = b.getParcelableArrayList("entries");
+                if(arrayEntries!=null)
+                    tableView.setDataAdapter(new SugarEntryTableDataAdapter(context, arrayEntries));
+            }
+        }
+
+
 
         public void showDatePicker() {
             new DatePickerFragment().show(getSupportFragmentManager(), "datePicker");
