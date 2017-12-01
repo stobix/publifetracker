@@ -16,5 +16,5 @@
     <string name="number_picker_separator_comma">.</string>
     <string name="decimal_point">.</string>
     <string name="number_picker_ok_button">Apply</string>
-    <string name="number_picker_cancel_button">Cancel</string>
+    <string name="number_picker_clear_button">Clear</string>
 </resources>

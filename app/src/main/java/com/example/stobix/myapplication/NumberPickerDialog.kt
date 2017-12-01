@@ -2,7 +2,6 @@ package com.example.stobix.myapplication
 
 import android.app.Dialog
 import android.content.Context
-import android.view.View
 import android.widget.Button
 import android.widget.NumberPicker
 import android.widget.NumberPicker.OnValueChangeListener
@@ -32,8 +31,8 @@ class NumberPickerDialog (
         super.show()
         this.setTitle("testeli")
         this.setContentView(R.layout.number_picker_dialog)
-        val ok: Button = this.findViewById(R.id.numberPickerOkButton)
-        val ook: Button = this.findViewById(R.id.numberPickerCancelButton)
+        val okButton: Button = this.findViewById(R.id.numberPickerOkButton)
+        val clearButton: Button = this.findViewById(R.id.numberPickerClearButton)
         val heltalspicker: NumberPicker = this.findViewById(R.id.numberPickerHeltal)
         heltalspicker.maxValue =  maxVal.substringBefore(".").toInt()
         heltalspicker.minValue = minVal.substringBefore(".").toInt()
@@ -46,12 +45,13 @@ class NumberPickerDialog (
         decimalpicker.value = defaultVal.substringAfter(".").toInt()*10
         decimalpicker.wrapSelectorWheel = false
 
-        ok.setOnClickListener {
+        okButton.setOnClickListener {
             val n = heltalspicker.value.toDouble()+decimalpicker.value.toDouble()/10.0
             listener?.onNumberSet(this,n.toFloat())
             this.dismiss()
         }
-        ook.setOnClickListener {
+        clearButton.setOnClickListener {
+            listener?.onNumberClear(this)
             this.dismiss()
         }
 
@@ -62,6 +62,6 @@ class NumberPickerDialog (
 
     interface OnNumberSetListener{
         fun onNumberSet(view: NumberPickerDialog, number: Float)
-
+        fun onNumberClear(view: NumberPickerDialog)
     }
 }

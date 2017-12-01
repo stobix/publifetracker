@@ -35,12 +35,12 @@
         app:layout_constraintTop_toBottomOf="@+id/numberPickerHeltal" />
 
     <Button
-        android:id="@+id/numberPickerCancelButton"
+        android:id="@+id/numberPickerClearButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="@string/number_picker_cancel_button"
+        android:text="@string/number_picker_clear_button"
         app:layout_constraintStart_toEndOf="@+id/numberPickerOkButton"
         app:layout_constraintTop_toBottomOf="@+id/numberPickerDecimal" />
 

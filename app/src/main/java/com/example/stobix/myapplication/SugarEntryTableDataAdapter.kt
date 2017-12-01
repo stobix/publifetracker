@@ -28,8 +28,14 @@ class SugarEntryTableDataAdapter(
                 val myDateString = DateFormat.format(formatString, myDate).toString()
                 renderString(myDateString)
             }
-            1 ->  renderString(String.format("%.1f", currRow.sugarLevel / 10f))
-            2 ->  renderString(currRow.extra ?: "")
+            1 -> {
+                if(currRow.sugarLevel > 0)
+                    renderString(String.format("%.1f", currRow.sugarLevel / 10f))
+                else
+                    renderString("")
+            }
+
+            2 -> renderString(currRow.extra ?: "")
             else -> renderString("N/A")
         }
     }

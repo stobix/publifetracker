@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.NumberPicker
 import android.widget.TextView
 import com.example.stobix.myapplication.NumberPickerDialog.OnNumberSetListener
 
@@ -26,13 +25,10 @@ open class SugarEntryCreationActivity
         ,SendResultAble
         ,OnNumberSetListener
 {
-    override fun onNumberSet(view: NumberPickerDialog, number: Float) {
-        d("number set!","$number")
-        sugarView?.setText(number.toString(),TextView.BufferType.NORMAL)
-    }
 
     private var uid: Int=0
-    private var date: DateHandler= DateHandler()
+    private var date: DateHandler = DateHandler()
+    private var sugarLevel: Float? = null
     private var dateView: TextView? = null
     private var timeView: TextView? = null
     private var sugarView: TextView? = null
@@ -95,12 +91,7 @@ open class SugarEntryCreationActivity
 
     private fun handleSubmission(sugarV: TextView, extraV: TextView){
         val entry= SugarEntry(uid,date.timestamp)
-        entry.sugarLevel = try {
-            (java.lang.Float.valueOf(sugarV.text?.toString()?:"0")*10).toInt()
-        }
-        catch (_: Exception) {
-            0
-        }
+        entry.sugarLevel = sugarLevel?.times(10)?.toInt() ?: -1
         entry.extra = extraV.text?.toString()?:"N/A"
         d("SugarEntry submit", ""+entry.uid+" "+entry.epochTimestamp+" "+entry.sugarLevel+" "+entry.extra)
         (activity as OnSugarEntryEnteredHandler).onSugarEntryEntered(entry)
@@ -123,6 +114,17 @@ open class SugarEntryCreationActivity
         date.setTime(hour,minute)
         val timeText= "%02d:%02d".format(hour,minute)
         timeView!!.setText(timeText, TextView.BufferType.NORMAL)
+    }
+
+    override fun onNumberSet(view: NumberPickerDialog, number: Float) {
+        d("number set!","$number")
+        sugarLevel=number
+        sugarView?.setText(number.toString(),TextView.BufferType.NORMAL)
+    }
+
+    override fun onNumberClear(view: NumberPickerDialog) {
+        sugarLevel=null
+        sugarView?.setText("",TextView.BufferType.NORMAL)
     }
 
     companion object{

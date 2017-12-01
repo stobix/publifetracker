@@ -50,7 +50,7 @@ import static android.util.Log.d;
             nextUID++;
             sugarEntryGeneralAction(s,
                     (sugarEntry) -> dao.insert(sugarEntry),
-                    (sugarEntry,dataAdapter) ->dataAdapter.add(sugarEntry)
+                    (sugarEntry,dataAdapter) -> dataAdapter.add(sugarEntry)
             );
         }
 
@@ -78,6 +78,7 @@ import static android.util.Log.d;
                             findViewById(R.id.tableView),
                             table_action
                     );
+
             (new Thread(
                     () -> {
                         db_action.accept(s);
@@ -89,8 +90,10 @@ import static android.util.Log.d;
                         table_data_handler.sendMessage(msg);
 
                     }
+
             )).start();
         }
+
 
         private static class EntryHandler extends Handler {
             final SortableSugarEntryTableView tableView;
@@ -234,6 +237,12 @@ import static android.util.Log.d;
         @Override
         public void onNumberSet(@NotNull NumberPickerDialog view, float number) {
             creationActivity.onNumberSet(view,number);
+
+        }
+
+        @Override
+        public void onNumberClear(@NotNull NumberPickerDialog view) {
+            creationActivity.onNumberClear(view);
 
         }
 

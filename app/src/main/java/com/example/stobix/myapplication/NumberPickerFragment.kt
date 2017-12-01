@@ -6,6 +6,9 @@ import android.support.v4.app.DialogFragment
 import android.widget.NumberPicker
 
 class NumberPickerFragment : DialogFragment(), NumberPickerDialog.OnNumberSetListener {
+    override fun onNumberClear(view: NumberPickerDialog) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return NumberPickerDialog(activity, this, 4.2)
