@@ -9,23 +9,14 @@ import android.widget.NumberPicker.OnValueChangeListener
 class NumberPickerDialog (
         ctx: Context,
         val listener: OnNumberSetListener?,
-        val defaultVal: String = "4.2",
-        val minVal: String = "0.0",
-        val maxVal: String = "100.0"
+        val defaultVal: Int = 4,
+        val defaultFraction: Int = 2,
+        val minVal: Int = 0,
+        val maxVal: Int = 100
 ) :
         Dialog(ctx),
         OnValueChangeListener
 {
-
-    constructor(ctx: Context,listener: OnNumberSetListener?) :
-            this(ctx,listener,"0.0","0.0","100.0")
-
-    constructor(ctx: Context,
-                listener: OnNumberSetListener?,
-                default: Double = 0.0,
-                min: Double = 0.0,
-                max: Double = 100.0) :
-            this(ctx,listener,default.toString(),min.toString(),max.toString())
 
     override fun show() {
         super.show()
@@ -34,22 +25,22 @@ class NumberPickerDialog (
         val okButton: Button = this.findViewById(R.id.numberPickerOkButton)
         val clearButton: Button = this.findViewById(R.id.numberPickerClearButton)
         val heltalspicker: NumberPicker = this.findViewById(R.id.numberPickerHeltal)
-        heltalspicker.maxValue =  maxVal.substringBefore(".").toInt()
-        heltalspicker.minValue = minVal.substringBefore(".").toInt()
-        heltalspicker.value = defaultVal.substringBefore(".").toInt()
+        heltalspicker.maxValue =  maxVal
+        heltalspicker.minValue = minVal
+        heltalspicker.value = defaultVal
         heltalspicker.wrapSelectorWheel = false
 
         val decimalpicker: NumberPicker = this.findViewById(R.id.numberPickerDecimal)
         decimalpicker.maxValue =  9
         decimalpicker.minValue = 0
-        decimalpicker.value = defaultVal.substringAfter(".").toInt()*10
+        decimalpicker.value = defaultFraction
         decimalpicker.wrapSelectorWheel = false
 
         okButton.setOnClickListener {
-            val n = heltalspicker.value.toDouble()+decimalpicker.value.toDouble()/10.0
-            listener?.onNumberSet(this,n.toFloat())
+            listener?.onNumberSet(this,heltalspicker.value,decimalpicker.value)
             this.dismiss()
         }
+
         clearButton.setOnClickListener {
             listener?.onNumberClear(this)
             this.dismiss()
@@ -61,7 +52,7 @@ class NumberPickerDialog (
     }
 
     interface OnNumberSetListener{
-        fun onNumberSet(view: NumberPickerDialog, number: Float)
+        fun onNumberSet(view: NumberPickerDialog, number: Int, fraction: Int)
         fun onNumberClear(view: NumberPickerDialog)
     }
 }

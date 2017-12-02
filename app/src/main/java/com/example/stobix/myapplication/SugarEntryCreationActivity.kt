@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.DialogFragment
 import android.os.Bundle
 import android.util.Log.d
+import android.util.Log.i
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +24,7 @@ open class SugarEntryCreationActivity
 
     private var uid: Int=0
     private var date: DateHandler = DateHandler()
-    private var sugarLevel: Double? = null
+    private var sugarLevel: Int? = null
     private var alreadyDefinedEntry: Boolean = false
     lateinit private var dateView: TextView
     lateinit private var timeView: TextView
@@ -38,7 +39,7 @@ open class SugarEntryCreationActivity
             entry=arguments.getParcelable("entry")
             uid= entry.uid
             date.timestamp= entry.epochTimestamp
-            sugarLevel=if (entry.sugarLevel==-1) null else entry.sugarLevel.toDouble()/10f
+            sugarLevel=if (entry.sugarLevel==-1) null else entry.sugarLevel
             d( "SugarEntry create",
                     "already defined, uid:${entry.uid}, timestamp:${entry.epochTimestamp}, sugar: ${entry.sugarLevel}, extra: ${entry.epochTimestamp}"
             )
@@ -47,6 +48,14 @@ open class SugarEntryCreationActivity
             date.timestamp = arguments.getLong("timestamp")
             d("SugarEntry create","creating new, uid:${uid}, timestamp:${date.timestamp}")
             entry = SugarEntry(uid, date.timestamp)
+        }
+    }
+
+    fun sugarLevelToString(): String {
+        val sugarLevel=sugarLevel
+        when {
+            sugarLevel == null -> return ""
+            else -> return "${sugarLevel / 10}.${sugarLevel % 10}"
         }
     }
 
@@ -69,7 +78,7 @@ open class SugarEntryCreationActivity
         val buttonAddClose: Button =v.findViewById<Button>(R.id.entryAddClose)
 
         if(alreadyDefinedEntry) {
-            sugarView.text=sugarLevel?.toString()?:""
+            sugarView.text=sugarLevelToString()
             extraV.text= entry.extra
             buttonAddClose.text=getString(R.string.edit_dialog_button_update)
             buttonAdd.visibility=View.GONE
@@ -80,7 +89,24 @@ open class SugarEntryCreationActivity
 
         dateView.setOnClickListener { (activity as MainActivity).showDatePicker(date.year,date.month,date.day) }
         timeView.setOnClickListener { (activity as MainActivity).showTimePicker(date.hour,date.minute) }
-        sugarView.setOnClickListener{ (activity as MainActivity).showNumberPicker(sugarLevel?:4.2,0.0,100.0) }
+        sugarView.setOnClickListener {
+            val sugarLevel = sugarLevel
+            when {
+                sugarLevel != null -> {
+                    (activity as MainActivity).showNumberPicker(
+                            sugarLevel / 10,
+                            sugarLevel % 10,
+                            0,
+                            100)
+                }
+                else ->
+                    (activity as MainActivity).showNumberPicker(
+                            4,
+                            2,
+                            0,
+                            100)
+            }
+        }
 
         buttonAdd.setOnClickListener {onSubmit(extraV)}
         buttonAddClose.setOnClickListener { onSubmitAndClose(extraV) }
@@ -88,6 +114,7 @@ open class SugarEntryCreationActivity
         return v
 
     }
+
 
     // Sending a full SugarEntry since I'm not sure what fields it will contain in the future.
     interface OnSugarEntryEnteredHandler {
@@ -113,7 +140,7 @@ open class SugarEntryCreationActivity
 
     private fun handleSubmission(extraView: TextView){
         entry.epochTimestamp=date.timestamp
-        entry.sugarLevel = sugarLevel?.times(10)?.toInt() ?: -1
+        entry.sugarLevel = sugarLevel ?: -1
         entry.extra = extraView.text?.toString() ?: "N/A"
         if(alreadyDefinedEntry) {
             d("SugarEntry update", "" + entry.uid + " " + entry.epochTimestamp + " " + entry.sugarLevel + " " + entry.extra)
@@ -137,9 +164,10 @@ open class SugarEntryCreationActivity
         timeView.text=timeText
     }
 
-    fun onNumberSet(number: Float) {
-        sugarLevel=number.toDouble()
-        sugarView.text=number.toString()
+    fun onNumberSet(number: Int, fraction:Int) {
+        i("SugarView","$number.$fraction")
+        sugarLevel=number*10+fraction
+        sugarView.text=sugarLevelToString()
     }
 
     fun onNumberClear() {

@@ -283,12 +283,13 @@ import static android.util.Log.d;
             t.show(getSupportFragmentManager(), "timePicker");
         }
 
-        public void showNumberPicker(double val, double min, double max){
+        public void showNumberPicker(int val, int frac, int min, int max){
             NumberPickerFragment n = new NumberPickerFragment();
             Bundle b = new Bundle();
-            b.putDouble("value",val);
-            b.putDouble("min",min);
-            b.putDouble("max",max);
+            b.putInt("value",val);
+            b.putInt("fraction",frac);
+            b.putInt("min",min);
+            b.putInt("max",max);
             n.setArguments(b);
             n.show(getSupportFragmentManager(), "numberPicker");
         }
@@ -309,8 +310,8 @@ import static android.util.Log.d;
         }
 
         @Override
-        public void handleNumber(float number) {
-            creationActivity.onNumberSet(number);
+        public void handleNumber(int number, int fraction) {
+            creationActivity.onNumberSet(number, fraction);
         }
         @Override
         public void handleNumberClear() {
