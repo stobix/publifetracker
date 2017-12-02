@@ -10,11 +10,6 @@ import java.util.Date
 
 import android.arch.persistence.room.ColumnInfo.INTEGER
 
-/**
- * Created by stobix on 11/9/17.
- *
- */
-
 @Entity(tableName = "sugar_entries")
 /*
     room wants an empty constructor in kotlin to be able to parse the file.
@@ -31,8 +26,6 @@ data class SugarEntry constructor(
         @ColumnInfo(name = "sugar") var sugarLevel: Int=-1, // TODO Should this be a nullable in the database?
         @ColumnInfo(name = "extra") var extra: String?=null
 ) : Parcelable {
-
-    constructor(uid: Int, date: Date?, sugarLevel: Int, extra: String?) : this(uid, date?.time ?: 0L, sugarLevel, extra)
 
     // The rest of this file describes how to destruct a SugarEntry into a Parcel,
     // and how to get it back.
