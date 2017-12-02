@@ -39,7 +39,8 @@
         android:singleLine="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView2"
-        app:layout_constraintTop_toBottomOf="@+id/entryCreatorDate" />
+        app:layout_constraintTop_toBottomOf="@+id/entryCreatorDate"
+        tools:ignore="KeyboardInaccessibleWidget" />
 
     <EditText
         android:id="@+id/entryCreatorSugar"
@@ -57,7 +58,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView3"
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorTime"
-        tools:text="@string/input_sugar" />
+        tools:text="@string/input_sugar"
+        tools:ignore="KeyboardInaccessibleWidget" />
 
     <EditText
         android:id="@+id/entryCreatorExtra"
@@ -82,7 +84,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
-        android:text="@string/button_add_close"
+        android:text="@string/creation_dialog_button_add_close"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorExtra" />
@@ -94,7 +96,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
-        android:text="@string/button_add"
+        android:text="@string/creation_dialog_button_add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/entryAddClose"
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorExtra" />
@@ -106,7 +108,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
-        android:text="@string/button_close"
+        android:text="@string/creation_dialog_button_close"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/entryAdd"
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorExtra" />

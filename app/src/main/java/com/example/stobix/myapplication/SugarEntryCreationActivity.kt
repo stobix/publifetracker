@@ -24,23 +24,26 @@ open class SugarEntryCreationActivity
     private var uid: Int=0
     private var date: DateHandler = DateHandler()
     private var sugarLevel: Float? = null
-    private var dateView: TextView? = null
-    private var timeView: TextView? = null
-    private var sugarView: TextView? = null
     private var alreadyDefinedEntry: Boolean = false
-    private var entry: SugarEntry? = null
+    lateinit private var dateView: TextView
+    lateinit private var timeView: TextView
+    lateinit private var sugarView: TextView
+    lateinit private var entry: SugarEntry
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        alreadyDefinedEntry = arguments.getBoolean("editCurrent")
+        alreadyDefinedEntry = arguments.getBoolean("EditCurrent")
         if(alreadyDefinedEntry) {
             entry=arguments.getParcelable("entry")
-            uid=entry!!.uid
-            date.timestamp=entry!!.epochTimestamp
+            uid= entry.uid
+            date.timestamp= entry.epochTimestamp
+            sugarLevel=entry.sugarLevel.toFloat()/10f
+            d("SugarEntry create","already defined, uid:${entry.uid}, timestamp:${entry.epochTimestamp}")
         } else {
             uid = arguments.getInt("uid")
             date.timestamp = arguments.getLong("timestamp")
+            d("SugarEntry create","creating new, uid:${uid}, timestamp:${date.timestamp}")
             entry = SugarEntry(uid, date.timestamp)
         }
     }
@@ -57,21 +60,32 @@ open class SugarEntryCreationActivity
 
         val dateText="%d-%02d-%02d".format(date.year,date.month+1,date.day)
         val timeText=""+date.hour+":"+date.minute // +s":"+date.second
-        dateView!!.text=dateText
-        timeView!!.text=timeText
+        dateView.text=dateText
+        timeView.text=timeText
+
+        val buttonAdd: Button = v.findViewById<Button>(R.id.entryAdd)
+        val buttonClose: Button = v.findViewById<Button>(R.id.entryClose)
+        val buttonAddClose: Button =v.findViewById<Button>(R.id.entryAddClose)
 
         if(alreadyDefinedEntry) {
-            sugarView!!.text=(entry!!.sugarLevel/10.0).toString()
-            extraV.text=entry!!.extra
+            sugarView.text=(entry.sugarLevel/10.0).toString()
+            extraV.text= entry.extra
+            buttonAddClose.text=getString(R.string.edit_dialog_button_update)
+            buttonAdd.visibility=View.GONE
+            buttonClose.visibility=View.GONE
+        } else {
+            buttonAddClose.text=getString(R.string.creation_dialog_button_add_close)
+            buttonAdd.visibility=View.VISIBLE
+            buttonClose.visibility=View.VISIBLE
         }
 
-        dateView!!.setOnClickListener { (activity as MainActivity).showDatePicker() }
-        timeView!!.setOnClickListener { (activity as MainActivity).showTimePicker() }
-        sugarView!!.setOnClickListener{ (activity as MainActivity).showNumberPicker() }
+        dateView.setOnClickListener { (activity as MainActivity).showDatePicker() }
+        timeView.setOnClickListener { (activity as MainActivity).showTimePicker() }
+        sugarView.setOnClickListener{ (activity as MainActivity).showNumberPicker() }
 
-        v.findViewById<Button>(R.id.entryAdd).setOnClickListener {onSubmit(extraV)}
-        v.findViewById<Button>(R.id.entryClose).setOnClickListener { onClose() }
-        v.findViewById<Button>(R.id.entryAddClose).setOnClickListener { onSubmitAndClose(extraV) }
+        buttonAdd.setOnClickListener {onSubmit(extraV)}
+        buttonClose.setOnClickListener { onClose() }
+        buttonAddClose.setOnClickListener { onSubmitAndClose(extraV) }
 
         return v
 
@@ -80,6 +94,10 @@ open class SugarEntryCreationActivity
     // Sending a full SugarEntry since I'm not sure what fields it will contain in the future.
     interface OnSugarEntryEnteredHandler {
         fun onSugarEntryEntered(s: SugarEntry)
+    }
+
+    interface OnSugarEntryChangedHandler{
+        fun onSugarEntryChanged(s: SugarEntry)
     }
 
     private fun onSubmit(extraV: TextView) {
@@ -96,12 +114,16 @@ open class SugarEntryCreationActivity
     }
 
     private fun handleSubmission(extraView: TextView){
-        val entry=this.entry!!
         entry.epochTimestamp=date.timestamp
         entry.sugarLevel = sugarLevel?.times(10)?.toInt() ?: -1
         entry.extra = extraView.text?.toString() ?: "N/A"
-        d("SugarEntry submit", "" + entry.uid + " " + entry.epochTimestamp + " " + entry.sugarLevel + " " + entry.extra)
-        (activity as OnSugarEntryEnteredHandler).onSugarEntryEntered(entry)
+        if(alreadyDefinedEntry) {
+            d("SugarEntry update", "" + entry.uid + " " + entry.epochTimestamp + " " + entry.sugarLevel + " " + entry.extra)
+            (activity as OnSugarEntryChangedHandler).onSugarEntryChanged(entry)
+        } else {
+            d("SugarEntry submit", "" + entry.uid + " " + entry.epochTimestamp + " " + entry.sugarLevel + " " + entry.extra)
+            (activity as OnSugarEntryEnteredHandler).onSugarEntryEntered(entry)
+        }
     }
 
     private fun onClose(){
@@ -112,28 +134,28 @@ open class SugarEntryCreationActivity
         date.setDate(year,month,day)
         // Calendars use a 0-indexed gregorian/julian month for some reason!
         val dateText="%d-%02d-%02d".format(year,month+1,day)
-        dateView!!.text=dateText
+        dateView.text=dateText
     }
 
     fun handleTime(hour: Int, minute: Int) {
         date.setTime(hour,minute)
         val timeText= "%02d:%02d".format(hour,minute)
-        timeView!!.text=timeText
+        timeView.text=timeText
     }
 
     fun onNumberSet(number: Float) {
         sugarLevel=number
-        sugarView?.text=number.toString()
+        sugarView.text=number.toString()
     }
 
     fun onNumberClear() {
         sugarLevel=null
-        sugarView?.text=""
+        sugarView.text=""
     }
 
     companion object Creator{
-        fun newInstance(uid: Int) = newInstance(uid,DateHandler().timestamp)
-        fun newInstance(uid: Int, timestamp: Long ): SugarEntryCreationActivity{
+        @JvmStatic fun newInstance(uid: Int) = newInstance(uid,DateHandler().timestamp)
+        @JvmStatic fun newInstance(uid: Int, timestamp: Long ): SugarEntryCreationActivity{
             val s = SugarEntryCreationActivity()
             val args = Bundle()
             d("SugarEntry creation","Called with uid:"+uid+" timestamp:"+timestamp)
@@ -143,9 +165,10 @@ open class SugarEntryCreationActivity
             s.arguments=args
             return s
         }
-        fun newInstance(sugarEntry: SugarEntry): SugarEntryCreationActivity{
+        @JvmStatic fun newInstance(sugarEntry: SugarEntry): SugarEntryCreationActivity{
             val s = SugarEntryCreationActivity()
             val args = Bundle()
+            d("SugarEntry edit","Called with uid:"+sugarEntry.uid+" timestamp:"+sugarEntry.epochTimestamp)
             args.putBoolean("EditCurrent",true)
             args.putParcelable("entry",sugarEntry)
             s.arguments=args

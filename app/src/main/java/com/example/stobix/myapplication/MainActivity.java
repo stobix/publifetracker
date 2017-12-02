@@ -26,7 +26,8 @@ import static android.util.Log.d;
             DatePickerFragment.DatePickerHandler,
             TimePickerFragment.TimePickerHandler,
             NumberPickerDialog.OnNumberSetListener,
-            SugarEntryCreationActivity.OnSugarEntryEnteredHandler
+            SugarEntryCreationActivity.OnSugarEntryEnteredHandler,
+            SugarEntryCreationActivity.OnSugarEntryChangedHandler
     {
 
         // Used to handle callback "bleed through"
@@ -62,7 +63,17 @@ import static android.util.Log.d;
                 // TODO
                 //open some dialog, maybe the entry creation dialog, to change element,
                 // and let it call sugarEntryChanged(sugarEntry);
-                sugarEntryDeleted(sugarEntry);
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+                if (prev != null) {
+                    ft.remove(prev);
+                }
+                ft.addToBackStack(null);
+
+                creationActivity = SugarEntryCreationActivity.newInstance(sugarEntry);
+                creationActivity.show(ft, "dialog");
+
+                //sugarEntryDeleted(sugarEntry);
             });
 
 
@@ -128,7 +139,7 @@ import static android.util.Log.d;
             }
             ft.addToBackStack(null);
 
-            creationActivity = SugarEntryCreationActivity.Creator.newInstance(nextUID);
+            creationActivity = SugarEntryCreationActivity.newInstance(nextUID);
             creationActivity.show(ft, "dialog");
 
         }
@@ -173,10 +184,10 @@ import static android.util.Log.d;
         }
 
         // Called when the user has changed a sugar entry and pressed 'submit changes'
-        public void sugarEntryChanged(@NotNull SugarEntry s){
+        public void onSugarEntryChanged(@NotNull SugarEntry s){
            sugarEntryGeneralAction(s,
                    (sugarEntry) -> dao.update(sugarEntry),
-                   (sugarEntry, sugarEntryTableDataAdapter) -> {}
+                   (sugarEntry, dataAdapter) -> dataAdapter.notifyDataSetChanged()
                    );
         }
 
