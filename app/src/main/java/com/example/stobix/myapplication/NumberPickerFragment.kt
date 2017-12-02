@@ -6,20 +6,28 @@ import android.support.v4.app.DialogFragment
 import android.widget.NumberPicker
 
 class NumberPickerFragment : DialogFragment(), NumberPickerDialog.OnNumberSetListener {
-    override fun onNumberClear(view: NumberPickerDialog) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return NumberPickerDialog(activity, this, 4.2)
+        val value = arguments.getDouble("value",4.2)
+        val min = arguments.getDouble("min",0.0)
+        val max = arguments.getDouble("max",100.0)
+        return NumberPickerDialog(activity, this, value,min,max)
     }
 
-    interface NumberPickerHandler {
+    interface NumberPickedHandler {
         fun handleNumber(number: Float)
     }
 
+    interface NumberClearedHandler {
+        fun handleNumberClear()
+    }
+
     override fun onNumberSet(view: NumberPickerDialog, number: Float){
-        val datePickerHandler = activity as NumberPickerHandler
-        datePickerHandler.handleNumber(number)
+        val numberPickedHandler = activity as NumberPickedHandler
+        numberPickedHandler.handleNumber(number)
+    }
+    override fun onNumberClear(view: NumberPickerDialog) {
+        val numberClearedHandler = activity as NumberClearedHandler
+        numberClearedHandler.handleNumberClear()
     }
 }

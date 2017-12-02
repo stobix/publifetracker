@@ -23,7 +23,7 @@ open class SugarEntryCreationActivity
 
     private var uid: Int=0
     private var date: DateHandler = DateHandler()
-    private var sugarLevel: Float? = null
+    private var sugarLevel: Double? = null
     private var alreadyDefinedEntry: Boolean = false
     lateinit private var dateView: TextView
     lateinit private var timeView: TextView
@@ -38,8 +38,10 @@ open class SugarEntryCreationActivity
             entry=arguments.getParcelable("entry")
             uid= entry.uid
             date.timestamp= entry.epochTimestamp
-            sugarLevel=entry.sugarLevel.toFloat()/10f
-            d("SugarEntry create","already defined, uid:${entry.uid}, timestamp:${entry.epochTimestamp}")
+            sugarLevel=if (entry.sugarLevel==-1) null else entry.sugarLevel.toDouble()/10f
+            d( "SugarEntry create",
+                    "already defined, uid:${entry.uid}, timestamp:${entry.epochTimestamp}, sugar: ${entry.sugarLevel}, extra: ${entry.epochTimestamp}"
+            )
         } else {
             uid = arguments.getInt("uid")
             date.timestamp = arguments.getLong("timestamp")
@@ -59,32 +61,28 @@ open class SugarEntryCreationActivity
         val extraV = v.findViewById<TextView>(R.id.entryCreatorExtra)
 
         val dateText="%d-%02d-%02d".format(date.year,date.month+1,date.day)
-        val timeText=""+date.hour+":"+date.minute // +s":"+date.second
+        val timeText="%02d:%02d".format(date.hour,date.minute)
         dateView.text=dateText
         timeView.text=timeText
 
         val buttonAdd: Button = v.findViewById<Button>(R.id.entryAdd)
-        val buttonClose: Button = v.findViewById<Button>(R.id.entryClose)
         val buttonAddClose: Button =v.findViewById<Button>(R.id.entryAddClose)
 
         if(alreadyDefinedEntry) {
-            sugarView.text=(entry.sugarLevel/10.0).toString()
+            sugarView.text=sugarLevel?.toString()?:""
             extraV.text= entry.extra
             buttonAddClose.text=getString(R.string.edit_dialog_button_update)
             buttonAdd.visibility=View.GONE
-            buttonClose.visibility=View.GONE
         } else {
             buttonAddClose.text=getString(R.string.creation_dialog_button_add_close)
             buttonAdd.visibility=View.VISIBLE
-            buttonClose.visibility=View.VISIBLE
         }
 
-        dateView.setOnClickListener { (activity as MainActivity).showDatePicker() }
-        timeView.setOnClickListener { (activity as MainActivity).showTimePicker() }
-        sugarView.setOnClickListener{ (activity as MainActivity).showNumberPicker() }
+        dateView.setOnClickListener { (activity as MainActivity).showDatePicker(date.year,date.month,date.day) }
+        timeView.setOnClickListener { (activity as MainActivity).showTimePicker(date.hour,date.minute) }
+        sugarView.setOnClickListener{ (activity as MainActivity).showNumberPicker(sugarLevel?:4.2,0.0,100.0) }
 
         buttonAdd.setOnClickListener {onSubmit(extraV)}
-        buttonClose.setOnClickListener { onClose() }
         buttonAddClose.setOnClickListener { onSubmitAndClose(extraV) }
 
         return v
@@ -126,10 +124,6 @@ open class SugarEntryCreationActivity
         }
     }
 
-    private fun onClose(){
-        this.dismiss()
-    }
-
     fun handleDate(year: Int, month: Int, day: Int) {
         date.setDate(year,month,day)
         // Calendars use a 0-indexed gregorian/julian month for some reason!
@@ -144,7 +138,7 @@ open class SugarEntryCreationActivity
     }
 
     fun onNumberSet(number: Float) {
-        sugarLevel=number
+        sugarLevel=number.toDouble()
         sugarView.text=number.toString()
     }
 

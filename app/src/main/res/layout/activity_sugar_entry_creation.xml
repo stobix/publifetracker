@@ -101,18 +101,6 @@
         app:layout_constraintEnd_toStartOf="@+id/entryAddClose"
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorExtra" />
 
-    <Button
-        android:id="@+id/entryClose"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/creation_dialog_button_close"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/entryAdd"
-        app:layout_constraintTop_toBottomOf="@+id/entryCreatorExtra" />
-
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"

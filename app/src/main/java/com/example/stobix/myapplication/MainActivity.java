@@ -25,7 +25,8 @@ import static android.util.Log.d;
             implements
             DatePickerFragment.DatePickerHandler,
             TimePickerFragment.TimePickerHandler,
-            NumberPickerDialog.OnNumberSetListener,
+            NumberPickerFragment.NumberPickedHandler,
+            NumberPickerFragment.NumberClearedHandler,
             SugarEntryCreationActivity.OnSugarEntryEnteredHandler,
             SugarEntryCreationActivity.OnSugarEntryChangedHandler
     {
@@ -263,19 +264,40 @@ import static android.util.Log.d;
             }
         }
 
-
-
-        public void showDatePicker() {
-            new DatePickerFragment().show(getSupportFragmentManager(), "datePicker");
+        public void showDatePicker(int year,int month,int day) {
+            DatePickerFragment datePickerFragment=new DatePickerFragment();
+            Bundle b = new Bundle();
+            b.putInt("year",year);
+            b.putInt("month",month);
+            b.putInt("day",day);
+            datePickerFragment.setArguments(b);
+            datePickerFragment.show(getSupportFragmentManager(), "datePicker");
         }
 
-        public void showTimePicker() {
-            new TimePickerFragment().show(getSupportFragmentManager(), "timePicker");
+        public void showTimePicker(int hour, int minute) {
+            TimePickerFragment t = new TimePickerFragment();
+            Bundle b = new Bundle();
+            b.putInt("hour",hour);
+            b.putInt("minute",minute);
+            t.setArguments(b);
+            t.show(getSupportFragmentManager(), "timePicker");
         }
 
+        public void showNumberPicker(double val, double min, double max){
+            NumberPickerFragment n = new NumberPickerFragment();
+            Bundle b = new Bundle();
+            b.putDouble("value",val);
+            b.putDouble("min",min);
+            b.putDouble("max",max);
+            n.setArguments(b);
+            n.show(getSupportFragmentManager(), "numberPicker");
+        }
+
+        /*
         public void showNumberPicker() {
             new NumberPickerDialog(MainActivity.this,MainActivity.this).show();
         }
+        */
 
         @Override
         public void handleDate(int year, int month, int day) {
@@ -287,15 +309,12 @@ import static android.util.Log.d;
         }
 
         @Override
-        public void onNumberSet(@NotNull NumberPickerDialog view, float number) {
+        public void handleNumber(float number) {
             creationActivity.onNumberSet(number);
-
         }
-
         @Override
-        public void onNumberClear(@NotNull NumberPickerDialog view) {
+        public void handleNumberClear() {
             creationActivity.onNumberClear();
-
         }
 
     }
