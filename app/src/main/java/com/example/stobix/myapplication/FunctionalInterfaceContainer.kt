@@ -1,13 +1,9 @@
 package com.example.stobix.myapplication
 
 /**
- * This file contains a collection of small usable interfaces.
+ * This file contains et al a subset of the java.util.function interfaces,
+ * since they're not supported directly by android API 22
  */
-
-interface SendResultAble {
-    fun receiveResult(type: String, vararg results: Int)
-}
-
 
 @FunctionalInterface
 interface Consumer<in T> {
@@ -29,7 +25,6 @@ interface BiFunction<in T, in U, out R> {
     fun apply(t: T, u: U): R
 }
 
-
 @FunctionalInterface
 interface Supplier<out T>{
     fun get(): T
@@ -38,4 +33,10 @@ interface Supplier<out T>{
 @FunctionalInterface
 interface Predicate<in T>{
    fun test(t: T): Boolean
+}
+
+// This only makes sense in Kotlin
+@FunctionalInterface
+interface BiSupplier<out T,out S>{
+    fun get(): Pair<T,S>
 }
