@@ -18,4 +18,6 @@
     <string name="number_picker_ok_button">Apply</string>
     <string name="number_picker_clear_button">Clear</string>
     <string name="edit_dialog_button_update">update</string>
+    <string name="number_picker_sugar_level">Sugar Level</string>
+    <string name="action_colors">Color Settings</string>
 </resources>

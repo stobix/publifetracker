@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.stobix.myapplication.MainActivity">
     <item
+        android:id="@+id/action_colors"
+        android:title="@string/action_colors" />
+    <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"

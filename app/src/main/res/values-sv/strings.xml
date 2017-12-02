@@ -20,4 +20,6 @@
     <string name="number_picker_clear_button">Rensa</string>
     <string name="number_picker_ok_button">Ok</string>
     <string name="edit_dialog_button_update">Uppdatera</string>
+    <string name="number_picker_sugar_level">Blodsockernivå</string>
+    <string name="action_colors">Färginställningar</string>
 </resources>

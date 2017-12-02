@@ -19,7 +19,7 @@ class NumberPickerDialog (
 
     override fun show() {
         super.show()
-        this.setTitle("testeli")
+        this.setTitle(context.getString(R.string.number_picker_sugar_level))
         this.setContentView(R.layout.number_picker_dialog)
 
         val (heltalsdel,decimaldel)=values

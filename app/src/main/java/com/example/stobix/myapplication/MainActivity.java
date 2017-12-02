@@ -3,14 +3,22 @@ package com.example.stobix.myapplication;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.arch.persistence.room.Room;
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.OnColorSelectedListener;
+import com.flask.colorpicker.builder.ColorPickerClickListener;
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -126,7 +134,42 @@ import static android.util.Log.d;
 
             //noinspection SimplifiableIfStatement
             if (id == R.id.action_settings) {
+                Log.i("MenuClick", "onOptionsItemSelected: ");
                 return true;
+            }
+
+            if (id == R.id.action_colors){
+
+                ColorPickerDialogBuilder
+                        .with(this)
+                        //.with(context)
+                        .setTitle("Choose color")
+                        .initialColor(0xFFFFFFFF)
+                        .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                        .density(12)
+                        .setOnColorSelectedListener(new OnColorSelectedListener() {
+                            @Override
+                            public void onColorSelected(int selectedColor) {
+                                d("COLOR","Color selected:"+Integer.toHexString(selectedColor));
+                                //toast("onColorSelected: 0x" + Integer.toHexString(selectedColor));
+                            }
+                        })
+                        .setPositiveButton("ok", new ColorPickerClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
+                                d("COLOR","Pos click");
+                                //changeBackgroundColor(selectedColor);
+                            }
+                        })
+                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                d("COLOR","Neg click");
+                            }
+                        })
+                        .build()
+                        .show();
+
             }
 
             return super.onOptionsItemSelected(item);
