@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.codecrafters.tableview.TableDataAdapter;
+import kotlin.Pair;
 
 import static android.util.Log.d;
 
@@ -222,6 +223,7 @@ import static android.util.Log.d;
         }
 
 
+
         // Made static (i.e. no outer scope references) to prevent memory issues, since lint complained about the anonymous class instance.
         // See https://stackoverflow.com/questions/11407943/this-handler-class-should-be-static-or-leaks-might-occur-incominghandler
         private static class EntryHandler extends Handler {
@@ -310,8 +312,8 @@ import static android.util.Log.d;
         }
 
         @Override
-        public void handleNumber(int number, int fraction) {
-            creationActivity.onNumberSet(number, fraction);
+        public void handleNumber(@NotNull Pair<Integer, Integer> number) {
+            creationActivity.onNumberSet(number);
         }
         @Override
         public void handleNumberClear() {

@@ -11,20 +11,20 @@ class NumberPickerFragment : DialogFragment(), NumberPickerDialog.OnNumberSetLis
         val fraction = arguments.getInt("fraction",2)
         val min = arguments.getInt("min",0)
         val max = arguments.getInt("max",100)
-        return NumberPickerDialog(activity, this, value,fraction,min,max)
+        return NumberPickerDialog(activity, this, Pair(value,fraction),min,max)
     }
 
     interface NumberPickedHandler {
-        fun handleNumber(number: Int,fraction: Int)
+        fun handleNumber(number: Pair<Int, Int>)
     }
 
     interface NumberClearedHandler {
         fun handleNumberClear()
     }
 
-    override fun onNumberSet(view: NumberPickerDialog, number: Int, fraction: Int){
+    override fun onNumberSet(view: NumberPickerDialog, value: Pair<Int,Int>){
         val numberPickedHandler = activity as NumberPickedHandler
-        numberPickedHandler.handleNumber(number,fraction)
+        numberPickedHandler.handleNumber(value)
     }
     override fun onNumberClear(view: NumberPickerDialog) {
         val numberClearedHandler = activity as NumberClearedHandler

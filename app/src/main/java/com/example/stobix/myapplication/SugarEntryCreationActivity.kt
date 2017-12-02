@@ -51,7 +51,7 @@ open class SugarEntryCreationActivity
         }
     }
 
-    fun sugarLevelToString(): String {
+    private fun sugarLevelToString(): String {
         val sugarLevel=sugarLevel
         when {
             sugarLevel == null -> return ""
@@ -143,10 +143,16 @@ open class SugarEntryCreationActivity
         entry.sugarLevel = sugarLevel ?: -1
         entry.extra = extraView.text?.toString() ?: "N/A"
         if(alreadyDefinedEntry) {
-            d("SugarEntry update", "" + entry.uid + " " + entry.epochTimestamp + " " + entry.sugarLevel + " " + entry.extra)
+            d("SugarEntry update", "" + entry.uid
+                    + " " + entry.epochTimestamp
+                    + " " + entry.sugarLevel
+                    + " " + entry.extra)
             (activity as OnSugarEntryChangedHandler).onSugarEntryChanged(entry)
         } else {
-            d("SugarEntry submit", "" + entry.uid + " " + entry.epochTimestamp + " " + entry.sugarLevel + " " + entry.extra)
+            d("SugarEntry submit", "" + entry.uid
+                    + " " + entry.epochTimestamp
+                    + " " + entry.sugarLevel
+                    + " " + entry.extra)
             (activity as OnSugarEntryEnteredHandler).onSugarEntryEntered(entry)
         }
     }
@@ -164,7 +170,8 @@ open class SugarEntryCreationActivity
         timeView.text=timeText
     }
 
-    fun onNumberSet(number: Int, fraction:Int) {
+    fun onNumberSet(values: Pair<Int,Int>) {
+        val (number,fraction)=values
         i("SugarView","$number.$fraction")
         sugarLevel=number*10+fraction
         sugarView.text=sugarLevelToString()

@@ -9,8 +9,7 @@ import android.widget.NumberPicker.OnValueChangeListener
 class NumberPickerDialog (
         ctx: Context,
         val listener: OnNumberSetListener?,
-        val defaultVal: Int = 4,
-        val defaultFraction: Int = 2,
+        val values: Pair<Int,Int> = Pair(4,2),
         val minVal: Int = 0,
         val maxVal: Int = 100
 ) :
@@ -22,22 +21,24 @@ class NumberPickerDialog (
         super.show()
         this.setTitle("testeli")
         this.setContentView(R.layout.number_picker_dialog)
+
+        val (heltalsdel,decimaldel)=values
         val okButton: Button = this.findViewById(R.id.numberPickerOkButton)
         val clearButton: Button = this.findViewById(R.id.numberPickerClearButton)
         val heltalspicker: NumberPicker = this.findViewById(R.id.numberPickerHeltal)
         heltalspicker.maxValue =  maxVal
         heltalspicker.minValue = minVal
-        heltalspicker.value = defaultVal
+        heltalspicker.value = heltalsdel
         heltalspicker.wrapSelectorWheel = false
 
         val decimalpicker: NumberPicker = this.findViewById(R.id.numberPickerDecimal)
         decimalpicker.maxValue =  9
         decimalpicker.minValue = 0
-        decimalpicker.value = defaultFraction
+        decimalpicker.value = decimaldel
         decimalpicker.wrapSelectorWheel = false
 
         okButton.setOnClickListener {
-            listener?.onNumberSet(this,heltalspicker.value,decimalpicker.value)
+            listener?.onNumberSet(this,Pair(heltalspicker.value,decimalpicker.value))
             this.dismiss()
         }
 
@@ -52,7 +53,7 @@ class NumberPickerDialog (
     }
 
     interface OnNumberSetListener{
-        fun onNumberSet(view: NumberPickerDialog, number: Int, fraction: Int)
+        fun onNumberSet(view: NumberPickerDialog, value: Pair<Int,Int>)
         fun onNumberClear(view: NumberPickerDialog)
     }
 }
