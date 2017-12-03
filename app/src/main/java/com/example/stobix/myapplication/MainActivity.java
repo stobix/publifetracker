@@ -135,6 +135,24 @@ import static android.util.Log.d;
             return true;
         }
 
+
+        /**
+         * From the super class documentation:
+         *
+         * This hook is called whenever an item in your options menu is selected.
+         * The default implementation simply returns false to have the normal
+         * processing happen (calling the item's Runnable or sending a message to
+         * its Handler as appropriate).  You can use this method for any items
+         * for which you would like to do processing without those other
+         * facilities.
+         *
+         * <p>Derived classes should call through to the base class for it to
+         * perform the default menu handling.</p>
+         *
+         * @return boolean Return false to allow normal menu processing to
+         *         proceed, true to consume it here.
+         */
+
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
             // Handle action bar item clicks here. The action bar will
@@ -151,31 +169,19 @@ import static android.util.Log.d;
 
                     ColorPickerDialogBuilder
                             .with(this)
-                            //.with(context)
                             .setTitle("Choose color")
                             .initialColor(0xFFFFFFFF)
                             .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                             .density(12)
-                            .setOnColorSelectedListener(new OnColorSelectedListener() {
-                                @Override
-                                public void onColorSelected(int selectedColor) {
-                                    d("COLOR", "Color selected:" + Integer.toHexString(selectedColor));
-                                    //toast("onColorSelected: 0x" + Integer.toHexString(selectedColor));
-                                }
-                            })
-                            .setPositiveButton("ok", new ColorPickerClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-                                    d("COLOR", "Pos click");
-                                    //changeBackgroundColor(selectedColor);
-                                }
-                            })
-                            .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    d("COLOR", "Neg click");
-                                }
-                            })
+                            .setOnColorSelectedListener(selectedColor ->
+                                    d("COLOR", "Color selected:"
+                                            + Integer.toHexString(selectedColor)))
+                            .setPositiveButton("ok", (dialog, selectedColor, allColors) ->
+                                // TODO Use the color for something.
+                                    d("COLOR", "Color confirmed:"
+                                            + Integer.toHexString(selectedColor)))
+                            .setNegativeButton("cancel", (dialog, which) ->
+                                    d("COLOR", "Color aborted"))
                             .build()
                             .show();
 
