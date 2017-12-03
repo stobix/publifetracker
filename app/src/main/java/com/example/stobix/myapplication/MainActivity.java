@@ -4,7 +4,8 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.arch.persistence.room.Room;
 import android.content.DialogInterface;
-import android.graphics.Color;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -55,9 +56,18 @@ import static android.util.Log.d;
         // crash the data base on insertion.
         private int nextUID;
 
+        private boolean useZimmik;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
+            SharedPreferences preferences = getSharedPreferences("colorsNstuff",MODE_PRIVATE);
+            useZimmik = preferences.getBoolean("zimmik",true);
+            if(useZimmik){
+                setTheme(R.style.Theme_Zimmik_NoActionBar);
+            } else {
+                setTheme(R.style.Theme_Joel_NoActionBar);
+            }
+
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
             Toolbar toolbar = findViewById(R.id.toolbar);
@@ -130,49 +140,60 @@ import static android.util.Log.d;
             // Handle action bar item clicks here. The action bar will
             // automatically handle clicks on the Home/Up button, so long
             // as you specify a parent activity in AndroidManifest.xml.
-            int id = item.getItemId();
 
-            //noinspection SimplifiableIfStatement
-            if (id == R.id.action_settings) {
-                Log.i("MenuClick", "onOptionsItemSelected: ");
-                return true;
+            switch(item.getItemId()) {
+                case R.id.action_settings:
+                    Log.i("MenuClick", "onOptionsItemSelected: ");
+                    return true;
+
+
+                case R.id.action_colors:
+
+                    ColorPickerDialogBuilder
+                            .with(this)
+                            //.with(context)
+                            .setTitle("Choose color")
+                            .initialColor(0xFFFFFFFF)
+                            .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                            .density(12)
+                            .setOnColorSelectedListener(new OnColorSelectedListener() {
+                                @Override
+                                public void onColorSelected(int selectedColor) {
+                                    d("COLOR", "Color selected:" + Integer.toHexString(selectedColor));
+                                    //toast("onColorSelected: 0x" + Integer.toHexString(selectedColor));
+                                }
+                            })
+                            .setPositiveButton("ok", new ColorPickerClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
+                                    d("COLOR", "Pos click");
+                                    //changeBackgroundColor(selectedColor);
+                                }
+                            })
+                            .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    d("COLOR", "Neg click");
+                                }
+                            })
+                            .build()
+                            .show();
+
+                    return true;
+
+                case R.id.action_switch_theme:
+                    SharedPreferences.Editor editor = getSharedPreferences("colorsNstuff",MODE_PRIVATE).edit();
+                    editor.putBoolean("zimmik",!useZimmik);
+                    editor.apply();
+                    Intent intent = getIntent();
+                    finish();
+
+                    startActivity(intent);
+                    return true;
+                default:
+                    return super.onOptionsItemSelected(item);
             }
 
-            if (id == R.id.action_colors){
-
-                ColorPickerDialogBuilder
-                        .with(this)
-                        //.with(context)
-                        .setTitle("Choose color")
-                        .initialColor(0xFFFFFFFF)
-                        .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
-                        .density(12)
-                        .setOnColorSelectedListener(new OnColorSelectedListener() {
-                            @Override
-                            public void onColorSelected(int selectedColor) {
-                                d("COLOR","Color selected:"+Integer.toHexString(selectedColor));
-                                //toast("onColorSelected: 0x" + Integer.toHexString(selectedColor));
-                            }
-                        })
-                        .setPositiveButton("ok", new ColorPickerClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-                                d("COLOR","Pos click");
-                                //changeBackgroundColor(selectedColor);
-                            }
-                        })
-                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                d("COLOR","Neg click");
-                            }
-                        })
-                        .build()
-                        .show();
-
-            }
-
-            return super.onOptionsItemSelected(item);
         }
 
         // Show the dialog for creating a SugarEntry

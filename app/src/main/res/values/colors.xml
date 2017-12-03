@@ -5,4 +5,9 @@
     <color name="colorAccent">#FF4081</color>
     <color name="table_data_row_even">#e2cd78</color>
     <color name="table_data_row_odd">#b477bc</color>
+
+    <color name="joelAccent">#ffa340</color>
+    <color name="joelPrimary">#130404</color>
+    <color name="joelPrimaryDark">#744b0d</color>
+
 </resources>

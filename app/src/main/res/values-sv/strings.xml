@@ -22,4 +22,5 @@
     <string name="edit_dialog_button_update">Uppdatera</string>
     <string name="number_picker_sugar_level">Blodsockernivå</string>
     <string name="action_colors">Färginställningar</string>
+    <string name="action_switch_theme">Byt färgtema</string>
 </resources>

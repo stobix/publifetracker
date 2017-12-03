@@ -6,6 +6,9 @@
         android:id="@+id/action_colors"
         android:title="@string/action_colors" />
     <item
+        android:id="@+id/action_switch_theme"
+        android:title="@string/action_switch_theme" />
+    <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
