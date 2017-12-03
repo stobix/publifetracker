@@ -17,6 +17,8 @@
         <item name="colorPrimary">@color/joelPrimary</item>
         <item name="colorPrimaryDark">@color/joelPrimaryDark</item>
         <item name="colorAccent">@color/joelAccent</item>
+        <item name="android:statusBarColor">@color/joelPrimaryDark</item>
+        <item name="android:windowBackground">@color/joelWindowBackground</item>
     </style>
 
     <style name="Theme.Joel.NoActionBar" >

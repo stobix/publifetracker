@@ -30,6 +30,7 @@ class SugarEntryTableDataAdapter(
             }
             1 -> {
                 if(currRow.sugarLevel > 0)
+                    // TODO set locale somewhere in the app so this displays a decimal comma in countries that use it
                     renderString(String.format("%.1f", currRow.sugarLevel / 10f))
                 else
                     renderString("")
