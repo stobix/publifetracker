@@ -96,7 +96,11 @@ import static android.util.Log.d;
                 creationActivity = SugarEntryCreationActivity.newInstance(sugarEntry);
                 creationActivity.show(ft, "dialog");
 
-                //sugarEntryDeleted(sugarEntry);
+            });
+
+            tv.addDataLongClickListener((raw,sugarEntry) -> {
+                sugarEntryDeleted(sugarEntry);
+                return true;
             });
 
 
