@@ -1,4 +1,4 @@
-package com.example.stobix.myapplication
+package stobix.compat.functions
 
 /**
  * This file contains et al a subset of the java.util.function interfaces,
@@ -32,7 +32,7 @@ interface Supplier<out T>{
 
 @FunctionalInterface
 interface Predicate<in T>{
-   fun test(t: T): Boolean
+    fun test(t: T): Boolean
 }
 
 // This only makes sense in Kotlin
