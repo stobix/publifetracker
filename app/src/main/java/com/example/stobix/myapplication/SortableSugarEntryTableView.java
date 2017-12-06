@@ -2,6 +2,7 @@ package com.example.stobix.myapplication;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 
@@ -26,8 +27,34 @@ public class SortableSugarEntryTableView extends SortableTableView<SugarEntry> {
         this(context, attributes, android.R.attr.listViewStyle);
     }
 
+
     public SortableSugarEntryTableView(final Context context, final AttributeSet attributes, final int styleAttributes) {
         super(context,attributes,styleAttributes);
+
+        TypedArray themeSettings = context.getTheme().obtainStyledAttributes(attributes,
+                R.styleable.SortableSugarEntryTableView, 0, 0);
+
+        final int rowColorEven = themeSettings.getColor(
+                R.styleable.SortableSugarEntryTableView_table_data_row_even,
+                ContextCompat.getColor(context, R.color.table_data_row_even)
+        );
+
+        final int rowColorOdd = themeSettings.getColor(
+                R.styleable.SortableSugarEntryTableView_table_data_row_odd,
+                ContextCompat.getColor(context, R.color.table_data_row_odd)
+        );
+
+        final int headerColor = themeSettings.getColor(
+                R.styleable.SortableSugarEntryTableView_table_header_text,
+                ContextCompat.getColor(context, R.color.colorPrimary)
+        );
+
+        // TODO How to get the default text color, and how to set header color??
+        final int textColor = themeSettings.getColor(
+                R.styleable.SortableSugarEntryTableView_table_data_text,
+                ContextCompat.getColor(context, R.color.colorAccent)
+        );
+
 
         Resources res = getResources();
 
@@ -35,12 +62,10 @@ public class SortableSugarEntryTableView extends SortableTableView<SugarEntry> {
         final SimpleTableHeaderAdapter simpleTableHeaderAdapter =
                 new SimpleTableHeaderAdapter(context,hdrs);
 
-
-        simpleTableHeaderAdapter.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
+        simpleTableHeaderAdapter.setTextColor(headerColor);
         setHeaderAdapter(simpleTableHeaderAdapter);
 
-        final int rowColorEven = ContextCompat.getColor(context, R.color.table_data_row_even);
-        final int rowColorOdd = ContextCompat.getColor(context, R.color.table_data_row_odd);
+
         setDataRowBackgroundProvider(TableDataRowBackgroundProviders.alternatingRowColors(rowColorEven, rowColorOdd));
         setHeaderSortStateViewProvider(SortStateViewProviders.brightArrows());
 
@@ -49,7 +74,7 @@ public class SortableSugarEntryTableView extends SortableTableView<SugarEntry> {
                 new TableColumnWeightModel(hdrs.length);
 
         tableColumnWeightModel.setColumnWeight(0, 2);
-        tableColumnWeightModel.setColumnWeight(1, 3);
+        tableColumnWeightModel.setColumnWeight(1, 1);
         tableColumnWeightModel.setColumnWeight(2, 3);
         setColumnModel(tableColumnWeightModel);
 

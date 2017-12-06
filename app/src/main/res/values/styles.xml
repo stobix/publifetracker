@@ -19,6 +19,10 @@
         <item name="colorAccent">@color/joelAccent</item>
         <item name="android:statusBarColor">@color/joelPrimaryDark</item>
         <item name="android:windowBackground">@color/joelWindowBackground</item>
+        <item name="table_data_row_even">@color/joeldata_row_even</item>
+        <item name="table_data_row_odd">@color/joeldata_row_odd</item>
+        <item name="table_header_text">@color/joeldata_header_text</item>
+        <item name="tableView_headerColor">#ffcb00</item>
     </style>
 
     <style name="Theme.Joel.NoActionBar" >

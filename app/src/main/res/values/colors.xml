@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <declare-styleable name="SortableSugarEntryTableView">
+
+        <attr name="table_data_row_even" format="color"/>
+        <attr name="table_data_row_odd" format="color"/>
+        <attr name="table_data_text" format="color"/>
+        <attr name="table_data_text_even" format="color"/>
+        <attr name="table_data_text_odd" format="color"/>
+        <attr name="table_header_text" format="color"/>
+
+    </declare-styleable>
+
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
@@ -10,5 +21,8 @@
     <color name="joelPrimary">#130404</color>
     <color name="joelPrimaryDark">#744b0d</color>
     <color name="joelWindowBackground">#303030</color>
+    <color name="joeldata_row_odd">#bf2424</color>
+    <color name="joeldata_row_even">#52bf24</color>
+    <color name="joeldata_header_text">#24bfbc</color>
 
 </resources>
