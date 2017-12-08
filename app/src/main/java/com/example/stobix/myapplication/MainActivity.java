@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
@@ -26,6 +27,10 @@ import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,8 +38,12 @@ import de.codecrafters.tableview.TableDataAdapter;
 import kotlin.Pair;
 
 import static android.util.Log.d;
+/*
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
+*/
 
-    public class MainActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity
             implements
             DatePickerFragment.DatePickerHandler,
             TimePickerFragment.TimePickerHandler,
@@ -254,6 +263,46 @@ import static android.util.Log.d;
         }
         */
 
+        /* Checks if external storage is available for read and write */
+        public boolean isExternalStorageWritable() {
+            String state = Environment.getExternalStorageState();
+            if (Environment.MEDIA_MOUNTED.equals(state)) {
+                return true;
+            }
+            return false;
+        }
+
+        /* Checks if external storage is available to at least read */
+        public boolean isExternalStorageReadable() {
+            String state = Environment.getExternalStorageState();
+            if (Environment.MEDIA_MOUNTED.equals(state) ||
+                    Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+                return true;
+            }
+            return false;
+        }
+
+        public File getStorageDir(String someName) {
+            // Get the directory for the user's public pictures directory.
+            File file = new File(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOCUMENTS), someName);
+            if (!file.mkdirs()) {
+                Log.e("Filgrej", "Directory not created");
+            }
+            return file;
+        }
+
+        /*
+        TODO How do I even this?
+        public void saveStateAsFile(){
+            if(isExternalStorageReadable() && isExternalStorageWritable()) {
+                File dir = getStorageDir("kaka");
+                OutputStream out = Files.newOutputStream(dir.toPath(),CREATE, APPEND);
+            }
+
+        }
+        */
+
         // Called when the user has selected a sugar entry for deletion.
         public void sugarEntryDeleted(@NotNull SugarEntry s){
             sugarEntryGeneralAction(s,
@@ -283,6 +332,7 @@ import static android.util.Log.d;
                             tableView,
                             table_action
                     );
+
 
             (new Thread(
                     () -> {
