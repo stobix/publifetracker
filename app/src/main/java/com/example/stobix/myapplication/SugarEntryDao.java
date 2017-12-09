@@ -25,6 +25,11 @@ public interface SugarEntryDao {
     void insert(SugarEntry sugarEntry);
     @Insert
     void insertAll(SugarEntry... sugarEntries);
+    @Insert
+    void insertAll(List<SugarEntry> sugarEntryList);
+
+    @Query("Delete from sugar_entries ")
+    void clear_sugar_entries();
 
     @Delete
     void delete(SugarEntry sugarEntry);

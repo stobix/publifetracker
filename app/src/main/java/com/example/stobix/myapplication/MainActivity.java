@@ -414,15 +414,17 @@ public class MainActivity extends AppCompatActivity
             Log.i("file","opened text: "+text);
             List<SugarEntry> entries = g.fromJson(text,t);
             SugarEntryTableDataAdapter adapter = (SugarEntryTableDataAdapter) tableView.getDataAdapter();
+            /* TODO do the adapter thing in a handler after the db thread is finished. Mebbeh.
+             Or add a queue for actions to be performed.
+             Something that makes the user not be an idiot and crash the db if the request takes time.
+            */
             adapter.getData().clear();
             adapter.addAll(entries);
             adapter.notifyDataSetChanged();
-            /* TODO implement something like these
-             if(ask_user_if_clear_db()){
-                 dao.clearEntries()
-                 dao.insertAll(entries)
-             }
-            */
+            new Thread(() -> {
+                dao.clear_sugar_entries();
+                dao.insertAll(entries);
+            }).start();
         }
 
         @Override
