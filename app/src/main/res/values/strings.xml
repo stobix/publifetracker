@@ -21,4 +21,6 @@
     <string name="number_picker_sugar_level">Sugar Level</string>
     <string name="action_colors">Color Settings</string>
     <string name="action_switch_theme">Switch Theme</string>
+    <string name="action_export_db">export db</string>
+    <string name="action_import_db">import db</string>
 </resources>

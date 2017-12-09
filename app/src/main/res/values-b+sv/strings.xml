@@ -23,4 +23,6 @@
     <string name="number_picker_sugar_level">Blodsockernivå</string>
     <string name="action_colors">Färginställningar</string>
     <string name="action_switch_theme">Byt färgtema</string>
+    <string name="action_export_db">spara till fil</string>
+    <string name="action_import_db">hämta från fil</string>
 </resources>

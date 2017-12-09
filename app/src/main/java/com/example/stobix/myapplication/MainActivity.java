@@ -3,11 +3,10 @@ package com.example.stobix.myapplication;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.arch.persistence.room.Room;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
@@ -20,17 +19,14 @@ import stobix.compat.functions.Consumer;
 import stobix.compat.functions.BiConsumer;
 
 import com.flask.colorpicker.ColorPickerView;
-import com.flask.colorpicker.OnColorSelectedListener;
-import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.OpenOption;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,19 +34,17 @@ import de.codecrafters.tableview.TableDataAdapter;
 import kotlin.Pair;
 
 import static android.util.Log.d;
-/*
-import static java.nio.file.StandardOpenOption.APPEND;
-import static java.nio.file.StandardOpenOption.CREATE;
-*/
 
 public class MainActivity extends AppCompatActivity
-            implements
-            DatePickerFragment.DatePickerHandler,
-            TimePickerFragment.TimePickerHandler,
-            NumberPickerFragment.NumberPickedHandler,
-            NumberPickerFragment.NumberClearedHandler,
-            SugarEntryCreationActivity.OnSugarEntryEnteredHandler,
-            SugarEntryCreationActivity.OnSugarEntryChangedHandler
+        implements
+        DatePickerFragment.DatePickerHandler,
+        TimePickerFragment.TimePickerHandler,
+        NumberPickerFragment.NumberPickedHandler,
+        NumberPickerFragment.NumberClearedHandler,
+        SugarEntryCreationActivity.OnSugarEntryEnteredHandler,
+        SugarEntryCreationActivity.OnSugarEntryChangedHandler,
+        FileActions.FileCreateHandler,
+        FileActions.FileOpenHandler
     {
 
         // Used to handle callback "bleed through"
@@ -107,7 +101,7 @@ public class MainActivity extends AppCompatActivity
 
             });
 
-            tv.addDataLongClickListener((raw,sugarEntry) -> {
+            tv.addDataLongClickListener((row,sugarEntry) -> {
                 sugarEntryDeleted(sugarEntry);
                 return true;
             });
@@ -212,6 +206,15 @@ public class MainActivity extends AppCompatActivity
 
                     startActivity(intent);
                     return true;
+
+                case R.id.action_import_db:
+                    fa.userOpenFile();
+                    return true;
+
+                case R.id.action_export_db:
+                    fa.userCreateFile();
+                    return true;
+
                 default:
                     return super.onOptionsItemSelected(item);
             }
@@ -242,66 +245,6 @@ public class MainActivity extends AppCompatActivity
             );
         }
 
-        /*
-
-        Old function call temporarily added for instructional reasons:
-        public void sugarEntryDeleted(@NotNull SugarEntry s){
-            sugarEntryGeneralAction(s,
-                    new Consumer<SugarEntry>() {
-                        @Override
-                        public void accept(SugarEntry sugarEntry) {
-                            dao.delete(sugarEntry);
-                        }
-                    },
-                    new BiConsumer<SugarEntry, TableDataAdapter<SugarEntry>>() {
-                        @Override
-                        public void accept(SugarEntry sugarEntry, TableDataAdapter<SugarEntry> dataAdapter) {
-                            dataAdapter.remove(sugarEntry);
-                        }
-                    }
-            );
-        }
-        */
-
-        /* Checks if external storage is available for read and write */
-        public boolean isExternalStorageWritable() {
-            String state = Environment.getExternalStorageState();
-            if (Environment.MEDIA_MOUNTED.equals(state)) {
-                return true;
-            }
-            return false;
-        }
-
-        /* Checks if external storage is available to at least read */
-        public boolean isExternalStorageReadable() {
-            String state = Environment.getExternalStorageState();
-            if (Environment.MEDIA_MOUNTED.equals(state) ||
-                    Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-                return true;
-            }
-            return false;
-        }
-
-        public File getStorageDir(String someName) {
-            // Get the directory for the user's public pictures directory.
-            File file = new File(Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_DOCUMENTS), someName);
-            if (!file.mkdirs()) {
-                Log.e("Filgrej", "Directory not created");
-            }
-            return file;
-        }
-
-        /*
-        TODO How do I even this?
-        public void saveStateAsFile(){
-            if(isExternalStorageReadable() && isExternalStorageWritable()) {
-                File dir = getStorageDir("kaka");
-                OutputStream out = Files.newOutputStream(dir.toPath(),CREATE, APPEND);
-            }
-
-        }
-        */
 
         // Called when the user has selected a sugar entry for deletion.
         public void sugarEntryDeleted(@NotNull SugarEntry s){
@@ -350,7 +293,6 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-
         // Made static (i.e. no outer scope references) to prevent memory issues, since lint complained about the anonymous class instance.
         // See https://stackoverflow.com/questions/11407943/this-handler-class-should-be-static-or-leaks-might-occur-incominghandler
         private static class EntryHandler extends Handler {
@@ -393,6 +335,8 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+
+
         public void showDatePicker(int year,int month,int day) {
             DatePickerFragment datePickerFragment=new DatePickerFragment();
             Bundle b = new Bundle();
@@ -429,6 +373,8 @@ public class MainActivity extends AppCompatActivity
         }
         */
 
+        private FileActions fa = new FileActions(this);
+
         @Override
         public void handleDate(int year, int month, int day) {
             creationActivity.handleDate(year,month,day);
@@ -442,9 +388,52 @@ public class MainActivity extends AppCompatActivity
         public void handleNumber(@NotNull Pair<Integer, Integer> number) {
             creationActivity.onNumberSet(number);
         }
+
         @Override
         public void handleNumberClear() {
             creationActivity.onNumberClear();
+        }
+
+        @Override
+        public void handleFileCreated(@NotNull Uri uri) {
+            Log.i("file","created URI: "+uri.toString());
+            Gson g = new Gson();
+            Type t = new TypeToken<List<SugarEntry>>() {}.getType();
+            String json = g.toJson(tableView.getDataAdapter().getData(),t);
+            Log.i("file (json)",json);
+            fa.putTextInUri(uri,json);
+        }
+
+        @Override
+        public void handleFileOpened(@NotNull Uri uri) {
+            // Gson procedure taken from http://www.vogella.com/tutorials/JavaLibrary-Gson/article.html
+            Log.i("file","opened URI: "+uri.toString());
+            String text = fa.readTextFromUri(uri);
+            Gson g = new Gson();
+            Type t = new TypeToken<List<SugarEntry>>() {}.getType();
+            Log.i("file","opened text: "+text);
+            List<SugarEntry> entries = g.fromJson(text,t);
+            SugarEntryTableDataAdapter adapter = (SugarEntryTableDataAdapter) tableView.getDataAdapter();
+            adapter.getData().clear();
+            adapter.addAll(entries);
+            adapter.notifyDataSetChanged();
+            /* TODO implement something like these
+             if(ask_user_if_clear_db()){
+                 dao.clearEntries()
+                 dao.insertAll(entries)
+             }
+            */
+        }
+
+        @Override
+        public void onActivityResult(int requestCode, int resultCode,
+                                     Intent resultData) {
+            if(!fa.handleFileAction(requestCode,resultCode,resultData)){
+                if(fa.isFileAction(requestCode))
+                    Log.d("Activity result","activity aborted/failed: "+requestCode);
+                else
+                    Log.e("Activity result","unknown activity result: "+requestCode);
+            }
         }
 
     }
