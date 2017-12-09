@@ -6,7 +6,7 @@ android {
     buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.example.stobix.myapplication"
-        minSdkVersion 21
+        minSdkVersion 19
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -27,6 +27,8 @@ android {
         targetCompatibility 1.8
         sourceCompatibility 1.8
     }
+    productFlavors {
+    }
 }
 
 dependencies {
@@ -35,10 +37,9 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     // ColorPickerView
-    compile "com.github.danielnilsson9:color-picker-view:1.4.0@aar"
+    compile 'com.github.danielnilsson9:color-picker-view:1.4.0@aar'
     // Maybe better colorpicker
     compile 'com.github.QuadFlask:colorpicker:0.0.13'
-
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'com.android.support:appcompat-v7:26.1.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
@@ -48,8 +49,7 @@ dependencies {
     implementation 'android.arch.persistence.room:runtime:1.0.0'
     annotationProcessor 'android.arch.persistence.room:compiler:1.0.0'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    compile project (":compat")
-
+    compile project(':compat')
 }
 repositories {
     mavenCentral()
