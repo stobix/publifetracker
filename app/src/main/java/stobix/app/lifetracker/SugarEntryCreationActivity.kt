@@ -1,4 +1,4 @@
-package com.example.stobix.myapplication
+package stobix.app.lifetracker
 
 import android.annotation.SuppressLint
 import android.app.DialogFragment
@@ -129,7 +129,7 @@ open class SugarEntryCreationActivity
         handleSubmission(extraV)
         if(!alreadyDefinedEntry) {
             uid++
-            entry=SugarEntry(uid)
+            entry= SugarEntry(uid)
         }
     }
 
@@ -183,8 +183,8 @@ open class SugarEntryCreationActivity
     }
 
     companion object Creator{
-        @JvmStatic fun newInstance(uid: Int) = newInstance(uid,DateHandler().timestamp)
-        @JvmStatic fun newInstance(uid: Int, timestamp: Long ): SugarEntryCreationActivity{
+        @JvmStatic fun newInstance(uid: Int) = newInstance(uid, DateHandler().timestamp)
+        @JvmStatic fun newInstance(uid: Int, timestamp: Long ): SugarEntryCreationActivity {
             val s = SugarEntryCreationActivity()
             val args = Bundle()
             d("SugarEntry creation","Called with uid:"+uid+" timestamp:"+timestamp)
@@ -194,7 +194,7 @@ open class SugarEntryCreationActivity
             s.arguments=args
             return s
         }
-        @JvmStatic fun newInstance(sugarEntry: SugarEntry): SugarEntryCreationActivity{
+        @JvmStatic fun newInstance(sugarEntry: SugarEntry): SugarEntryCreationActivity {
             val s = SugarEntryCreationActivity()
             val args = Bundle()
             d("SugarEntry edit","Called with uid:"+sugarEntry.uid+" timestamp:"+sugarEntry.epochTimestamp)

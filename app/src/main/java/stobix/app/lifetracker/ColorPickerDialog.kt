@@ -1,9 +1,8 @@
-package com.example.stobix.myapplication
+package stobix.app.lifetracker
 
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
-import android.support.v4.graphics.ColorUtils
 
 /**
  * Created by stobix on 12/2/17.

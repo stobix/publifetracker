@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
-import com.example.thingpicker.R
 
 open class ThingPicker(context: Context,attrs: AttributeSet) : View(context, attrs) {
 

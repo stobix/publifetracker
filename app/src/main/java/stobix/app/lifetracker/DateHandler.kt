@@ -1,4 +1,4 @@
-package com.example.stobix.myapplication
+package stobix.app.lifetracker
 
 import java.util.Calendar
 

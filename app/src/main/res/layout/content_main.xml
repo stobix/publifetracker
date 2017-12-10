@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.stobix.myapplication.MainActivity"
+    tools:context="stobix.app.lifetracker.MainActivity"
     tools:showIn="@layout/activity_main">
 
     <!--
@@ -76,7 +76,7 @@
         app:layout_constraintStart_toEndOf="@+id/editText3" />
 
 -->
-    <com.example.stobix.myapplication.SortableSugarEntryTableView
+    <stobix.app.lifetracker.SortableSugarEntryTableView
         android:id="@+id/tableView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

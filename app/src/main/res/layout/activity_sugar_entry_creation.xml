@@ -5,7 +5,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.stobix.myapplication.SugarEntryCreationActivity" >
+    tools:context="stobix.app.lifetracker.SugarEntryCreationActivity" >
+    <!--
+        Putting SugarEntryCreationActivity above here seems to do nothing.
+        I must be missing some info.
+    -->
 
     <EditText
         android:id="@+id/entryCreatorDate"

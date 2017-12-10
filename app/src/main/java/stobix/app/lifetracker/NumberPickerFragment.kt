@@ -1,4 +1,4 @@
-package com.example.stobix.myapplication
+package stobix.app.lifetracker
 
 import android.app.Dialog
 import android.os.Bundle
@@ -11,7 +11,7 @@ class NumberPickerFragment : DialogFragment(), NumberPickerDialog.OnNumberSetLis
         val fraction = arguments.getInt("fraction",2)
         val min = arguments.getInt("min",0)
         val max = arguments.getInt("max",100)
-        return NumberPickerDialog(activity, this, Pair(value,fraction),min,max)
+        return NumberPickerDialog(activity, this, Pair(value, fraction), min, max)
     }
 
     interface NumberPickedHandler {

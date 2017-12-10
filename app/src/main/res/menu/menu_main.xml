@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.stobix.myapplication.MainActivity">
+    tools:context="stobix.app.lifetracker.MainActivity">
     <item
         android:id="@+id/action_colors"
         android:title="@string/action_colors" />
