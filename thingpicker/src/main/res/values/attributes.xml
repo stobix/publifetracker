@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ThingPicker">
+        <attr name="colorBorderDarkest" format="color">black</attr>
+        <attr name="colorBorderLightest" format="color">gray70</attr>
+        <attr name="colorText" format="color">#ffcb00</attr>
+        <attr name="colorBackground" format="color">#ffcb00</attr>
+    </declare-styleable>
+</resources>
