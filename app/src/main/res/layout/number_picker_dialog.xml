@@ -6,23 +6,48 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <NumberPicker
-        android:id="@+id/numberPickerHeltal"
-        android:layout_width="40dp"
-        android:layout_height="125dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+    <FrameLayout
+        android:id="@+id/pickerFrame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <NumberPicker
-        android:id="@+id/numberPickerDecimal"
-        android:layout_width="40dp"
-        android:layout_height="125dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintStart_toEndOf="@+id/textView6"
-        app:layout_constraintTop_toTopOf="parent" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <NumberPicker
+                android:id="@+id/numberPickerHeltal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp" />
+
+            <NumberPicker
+                android:id="@+id/numberPickerDecimal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toEndOf="@+id/textView6"
+                app:layout_constraintTop_toTopOf="parent" />
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="12dp"
+            android:text="@string/number_picker_separator_comma"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            android:textSize="24sp"
+            tools:layout_editor_absoluteY="64dp"
+            tools:ignore="MissingConstraints" />
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/buttonbar"
@@ -32,7 +57,7 @@
         android:layout_marginTop="8dp"
         android:gravity="end"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/numberPickerDecimal">
+        app:layout_constraintTop_toBottomOf="@id/pickerFrame" >
 
         <Button
             android:id="@+id/numberPickerClearButton"
@@ -41,7 +66,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="@string/number_picker_clear_button" />
+            android:text="@string/number_picker_clear_button"
+            />
 
         <Button
             android:id="@+id/numberPickerOkButton"
@@ -54,16 +80,5 @@
     </LinearLayout>
 
 
-    <TextView
-        android:id="@+id/textView6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:text="@string/number_picker_separator_comma"
-        android:textAppearance="@style/TextAppearance.AppCompat"
-        android:textSize="24sp"
-        app:layout_constraintStart_toEndOf="@+id/numberPickerHeltal"
-        tools:layout_editor_absoluteY="64dp"
-        tools:ignore="MissingConstraints" />
 
 </android.support.constraint.ConstraintLayout>
