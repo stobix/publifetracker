@@ -24,5 +24,44 @@
     <color name="joeldata_row_odd">#bf2424</color>
     <color name="joeldata_row_even">#52bf24</color>
     <color name="joeldata_header_text">#24bfbc</color>
+    <color name="joeldata_headerColor">#ffcb00</color>
+
+    <color name="madAccent">#ffc800</color>
+    <color name="madPrimary">#00ffff</color>
+    <color name="madPrimaryDark">#000000</color>
+    <color name="madWindowBackground">#cefff3</color>
+    <color name="maddata_row_odd">#f6ff97</color>
+    <color name="maddata_row_even">#ff008c</color>
+    <color name="maddata_header_text">#d700da</color>
+    <color name="maddata_headerColor">#90ff00</color>
+
+    <color name="nicecreamAccent">#ffc800</color>
+    <color name="nicecreamPrimary">#de06c8</color>
+    <color name="nicecreamPrimaryDark">#000000</color>
+    <color name="nicecreamWindowBackground">#fff5fe</color>
+    <color name="nicecreamdata_row_odd">#fcffdd</color>
+    <color name="nicecreamdata_row_even">#fff6fb</color>
+    <color name="nicecreamdata_header_text">#870189</color>
+    <color name="nicecreamdata_headerColor">#ccff8a</color>
+
+    <color name="cottonAccent">#ffc800</color>
+    <color name="cottonPrimary">#de06c8</color>
+    <color name="cottonPrimaryDark">#000000</color>
+    <color name="cottonWindowBackground">#fff5fe</color>
+    <color name="cottondata_row_odd">#ddfff9</color>
+    <color name="cottondata_row_even">#fff6fb</color>
+    <color name="cottondata_header_text">#870189</color>
+    <color name="cottondata_headerColor">#ccff8a</color>
+
+    <color name="zimAccent">#fffd9c</color>
+    <color name="zimPrimary">#de06c8</color>
+    <color name="zimPrimaryDark">#000000</color>
+    <color name="zimWindowBackground">#fff5fe</color>
+    <color name="zimdata_row_odd">#ddfff9</color>
+    <color name="zimdata_row_even">#fff6fb</color>
+    <color name="zimdata_header_text">#870189</color>
+    <color name="zimdata_headerColor">#ccff8a</color>
+
+
 
 </resources>
