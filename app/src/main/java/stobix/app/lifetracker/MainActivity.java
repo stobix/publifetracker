@@ -15,6 +15,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
 import stobix.compat.functions.Consumer;
 import stobix.compat.functions.BiConsumer;
 
@@ -203,6 +206,16 @@ public class MainActivity extends AppCompatActivity
                     editor.apply();
                     Intent intent = getIntent();
                     finish();
+                    ArrayList<ColorItem> c = new ArrayList<>();
+                    c.add(new ColorItem("Zimmik",R.style.Theme_Zimmik_NoActionBar));
+                    c.add(new ColorItem("Joel",R.style.Theme_Joel_NoActionBar));
+                    // ...
+
+                    ArrayAdapter<ColorItem> adapter =
+                            new ArrayAdapter<ColorItem>(this, R.layout.theme_picker,c );
+                    ListView listView = findViewById(R.id.themePickerList);
+                    listView.setAdapter(adapter);
+
 
                     startActivity(intent);
                     return true;
@@ -217,6 +230,22 @@ public class MainActivity extends AppCompatActivity
 
                 default:
                     return super.onOptionsItemSelected(item);
+            }
+
+        }
+
+        private class ColorItem{
+            String colorThemeName;
+            int r_theme_value;
+            public ColorItem(String colorThemeName, int r_theme_value){
+                this.colorThemeName=colorThemeName;
+                this.r_theme_value=r_theme_value;
+            }
+            public String toString(){
+                return colorThemeName;
+            }
+            public int themeValue(){
+                return r_theme_value;
             }
 
         }
