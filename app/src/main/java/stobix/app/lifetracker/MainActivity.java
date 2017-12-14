@@ -67,20 +67,24 @@ public class MainActivity extends AppCompatActivity
         // crash the data base on insertion.
         private int nextUID;
 
-        private boolean useZimmik;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
+
             SharedPreferences preferences = getSharedPreferences("colorsNstuff",MODE_PRIVATE);
-            useZimmik = preferences.getBoolean("zimmik",true);
-            if(useZimmik){
+            boolean useTheme = preferences.getBoolean("useTheme",false);
+            if(useTheme) {
+                int themeVal = preferences.getInt("theme", R.style.Theme_Zimmik_NoActionBar);
+                Log.d("theme", "setting theme to "+themeVal);
+                setTheme(themeVal);
+            } else
                 setTheme(R.style.Theme_Zimmik_NoActionBar);
-            } else {
-                setTheme(R.style.Theme_Joel_NoActionBar);
-            }
 
             super.onCreate(savedInstanceState);
+            // TODO Add something that sets a default functioning theme if the set theme crashes the app!
+            // try
             setContentView(R.layout.activity_main);
+            // catch ... -> setTheme(alwaysWorking)
             Toolbar toolbar = findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
             tableView = findViewById(R.id.tableView);
@@ -205,27 +209,17 @@ public class MainActivity extends AppCompatActivity
                 case R.id.action_switch_theme:
 
                     ArrayList<ThemeListItem> c = new ArrayList<>();
+                    //
+                    // TODO Put more color themes here
+                    //
                     c.add(new ThemeListItem("Zimmik",R.style.Theme_Zimmik_NoActionBar));
                     c.add(new ThemeListItem("Joel",R.style.Theme_Joel_NoActionBar));
-                    // ...
+                    c.add(new ThemeListItem("Mad!",R.style.Theme_Mad_NoActionBar));
+                    c.add(new ThemeListItem("default",R.style.AppTheme_NoActionBar));
 
-                    /*ArrayAdapter<ThemeListItem> adapter =
-                            new ArrayAdapter<ThemeListItem>(this, R.layout.theme_picker,c );
-                    ListView listView = findViewById(R.id.themePickerList);
-                    listView.setAdapter(adapter);
-                    */
 
                     new ThemePickerDialog(this, c).show();
 
-                    /*
-                    SharedPreferences.Editor editor = getSharedPreferences("colorsNstuff",MODE_PRIVATE).edit();
-                    editor.putBoolean("zimmik",!useZimmik);
-                    editor.apply();
-                    Intent intent = getIntent();
-                    finish();
-
-                    startActivity(intent);
-                    */
                     return true;
 
                 case R.id.action_import_db:
@@ -243,6 +237,16 @@ public class MainActivity extends AppCompatActivity
         }
 
 
+        public void doSetTheme(int androidResourceThemeValue){
+                    SharedPreferences.Editor editor = getSharedPreferences("colorsNstuff",MODE_PRIVATE).edit();
+                    editor.putBoolean("useTheme",true);
+                    editor.putInt("theme",androidResourceThemeValue);
+                    editor.apply();
+                    Intent intent = getIntent();
+                    finish();
+
+                    startActivity(intent);
+        }
 
         // Show the dialog for creating a SugarEntry
         public void showSugarEntryCreationDialog() {

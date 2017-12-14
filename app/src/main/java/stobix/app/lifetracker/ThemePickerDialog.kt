@@ -3,26 +3,30 @@ package stobix.app.lifetracker
 import android.app.Dialog
 import android.content.Context
 import android.util.Log
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
 
-/**
- * Created by JoelE on 2017-12-14.
- */
 class ThemePickerDialog
     (val ctx: Context, val colors: ArrayList<ThemeListItem>) : Dialog(ctx)
 {
     override fun show() {
-        this.setTitle(context.getString(R.string.number_picker_sugar_level))
+        super.show()
         this.setContentView(R.layout.theme_picker)
-        val listView = this.findViewById<ListView>(R.id.themePickerList)
-        for(c in colors)
-            Log.d("colors",c.toString())
-        //val adapter  = ArrayAdapter<ThemeListItem>(ctx,R.layout.theme_picker_text_view,colors)
-        val adapter  = ArrayAdapter<ThemeListItem>(ctx,R.layout.theme_picker_text_view,ArrayList<ThemeListItem>())
-        listView.adapter = adapter
+        this.setTitle(context.getString(R.string.theme_picker_dialog_title))
+        val themesList = this.findViewById<ListView>(R.id.themePickerList)
+
+        val adapter  = ArrayAdapter<ThemeListItem>(ctx,R.layout.theme_picker_text_view,R.id.themePickerTextView, ArrayList<ThemeListItem>())
         for(c in colors)
             adapter.add(c)
-        super.show()
+        themesList.adapter = adapter
+        themesList.onItemClickListener = AdapterView.OnItemClickListener {
+            adapterView: AdapterView<*>, view1: View, i: Int, l: Long ->
+            Log.d("click","$l, which is ${colors[l.toInt()]}")
+            (ctx as MainActivity).doSetTheme(colors[l.toInt()].themeValue())
+            dismiss()
+        }
+
     }
 }

@@ -1,9 +1,5 @@
 package stobix.app.lifetracker;
 
-/**
- * Created by JoelE on 2017-12-14.
- */
-
 public class ThemeListItem{
     String colorThemeName;
     int r_theme_value;
@@ -17,5 +13,9 @@ public class ThemeListItem{
     public int themeValue(){
         return r_theme_value;
     }
+    // TODO Return the three "primary colors" for the theme.
+    public int color1(){return 0;}
+    public int color2(){return 0;}
+    public int color3(){return 0;}
 
 }
