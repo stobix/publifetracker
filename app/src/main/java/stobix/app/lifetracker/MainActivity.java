@@ -5,6 +5,7 @@ import android.app.FragmentTransaction;
 import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +16,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
 import stobix.compat.functions.Consumer;
 import stobix.compat.functions.BiConsumer;
 
@@ -198,6 +203,21 @@ public class MainActivity extends AppCompatActivity
                     return true;
 
                 case R.id.action_switch_theme:
+
+                    ArrayList<ThemeListItem> c = new ArrayList<>();
+                    c.add(new ThemeListItem("Zimmik",R.style.Theme_Zimmik_NoActionBar));
+                    c.add(new ThemeListItem("Joel",R.style.Theme_Joel_NoActionBar));
+                    // ...
+
+                    /*ArrayAdapter<ThemeListItem> adapter =
+                            new ArrayAdapter<ThemeListItem>(this, R.layout.theme_picker,c );
+                    ListView listView = findViewById(R.id.themePickerList);
+                    listView.setAdapter(adapter);
+                    */
+
+                    new ThemePickerDialog(this, c).show();
+
+                    /*
                     SharedPreferences.Editor editor = getSharedPreferences("colorsNstuff",MODE_PRIVATE).edit();
                     editor.putBoolean("zimmik",!useZimmik);
                     editor.apply();
@@ -205,6 +225,7 @@ public class MainActivity extends AppCompatActivity
                     finish();
 
                     startActivity(intent);
+                    */
                     return true;
 
                 case R.id.action_import_db:
@@ -220,6 +241,8 @@ public class MainActivity extends AppCompatActivity
             }
 
         }
+
+
 
         // Show the dialog for creating a SugarEntry
         public void showSugarEntryCreationDialog() {
@@ -424,6 +447,7 @@ public class MainActivity extends AppCompatActivity
             new Thread(() -> {
                 dao.clear_sugar_entries();
                 dao.insertAll(entries);
+                nextUID=dao.getMaxUID()+1;
             }).start();
         }
 
