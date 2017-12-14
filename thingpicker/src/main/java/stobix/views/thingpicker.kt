@@ -1,7 +1,9 @@
 package stobix.views
 
 import android.content.Context
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
 
@@ -49,6 +51,8 @@ open class ThingPicker(context: Context,attrs: AttributeSet) : View(context, att
         isExternalSet=true
     }
 
+    val paint = Paint()
+
     init {
         val a = context.theme.obtainStyledAttributes(attrs, R.styleable.ThingPicker,0,0)
         setInternally {
@@ -60,5 +64,8 @@ open class ThingPicker(context: Context,attrs: AttributeSet) : View(context, att
         a.recycle()
     }
 
+    override fun onDraw(canvas: Canvas?) {
+        super.onDraw(canvas)
+    }
 
 }
