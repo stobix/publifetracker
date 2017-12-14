@@ -17,14 +17,18 @@
     <color name="table_data_row_even">#e2cd78</color>
     <color name="table_data_row_odd">#b477bc</color>
 
-    <color name="joelAccent">#ec9b2a</color>
+    <color name="joeltextColorPrimary">#00ffcb</color>
+    <color name="joeltextColorSecondary">#5ffc05</color>
+    <color name="joeltextColorTertiary">#ffcb00</color>
+    <color name="joelnavigationBarColor">#203840</color>
+    <color name="joelAccent">#0b1213</color>
     <color name="joelPrimary">#130404</color>
-    <color name="joelPrimaryDark">#744b0d</color>
+    <color name="joelPrimaryDark">#000000</color>
     <color name="joelWindowBackground">#303030</color>
-    <color name="joeldata_row_odd">#bf2424</color>
-    <color name="joeldata_row_even">#52bf24</color>
+    <color name="joeldata_row_odd">#100503</color>
+    <color name="joeldata_row_even">#201607</color>
     <color name="joeldata_header_text">#24bfbc</color>
-    <color name="joeldata_headerColor">#ffcb00</color>
+    <color name="joeldata_headerColor">#304b54</color>
 
     <color name="madAccent">#ffc800</color>
     <color name="madPrimary">#00ffff</color>
