@@ -83,6 +83,7 @@
 
     <Button
         android:id="@+id/entryAddClose"
+        style="?android:attr/buttonBarButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -95,6 +96,7 @@
 
     <Button
         android:id="@+id/entryAdd"
+        style="?android:attr/buttonBarButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
