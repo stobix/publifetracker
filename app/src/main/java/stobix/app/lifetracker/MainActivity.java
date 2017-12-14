@@ -453,6 +453,7 @@ public class MainActivity extends AppCompatActivity
             new Thread(() -> {
                 dao.clear_sugar_entries();
                 dao.insertAll(entries);
+                nextUID=dao.getMaxUID()+1;
             }).start();
         }
 
