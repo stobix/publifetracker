@@ -9,7 +9,7 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 
 class ThemePickerDialog
-    (val ctx: Context, val colors: ArrayList<ThemeListItem>) : Dialog(ctx)
+    (private val ctx: Context, private val colors: ArrayList<ThemeListItem>) : Dialog(ctx)
 {
     override fun show() {
         super.show()
@@ -17,14 +17,18 @@ class ThemePickerDialog
         this.setTitle(context.getString(R.string.theme_picker_dialog_title))
         val themesList = this.findViewById<ListView>(R.id.themePickerList)
 
-        val adapter  = ArrayAdapter<ThemeListItem>(ctx,R.layout.theme_picker_text_view,R.id.themePickerTextView, ArrayList<ThemeListItem>())
+        val adapter  = ArrayAdapter<ThemeListItem>(
+                ctx,
+                android.R.layout.simple_list_item_1,
+                android.R.id.text1,
+                ArrayList<ThemeListItem>())
         for(c in colors)
             adapter.add(c)
         themesList.adapter = adapter
         themesList.onItemClickListener = AdapterView.OnItemClickListener {
-            adapterView: AdapterView<*>, view1: View, i: Int, l: Long ->
-            Log.d("click","$l, which is ${colors[l.toInt()]}")
-            (ctx as MainActivity).doSetTheme(colors[l.toInt()].themeValue())
+            _: AdapterView<*>, _: View, _viewedRow: Int, index: Long ->
+            Log.d("click","$index, which is ${colors[index.toInt()]}")
+            (ctx as MainActivity).doSetTheme(colors[index.toInt()].themeValue())
             dismiss()
         }
 
