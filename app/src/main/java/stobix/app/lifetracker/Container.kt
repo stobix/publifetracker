@@ -2,60 +2,102 @@ package stobix.app.lifetracker
 
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
-
-
-interface Containable
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 @Entity
 data class Container(
         @PrimaryKey var containerID: Int,
-        var contents: List<Containable>) : Containable
+        var contents: ArrayList<ContainerContent> = ArrayList())
+
+enum class ContainerContentType {
+    INT, STRING, PROPERTY
+}
 
 @Entity
-class IntContainerEntry(
+class ContainerContent(
         @PrimaryKey var id: Int,
-        var containerID: Int,
-        var pos: Int,
-        var thing: Int
-) : Containable
-
-@Entity
-class StringContainerEntry(
-        @PrimaryKey var id: Int,
-        var containerID: Int,
-        var pos: Int,
-        var thing: String
-) : Containable
-
-@Entity
-class PropertyContainerEntry(
-        @PrimaryKey var id: Int,
-        var containerID: Int,
-        var pos: Int,
-        var property: String,
-        var amount: Int,
-        var amountable: Boolean,
-        var description: String?
-) : Containable
-
-@Entity
-class ContainerContainerEntry(
-        @PrimaryKey var id: Int,
-        var containerID: Int,
-        var pos: Int,
-        var otherContainerID: Int
-) : Containable
+        var type: ContainerContentType,
+        var typeID: Int,
+        var amount: Int?,
+        var recur: Container?
+)
 
 
+class ContainerTester{
+    val g = Gson()
+    var cl:ArrayList<ContainerContent>
+    var c:Container
+    var c1:Container
+    val t = object : TypeToken<ArrayList<ContainerContent>>() {}.type
+    val t2 = object : TypeToken<Container>() {}.type
+    init{
+        cl = ArrayList<ContainerContent>()
+        /*
+        cl.add(StringContainerEntry(
+                0,0,0,"hej")
+        )
+        */
+        cl.add(ContainerContent(
+                0,
+                ContainerContentType.INT,
+                0,
+                null,
+                null
+        ))
+        c1 = Container(1)
+        cl.add(ContainerContent(
+                1,
+                ContainerContentType.STRING,
+                0,
+                3,
+                c1
+
+        ))
+        c = Container(0, cl)
+        /*
+        c.contents.add(PropertyContainerEntry(
+                0,0,0,"test",
+                3,true,"testelitest"
+        ))
+        */
+    }
+    fun toJSON() = g.toJson(c,t2)
+    fun toJSON(c:Container) = g.toJson(c,t2)
+    fun fromJSON(s:String):Container = g.fromJson<Container>(s,t2)
+}
 /*
  *
  *  [[Int,String],String,Property:Amount "Some thing"]
  *  ->
- *  Container CID
- *  ContainerContainerEntry X 0 CID
- *  IntContainerEntry _ X 0 Int
- *  StringContainerEntry _ X 1 String
- *  StringContainerEntry _ CID 1 String
- *  PropertyContainerEntry _ CID 2 Property Amount true "Some thing"
+ *  Container
+ *      containerID: CID
+ *  ContainerContainerEntry
+ *      id: X
+ *      pos: 0
+ *      containerID: CID
+ *  IntContainerEntry
+ *      id: _
+ *      containerID: X
+ *      pos: 0
+ *      thing: Int
+ *  StringContainerEntry
+ *      id: _
+ *      containerID: X
+ *      pos: 1
+ *      thing: String
+ *  StringContainerEntry
+ *      id: _
+ *      containerID: CID
+ *      pos: 1
+ *      thing: String
+ *  PropertyContainerEntry
+ *      id: _
+ *      containerID: CID
+ *      pos: 2
+ *      property: Property
+ *      amount: Amount
+ *      amountable: true
+ *      description: "Some thing"
  *
  */
