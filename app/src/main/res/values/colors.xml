@@ -11,6 +11,10 @@
 
     </declare-styleable>
 
+    <declare-styleable name="add_button">
+        <attr name="button_plus_color" format="color">#ffcb00</attr>
+    </declare-styleable>
+
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
@@ -65,7 +69,7 @@
     <color name="zimdata_row_even">#fff6fb</color>
     <color name="zimdata_header_text">#870189</color>
     <color name="zimdata_headerColor">#ccff8a</color>
-
+    <color name="button_plus_color">#ffcb00</color>
 
 
 </resources>

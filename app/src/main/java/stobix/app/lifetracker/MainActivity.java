@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.ImageViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onCreate(Bundle savedInstanceState) {
 
+
             SharedPreferences preferences = getSharedPreferences("colorsNstuff",MODE_PRIVATE);
             boolean useTheme = preferences.getBoolean("useTheme",false);
             if(useTheme) {
@@ -80,6 +82,8 @@ public class MainActivity extends AppCompatActivity
             } else
                 setTheme(R.style.Theme_Zimmik_NoActionBar);
 
+            // DOn't use savedInstanceState before setting the color theme! It can lead to a vicious
+            // loop if the previously selected theme didn't work. I think. ;)
             super.onCreate(savedInstanceState);
             // TODO Add something that sets a default functioning theme if the set theme crashes the app!
             // try
