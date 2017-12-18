@@ -18,18 +18,20 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:clickable="true"
         android:ems="10"
         android:focusable="false"
-        android:clickable="true"
         android:inputType="none"
         android:singleLine="true"
         android:text="@string/input_date"
+        android:textColor="?android:textColorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="KeyboardInaccessibleWidget,TextFields" />
 
     <EditText
+        android:textColor="?android:textColorPrimary"
         android:id="@+id/entryCreatorTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -44,9 +46,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView2"
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorDate"
+        tools:text="Time"
         tools:ignore="KeyboardInaccessibleWidget" />
 
     <EditText
+        android:textColor="?android:textColorPrimary"
         android:id="@+id/entryCreatorSugar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -66,6 +70,7 @@
         tools:ignore="KeyboardInaccessibleWidget" />
 
     <EditText
+        android:textColor="?android:textColorPrimary"
         android:id="@+id/entryCreatorExtra"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -89,6 +94,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
+        android:textColor="?colorAccent"
         android:text="@string/creation_dialog_button_add_close"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -102,6 +108,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
+        android:textColor="?colorAccent"
         android:text="@string/creation_dialog_button_add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/entryAddClose"
@@ -115,6 +122,7 @@
         android:layout_marginTop="8dp"
         android:labelFor="@id/entryCreatorDate"
         android:text="@string/input_date"
+        android:textColor="?attr/entry_labels_color"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorDate" />
 
@@ -125,6 +133,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:labelFor="@+id/entryCreatorTime"
+        android:textColor="?attr/entry_labels_color"
         android:text="@string/input_time"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorTime" />
@@ -136,6 +145,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:labelFor="@+id/entryCreatorSugar"
+        android:textColor="?attr/entry_labels_color"
         android:text="@string/input_sugar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorSugar" />
@@ -147,6 +157,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:labelFor="@+id/entryCreatorExtra"
+        android:textColor="?attr/entry_labels_color"
         android:text="@string/input_extra"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorExtra" />

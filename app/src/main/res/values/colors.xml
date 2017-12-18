@@ -12,7 +12,12 @@
     </declare-styleable>
 
     <declare-styleable name="add_button">
-        <attr name="button_plus_color" format="color">#ffcb00</attr>
+        <attr name="button_plus_color" format="color"/>
+    </declare-styleable>
+
+    <declare-styleable name="sugar_estry_dialog_details">
+        <attr name="entry_labels_color" format="color"/>
+        <attr name="entry_text_color" format="color"/>
     </declare-styleable>
 
     <color name="colorPrimary">#3F51B5</color>
