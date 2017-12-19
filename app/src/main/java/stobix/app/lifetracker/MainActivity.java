@@ -183,10 +183,10 @@ public class MainActivity extends AppCompatActivity
             // as you specify a parent activity in AndroidManifest.xml.
 
             switch(item.getItemId()) {
+                /*
                 case R.id.action_settings:
                     Log.i("MenuClick", "onOptionsItemSelected: ");
                     return true;
-
 
                 case R.id.action_colors:
 
@@ -209,6 +209,7 @@ public class MainActivity extends AppCompatActivity
                             .show();
 
                     return true;
+                    */
 
                 case R.id.action_switch_theme:
 
