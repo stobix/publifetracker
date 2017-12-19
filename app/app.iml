@@ -180,6 +180,7 @@
     <orderEntry type="library" name="com.android.support:design-26.1.0" level="project" />
     <orderEntry type="library" name="com.android.support:transition-26.1.0" level="project" />
     <orderEntry type="library" name="android.arch.core:runtime-1.0.0" level="project" />
+    <orderEntry type="module" module-name="thingpicker" />
     <orderEntry type="module" module-name="compat" />
   </component>
 </module>

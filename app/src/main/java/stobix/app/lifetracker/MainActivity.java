@@ -95,13 +95,13 @@ public class MainActivity extends AppCompatActivity
             tableView = findViewById(R.id.tableView);
 
             FloatingActionButton fab = findViewById(R.id.fab);
-            /*
             Log.d("VERSION",""+Build.VERSION.SDK_INT );
+            // FIXME Since API 21 seems to use activity_main.xml v19 for some reason, I use this as a quick fix, for now.
             if(Build.VERSION.SDK_INT < 21)
                 fab.setImageResource(android.R.drawable.ic_input_add);
             else
                 fab.setImageResource(R.drawable.ic_add_24dp);
-                */
+
             fab.setOnClickListener(view -> showSugarEntryCreationDialog() );
 
             SortableSugarEntryTableView tv = tableView;
