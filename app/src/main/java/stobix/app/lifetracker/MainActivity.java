@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -94,6 +95,13 @@ public class MainActivity extends AppCompatActivity
             tableView = findViewById(R.id.tableView);
 
             FloatingActionButton fab = findViewById(R.id.fab);
+            /*
+            Log.d("VERSION",""+Build.VERSION.SDK_INT );
+            if(Build.VERSION.SDK_INT < 21)
+                fab.setImageResource(android.R.drawable.ic_input_add);
+            else
+                fab.setImageResource(R.drawable.ic_add_24dp);
+                */
             fab.setOnClickListener(view -> showSugarEntryCreationDialog() );
 
             SortableSugarEntryTableView tv = tableView;
