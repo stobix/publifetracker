@@ -14,21 +14,25 @@ open class ThingPicker(context: Context,attrs: AttributeSet) : View(context, att
     var backColor = 0
         set(value) {
             field =value
+            fillPaint.color=value
             invalidateIfExternal()
         }
     var textColor: Int = 0
         set(value) {
             field =value
+            textPaint.color=value
             invalidateIfExternal()
         }
     var rectColorDark: Int = 0
         set(value) {
             field =value
+            rectColorDarkPaint.color=value
             invalidateIfExternal()
         }
     var rectColorLight: Int = 0
         set(value) {
             field =value
+            rectColorLightPaint.color=value
             invalidateIfExternal()
         }
 
@@ -50,22 +54,45 @@ open class ThingPicker(context: Context,attrs: AttributeSet) : View(context, att
         f()
         isExternalSet=true
     }
+    var textSize = -1f
+        set(value) {
+            field=value
+            if(value>0f)
+                textPaint.textSize = value
+            invalidateIfExternal()
+        }
 
-    val paint = Paint()
+    private var textPaint = Paint()
+    private var fillPaint = Paint()
+    private var rectColorDarkPaint = Paint()
+    private var rectColorLightPaint = Paint()
 
     init {
         val a = context.theme.obtainStyledAttributes(attrs, R.styleable.ThingPicker,0,0)
+
         setInternally {
             backColor = a.getColor(R.styleable.ThingPicker_colorBackground, Color.WHITE)
             textColor = a.getColor(R.styleable.ThingPicker_colorText, Color.BLACK)
             rectColorDark = a.getColor(R.styleable.ThingPicker_colorBorderDarkest, Color.DKGRAY)
             rectColorLight = a.getColor(R.styleable.ThingPicker_colorBorderLightest, Color.LTGRAY)
+            if (textSize==-1f)
+                textSize = textPaint.textSize
+            else
+                textPaint.textSize = textSize
         }
+
+        fillPaint.style=Paint.Style.FILL
         a.recycle()
     }
 
-    override fun onDraw(canvas: Canvas?) {
-        super.onDraw(canvas)
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
     }
+
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        canvas.drawText("test!",10f,10f,textPaint)
+    }
+
 
 }
