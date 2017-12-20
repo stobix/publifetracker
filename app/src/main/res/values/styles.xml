@@ -154,4 +154,24 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="Theme.Strong" parent="Theme.AppCompat" >
+        <item name="android:textColorPrimary">@color/strongtextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/strongtextColorSecondary</item>
+        <item name="android:textColorTertiary">@color/strongtextColorTertiary</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/strongnavigationBarColor</item>
+        <item name="colorPrimary">@color/strongPrimary</item>
+        <item name="colorPrimaryDark">@color/strongPrimaryDark</item>
+        <item name="colorAccent">@color/strongAccent</item>
+        <item name="android:windowBackground">@color/strongWindowBackground</item>
+        <item name="table_data_row_even">@color/strongdata_row_even</item>
+        <item name="table_data_row_odd">@color/strongdata_row_odd</item>
+        <item name="table_header_text">@color/strongdata_header_text</item>
+        <item name="tableView_headerColor">@color/strongdata_headerColor</item>
+    </style>
+
+    <style name="Theme.Strong.NoActionBar" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
 </resources>

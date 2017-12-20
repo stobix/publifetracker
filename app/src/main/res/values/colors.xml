@@ -108,6 +108,19 @@
     <color name="colddata_header_text">#565656</color>
     <color name="colddata_headerColor">#b6b6b6</color>
 
+    <color name="strongtextColorPrimary">#ff00a1</color>
+    <color name="strongtextColorSecondary">#59d4de</color>
+    <color name="strongtextColorTertiary">#cfffc6</color>
+    <color name="strongnavigationBarColor">#203840</color>
+    <color name="strongAccent">#fdff9c</color>
+    <color name="strongPrimary">#e5ff9d</color>
+    <color name="strongPrimaryDark">#000000</color>
+    <color name="strongWindowBackground">#da00cc</color>
+    <color name="strongdata_row_odd">#ab1688</color>
+    <color name="strongdata_row_even">#d20197</color>
+    <color name="strongdata_header_text">#affff8</color>
+    <color name="strongdata_headerColor">#d900f1</color>
+
 
 
 </resources>
