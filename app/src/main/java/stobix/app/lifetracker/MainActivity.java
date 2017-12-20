@@ -7,10 +7,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.ImageViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -71,6 +73,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onCreate(Bundle savedInstanceState) {
 
+
             SharedPreferences preferences = getSharedPreferences("colorsNstuff",MODE_PRIVATE);
             boolean useTheme = preferences.getBoolean("useTheme",false);
             if(useTheme) {
@@ -80,6 +83,8 @@ public class MainActivity extends AppCompatActivity
             } else
                 setTheme(R.style.Theme_Zimmik_NoActionBar);
 
+            // DOn't use savedInstanceState before setting the color theme! It can lead to a vicious
+            // loop if the previously selected theme didn't work. I think. ;)
             super.onCreate(savedInstanceState);
             // TODO Add something that sets a default functioning theme if the set theme crashes the app!
             // try
@@ -90,6 +95,13 @@ public class MainActivity extends AppCompatActivity
             tableView = findViewById(R.id.tableView);
 
             FloatingActionButton fab = findViewById(R.id.fab);
+            Log.d("VERSION",""+Build.VERSION.SDK_INT );
+            // FIXME Since API 21 seems to use activity_main.xml v19 for some reason, I use this as a quick fix, for now.
+            if(Build.VERSION.SDK_INT < 21)
+                fab.setImageResource(android.R.drawable.ic_input_add);
+            else
+                fab.setImageResource(R.drawable.ic_add_24dp);
+
             fab.setOnClickListener(view -> showSugarEntryCreationDialog() );
 
             SortableSugarEntryTableView tv = tableView;
@@ -179,10 +191,10 @@ public class MainActivity extends AppCompatActivity
             // as you specify a parent activity in AndroidManifest.xml.
 
             switch(item.getItemId()) {
+                /*
                 case R.id.action_settings:
                     Log.i("MenuClick", "onOptionsItemSelected: ");
                     return true;
-
 
                 case R.id.action_colors:
 
@@ -205,6 +217,7 @@ public class MainActivity extends AppCompatActivity
                             .show();
 
                     return true;
+                    */
 
                 case R.id.action_switch_theme:
 
@@ -213,7 +226,7 @@ public class MainActivity extends AppCompatActivity
                     // TODO Put more color themes here
                     //
                     c.add(new ThemeListItem("Zimmik",R.style.Theme_Zimmik_NoActionBar));
-                    c.add(new ThemeListItem("Joel",R.style.Theme_Joel_NoActionBar));
+                    c.add(new ThemeListItem("Joel",R.style.Joel_NoActionBar));
                     c.add(new ThemeListItem("Mad!",R.style.Theme_Mad_NoActionBar));
                     c.add(new ThemeListItem("Cold",R.style.Theme_Cold_NoActionBar));
                     c.add(new ThemeListItem("Spring",R.style.Theme_Spring_NoActionBar));
