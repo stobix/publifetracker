@@ -70,6 +70,17 @@ public class MainActivity extends AppCompatActivity
         private int nextUID;
 
 
+        public void testContainer(){
+            ContainerTester ct = new ContainerTester();
+            String s = ct.toJSON();
+            Log.d("TEST 1",s);
+            Container c = ct.fromJSON(s);
+            s=ct.toJSON(c);
+            Log.d("TEST 2",s);
+            Log.d("TEST 3",c.getContents().get(1).getRecur().getContents().toString());
+
+        }
+
         @Override
         protected void onCreate(Bundle savedInstanceState) {
 
@@ -192,6 +203,10 @@ public class MainActivity extends AppCompatActivity
 
             switch(item.getItemId()) {
                 /*
+                case R.id.action_test:
+                    testContainer();
+                    return true;
+
                 case R.id.action_settings:
                     Log.i("MenuClick", "onOptionsItemSelected: ");
                     return true;
@@ -448,6 +463,7 @@ public class MainActivity extends AppCompatActivity
             Log.i("file (json)",json);
             fa.putTextInUri(uri,json);
         }
+
 
         @Override
         public void handleFileOpened(@NotNull Uri uri) {

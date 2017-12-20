@@ -4,6 +4,9 @@
     tools:context="stobix.app.lifetracker.MainActivity">
     <!--
     <item
+        android:id="@+id/action_test"
+        android:title="test" />
+    <item
         android:id="@+id/action_colors"
         android:title="@string/action_colors" />
         -->
