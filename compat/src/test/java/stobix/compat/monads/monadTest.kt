@@ -45,7 +45,7 @@ class OptionsUnitTest{
         val oat = Some(::addTwo)
         fun <A,B,C>applyThings(f:Option<(A) -> B>, g: Option<(B) -> C>,a:A?):Option<C> {
             val thing = fromNullable(a)
-            return g.apply( f.apply(thing) )
+            return g apply (f apply thing)
         }
 
         Some("5") asEq applyThings(oat,oms,3)
@@ -55,9 +55,45 @@ class OptionsUnitTest{
     }
 
 
+
     @Test
     fun fromNullableTest() {
         None asEq fromNullable(null).map{it}
         Some(3) asEq fromNullable(3)
+    }
+
+    @Test
+    fun fromNullableMap(){
+        None asEq fromNullable(null).map {
+            @Suppress("UNREACHABLE_CODE")
+            fromNullable(it)
+        }
+        Some(Some(3)) asEq fromNullable(3).map {fromNullable(it)}
+
+    }
+
+    @Test
+    fun arrayApply() {
+        val functions = arrayOf<(Int)->Pair<Int,Int>> (
+                {Pair(it,it+3)},
+                {Pair(it,it/2)}
+        )
+        val values = arrayOf(1,2,3)
+        assertEquals(
+                "[(1, 4), (2, 5), (3, 6), (1, 0), (2, 1), (3, 1)]",
+                (functions apply values).contentDeepToString()
+        )
+    }
+
+    @Test
+    fun currying() {
+        fun four (a:Int, b: Int, c: Int, d: Int): Int = a+b+c+d+1
+
+        Some(3+1+2+3+1) asEq
+                (Some(3).map(curry(::four)) apply
+                        Some(1) apply
+                        Some(2) apply
+                        Some(3))
+
     }
 }
