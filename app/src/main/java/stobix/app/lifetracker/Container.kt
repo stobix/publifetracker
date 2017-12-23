@@ -8,64 +8,44 @@ import com.google.gson.reflect.TypeToken
 @Entity
 data class Container(
         @PrimaryKey var containerID: Int,
-        var contents: ArrayList<ContainerContent> = ArrayList())
+        var contents: ArrayList<ContainerContent> = ArrayList()) {
+
+    fun toJSON() = g.toJson(this,type)
+
+    fun addChild(c:ContainerContent) = this.contents.add(c)
+    fun addChild(
+            id: Int=contents.size+1,
+            type: ContainerContentType=ContainerContentType.CONTAINER,
+            typeID: Int?=null,
+            amount: Int?=null,
+            recur: Container?=null) =
+            addChild(ContainerContent(id,type,typeID,amount,recur))
+
+    companion object {
+        val g = Gson()
+        val type = object : TypeToken<Container>() {}.type
+        @JvmStatic
+        fun toJSON(thing: Container) = g.toJson(thing,type)
+        @JvmStatic
+        fun fromJSON(string: String) = g.fromJson<Container>(string,type)
+    }
+
+}
 
 enum class ContainerContentType {
-    INT, STRING, PROPERTY
+    INT, STRING, PROPERTY, CONTAINER
 }
 
 @Entity
 class ContainerContent(
         @PrimaryKey var id: Int,
-        var type: ContainerContentType,
-        var typeID: Int,
-        var amount: Int?,
-        var recur: Container?
+        var type: ContainerContentType=ContainerContentType.CONTAINER,
+        var typeID: Int?=null,
+        var amount: Int?=null,
+        var recur: Container?=null
 )
 
 
-class ContainerTester{
-    val g = Gson()
-    var cl:ArrayList<ContainerContent>
-    var c:Container
-    var c1:Container
-    val t = object : TypeToken<ArrayList<ContainerContent>>() {}.type
-    val t2 = object : TypeToken<Container>() {}.type
-    init{
-        cl = ArrayList<ContainerContent>()
-        /*
-        cl.add(StringContainerEntry(
-                0,0,0,"hej")
-        )
-        */
-        cl.add(ContainerContent(
-                0,
-                ContainerContentType.INT,
-                0,
-                null,
-                null
-        ))
-        c1 = Container(1)
-        cl.add(ContainerContent(
-                1,
-                ContainerContentType.STRING,
-                0,
-                3,
-                c1
-
-        ))
-        c = Container(0, cl)
-        /*
-        c.contents.add(PropertyContainerEntry(
-                0,0,0,"test",
-                3,true,"testelitest"
-        ))
-        */
-    }
-    fun toJSON() = g.toJson(c,t2)
-    fun toJSON(c:Container) = g.toJson(c,t2)
-    fun fromJSON(s:String):Container = g.fromJson<Container>(s,t2)
-}
 /*
  *
  *  [[Int,String],String,Property:Amount "Some thing"]
