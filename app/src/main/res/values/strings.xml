@@ -24,4 +24,5 @@
     <string name="action_export_db">export db</string>
     <string name="action_import_db">import db</string>
     <string name="theme_picker_dialog_title">Pick a color theme</string>
+    <string name="edit_dialog_button_delete">Delete</string>
 </resources>

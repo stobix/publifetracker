@@ -81,7 +81,7 @@ open class SugarEntryCreationActivity
             sugarView.text=sugarLevelToString()
             extraV.text= entry.extra
             buttonAddClose.text=getString(R.string.edit_dialog_button_update)
-            buttonAdd.visibility=View.GONE
+            buttonAdd.text=getString(R.string.edit_dialog_button_delete)
         } else {
             buttonAddClose.text=getString(R.string.creation_dialog_button_add_close)
             buttonAdd.visibility=View.VISIBLE
@@ -125,9 +125,17 @@ open class SugarEntryCreationActivity
         fun onSugarEntryChanged(s: SugarEntry)
     }
 
+    interface OnSugarEntryDeletedHandler{
+        fun onSugarEntryDeleted(s: SugarEntry)
+    }
+
     private fun onSubmit(extraV: TextView) {
-        handleSubmission(extraV)
-        if(!alreadyDefinedEntry) {
+        if(alreadyDefinedEntry) {
+            // delete the thing
+            (activity as OnSugarEntryDeletedHandler).onSugarEntryDeleted(entry)
+            dismiss()
+        } else {
+            handleSubmission(extraV)
             uid++
             entry= SugarEntry(uid)
         }

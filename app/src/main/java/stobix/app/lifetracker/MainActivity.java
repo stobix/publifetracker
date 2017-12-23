@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity
         NumberPickerFragment.NumberClearedHandler,
         SugarEntryCreationActivity.OnSugarEntryEnteredHandler,
         SugarEntryCreationActivity.OnSugarEntryChangedHandler,
+        SugarEntryCreationActivity.OnSugarEntryDeletedHandler,
         FileActions.FileCreateHandler,
         FileActions.FileOpenHandler
     {
@@ -124,10 +125,12 @@ public class MainActivity extends AppCompatActivity
 
             });
 
+            /*
             tv.addDataLongClickListener((row,sugarEntry) -> {
                 sugarEntryDeleted(sugarEntry);
                 return true;
             });
+            */
 
 
             Handler db_data_handler = new DataLoadHandler(this, tv);
@@ -292,6 +295,10 @@ public class MainActivity extends AppCompatActivity
             );
         }
 
+        @Override
+        public void onSugarEntryDeleted(@NotNull SugarEntry s) {
+            sugarEntryDeleted(s);
+        }
 
         // Called when the user has selected a sugar entry for deletion.
         public void sugarEntryDeleted(@NotNull SugarEntry s){
@@ -338,6 +345,7 @@ public class MainActivity extends AppCompatActivity
 
             )).start();
         }
+
 
 
         // Made static (i.e. no outer scope references) to prevent memory issues, since lint complained about the anonymous class instance.
