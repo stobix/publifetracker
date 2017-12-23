@@ -21,6 +21,29 @@ class ContainerUnitTest{
     }
 
     @Test
+    fun serializeSimpleCustomContainer(){
+        val a = Container(0)
+        assertEquals(simpleObjStr,Container._toJSON(a))
+    }
+
+    /*
+    @Test
+    fun serializeContainingCustomContainer(){
+        val a = Container(0)
+        a.addChild(type=ContainerContentType.PROPERTY)
+        assertEquals(simpleObjStr,Container._toJSON(a))
+    }
+
+    @Test
+    fun serializeContainerContainingCustomContainer(){
+        val a = Container(0)
+        val b = Container(1)
+        a.addChild(type=ContainerContentType.CONTAINER,recur=b)
+        assertEquals(simpleObjStr,Container._toJSON(a))
+    }
+    */
+
+    @Test
     fun deserializeSimpleContainer(){
         val a = Container.fromJSON(simpleObjStr)
         assertEquals(0,a.contents.size)
