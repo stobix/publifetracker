@@ -133,17 +133,17 @@
     <color name="strongdata_headerColor">#d900f1</color>
 
     <color name="hopetextColorPrimary">#a96321</color>
-    <color name="hopetextColorSecondary">#764207</color>
+    <color name="hopetextColorSecondary">#9c5709</color>
     <color name="hopetextColorTertiary">#ffcb00</color>
     <color name="hopenavigationBarColor">#4b7e3d</color>
     <color name="hopePrimary">#3d1e63</color>
     <color name="hopePrimaryDark">#4b7e3d</color>
     <color name="hopeAccent">#ae7de2</color>
-    <color name="hopewindowBackground">#4f1c56</color>
-    <color name="hopetable_data_row_even">#1d3a71</color>
-    <color name="hopetable_data_row_odd">#0e223b</color>
-    <color name="hopetable_header_text">#945024</color>
-    <color name="hopetableView_headerColor">#73189b</color>
+    <color name="hopewindowBackground">#371264</color>
+    <color name="hopetable_data_row_even">#261f79</color>
+    <color name="hopetable_data_row_odd">#1e154d</color>
+    <color name="hopetable_header_text">#c7692b</color>
+    <color name="hopetableView_headerColor">#2b145c</color>
     <color name="hopebutton_plus_color">#0f8626</color>
     <color name="hopeentry_labels_color">#155210</color>>
     <color name="hopeentry_text_color">#ffcb00</color>
