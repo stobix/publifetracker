@@ -202,4 +202,50 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="Hope" parent="DefaultTheme" >
+        <item name="android:textColorPrimary">@color/hopetextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/hopetextColorSecondary</item>
+        <item name="android:textColorTertiary">@color/hopetextColorTertiary</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/hopenavigationBarColor</item>
+        <item name="colorPrimary">@color/hopePrimary</item>
+        <item name="colorPrimaryDark">@color/hopePrimaryDark</item>
+        <item name="colorAccent">@color/hopeAccent</item>
+        <item name="android:windowBackground">@color/hopewindowBackground</item>
+        <item name="table_data_row_even">@color/hopetable_data_row_even</item>
+        <item name="table_data_row_odd">@color/hopetable_data_row_odd</item>
+        <item name="table_header_text">@color/hopetable_header_text</item>
+        <item name="tableView_headerColor">@color/hopetableView_headerColor</item>
+        <item name="button_plus_color">@color/hopebutton_plus_color</item>
+        <item name="entry_labels_color">@color/hopeentry_labels_color</item>>
+        <item name="entry_text_color">@color/hopeentry_text_color</item>
+    </style>
+
+    <style name="Hope.NoActionBar" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Hjul" parent="DefaultTheme" >
+        <item name="android:textColorPrimary">@color/hjultextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/hjultextColorSecondary</item>
+        <item name="android:textColorTertiary">@color/hjultextColorTertiary</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/hjulnavigationBarColor</item>
+        <item name="colorPrimary">@color/hjulPrimary</item>
+        <item name="colorPrimaryDark">@color/hjulPrimaryDark</item>
+        <item name="colorAccent">@color/hjulAccent</item>
+        <item name="android:windowBackground">@color/hjulwindowBackground</item>
+        <item name="table_data_row_even">@color/hjultable_data_row_even</item>
+        <item name="table_data_row_odd">@color/hjultable_data_row_odd</item>
+        <item name="table_header_text">@color/hjultable_header_text</item>
+        <item name="tableView_headerColor">@color/hjultableView_headerColor</item>
+        <item name="button_plus_color">@color/hjulbutton_plus_color</item>
+        <item name="entry_labels_color">@color/hjulentry_labels_color</item>>
+        <item name="entry_text_color">@color/hjulentry_text_color</item>
+    </style>
+
+    <style name="Hjul.NoActionBar" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
 </resources>

@@ -13,6 +13,7 @@
 
     <declare-styleable name="add_button">
         <attr name="button_plus_color" format="color"/>
+        <attr name="button_plus_background" format="color"/>
     </declare-styleable>
 
     <declare-styleable name="sugar_estry_dialog_details">
@@ -22,7 +23,7 @@
 
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#ff4081</color>
     <color name="table_data_row_even">#e2cd78</color>
     <color name="table_data_row_odd">#b477bc</color>
 
@@ -30,6 +31,7 @@
     <color name="joeltextColorSecondary">#5ffc05</color>
     <color name="joeltextColorTertiary">#ffcb00</color>
     <color name="joelnavigationBarColor">#203840</color>
+    <!--<color name="joelAccent">#89731a</color>-->
     <color name="joelAccent">#0b1213</color>
     <color name="joelPrimary">#130404</color>
     <color name="joelPrimaryDark">#000000</color>
@@ -129,6 +131,38 @@
     <color name="strongdata_row_even">#d20197</color>
     <color name="strongdata_header_text">#affff8</color>
     <color name="strongdata_headerColor">#d900f1</color>
+
+    <color name="hopetextColorPrimary">#a96321</color>
+    <color name="hopetextColorSecondary">#764207</color>
+    <color name="hopetextColorTertiary">#ffcb00</color>
+    <color name="hopenavigationBarColor">#4b7e3d</color>
+    <color name="hopePrimary">#3d1e63</color>
+    <color name="hopePrimaryDark">#4b7e3d</color>
+    <color name="hopeAccent">#ae7de2</color>
+    <color name="hopewindowBackground">#4f1c56</color>
+    <color name="hopetable_data_row_even">#1d3a71</color>
+    <color name="hopetable_data_row_odd">#0e223b</color>
+    <color name="hopetable_header_text">#945024</color>
+    <color name="hopetableView_headerColor">#73189b</color>
+    <color name="hopebutton_plus_color">#0f8626</color>
+    <color name="hopeentry_labels_color">#155210</color>>
+    <color name="hopeentry_text_color">#ffcb00</color>
+
+    <color name="hjultextColorPrimary">#ca932b</color>
+    <color name="hjultextColorSecondary">#cc7a22</color>
+    <color name="hjultextColorTertiary">#fe942e0c</color>
+    <color name="hjulnavigationBarColor">#730a0a</color>
+    <color name="hjulPrimary">#740f0f</color>
+    <color name="hjulPrimaryDark">#234107</color>
+    <color name="hjulAccent">#c25a19</color>
+    <color name="hjulwindowBackground">#26400b</color>
+    <color name="hjultable_data_row_even">#202905</color>
+    <color name="hjultable_data_row_odd">#2b390d</color>
+    <color name="hjultable_header_text">#8c1212</color>
+    <color name="hjultableView_headerColor">#4b1818</color>
+    <color name="hjulbutton_plus_color">#510b05</color>
+    <color name="hjulentry_labels_color">#c44720</color>>
+    <color name="hjulentry_text_color">#410e0e</color>
 
 
 
