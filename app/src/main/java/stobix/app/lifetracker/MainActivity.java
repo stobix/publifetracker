@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity
     {
 
         // Used to handle callback "bleed through"
-        private SugarEntryCreationActivity creationActivity;
+        //private SugarEntryCreationActivity creationActivity;
 
         // Since the table view ref never changes,
         // we can just assign it to this variable once instead of doing a lengthy lookup
@@ -120,8 +120,8 @@ public class MainActivity extends AppCompatActivity
                 }
                 ft.addToBackStack(null);
 
-                creationActivity = SugarEntryCreationActivity.newInstance(sugarEntry);
-                creationActivity.show(ft, "dialog");
+                SugarEntryCreationActivity creationActivityFlupp = SugarEntryCreationActivity.newInstance(sugarEntry);
+                creationActivityFlupp.show(ft, "dialog");
 
             });
 
@@ -282,8 +282,8 @@ public class MainActivity extends AppCompatActivity
             }
             ft.addToBackStack(null);
 
-            creationActivity = SugarEntryCreationActivity.newInstance(nextUID);
-            creationActivity.show(ft, "dialog");
+            SugarEntryCreationActivity creationActivityFlupp = SugarEntryCreationActivity.newInstance(nextUID);
+            creationActivityFlupp.show(ft, "dialog");
 
         }
 
@@ -432,23 +432,27 @@ public class MainActivity extends AppCompatActivity
 
         private FileActions fa = new FileActions(this);
 
+        private SugarEntryCreationActivity creationActivity(){
+            return (SugarEntryCreationActivity) getFragmentManager().findFragmentByTag("dialog");
+        }
+
         @Override
         public void handleDate(int year, int month, int day) {
-            creationActivity.handleDate(year,month,day);
+            creationActivity().handleDate(year,month,day);
         }
         @Override
         public void handleTime(int hour, int minute) {
-            creationActivity.handleTime(hour, minute) ;
+            creationActivity().handleTime(hour, minute) ;
         }
 
         @Override
         public void handleNumber(@NotNull Pair<Integer, Integer> number) {
-            creationActivity.onNumberSet(number);
+            creationActivity().onNumberSet(number);
         }
 
         @Override
         public void handleNumberClear() {
-            creationActivity.onNumberClear();
+            creationActivity().onNumberClear();
         }
 
         @Override
