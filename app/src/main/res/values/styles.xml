@@ -45,8 +45,8 @@
         <item name="table_data_row_odd">@color/joeldata_row_odd</item>
         <item name="table_header_text">@color/joeldata_header_text</item>
         <item name="tableView_headerColor">@color/joeldata_headerColor</item>
-        <item name="button_plus_color">#ee00e2</item>
-        <item name="entry_labels_color">?android:colorAccent</item>>
+        <item name="button_plus_color">@color/joeldata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
         <item name="entry_text_color">#ffcb00</item>
     </style>
 
@@ -69,7 +69,9 @@
         <item name="table_data_row_odd">@color/maddata_row_odd</item>
         <item name="table_header_text">@color/maddata_header_text</item>
         <item name="tableView_headerColor">@color/maddata_headerColor</item>
-        <item name="entry_labels_color">?android:colorAccent</item>>
+        <item name="button_plus_color">@color/maddata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
+        <item name="entry_text_color">#ffcb00</item>
     </style>
 
     <style name="Theme.Mad.NoActionBar" >
@@ -90,7 +92,9 @@
         <item name="table_data_row_odd">@color/zimdata_row_odd</item>
         <item name="table_header_text">@color/zimdata_header_text</item>
         <item name="tableView_headerColor">@color/zimdata_headerColor</item>
-        <item name="entry_labels_color">?android:colorAccent</item>>
+        <item name="button_plus_color">@color/zimdata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
+        <item name="entry_text_color">#ffcb00</item>
     </style>
 
     <style name="Theme.Zimmik.NoActionBar" >
@@ -111,7 +115,9 @@
         <item name="table_data_row_odd">@color/springdata_row_odd</item>
         <item name="table_header_text">@color/springdata_header_text</item>
         <item name="tableView_headerColor">@color/springdata_headerColor</item>
-        <item name="entry_labels_color">?android:colorAccent</item>>
+        <item name="button_plus_color">@color/springdata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
+        <item name="entry_text_color">#ffcb00</item>
     </style>
 
     <style name="Theme.Spring.NoActionBar" >
@@ -132,7 +138,9 @@
         <item name="table_data_row_odd">@color/colddata_row_odd</item>
         <item name="table_header_text">@color/colddata_header_text</item>
         <item name="tableView_headerColor">@color/colddata_headerColor</item>
-        <item name="entry_labels_color">?android:colorAccent</item>>
+        <item name="button_plus_color">@color/colddata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
+        <item name="entry_text_color">#ffcb00</item>
     </style>
 
     <style name="Theme.Cold.NoActionBar" >
@@ -153,7 +161,9 @@
         <item name="table_data_row_odd">@color/cottondata_row_odd</item>
         <item name="table_header_text">@color/cottondata_header_text</item>
         <item name="tableView_headerColor">@color/cottondata_headerColor</item>
-        <item name="entry_labels_color">?android:colorAccent</item>>
+        <item name="button_plus_color">@color/cottondata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
+        <item name="entry_text_color">#ffcb00</item>
     </style>
 
     <style name="Theme.Cotton.NoActionBar" >
@@ -174,7 +184,9 @@
         <item name="table_data_row_odd">@color/nicecreamdata_row_odd</item>
         <item name="table_header_text">@color/nicecreamdata_header_text</item>
         <item name="tableView_headerColor">@color/nicecreamdata_headerColor</item>
-        <item name="entry_labels_color">?android:colorAccent</item>>
+        <item name="button_plus_color">@color/nicecreamdata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
+        <item name="entry_text_color">#ffcb00</item>
     </style>
 
     <style name="Theme.Nicecream.NoActionBar" >
@@ -195,9 +207,58 @@
         <item name="table_data_row_odd">@color/strongdata_row_odd</item>
         <item name="table_header_text">@color/strongdata_header_text</item>
         <item name="tableView_headerColor">@color/strongdata_headerColor</item>
+        <item name="button_plus_color">@color/strongdata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
+        <item name="entry_text_color">#ffcb00</item>
     </style>
 
     <style name="Theme.Strong.NoActionBar" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Fuel" parent="Theme.AppCompat" >
+        <item name="android:textColorPrimary">@color/fueltextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/fueltextColorSecondary</item>
+        <item name="android:textColorTertiary">@color/fueltextColorTertiary</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/fuelnavigationBarColor</item>
+        <item name="colorPrimary">@color/fuelPrimary</item>
+        <item name="colorPrimaryDark">@color/fuelPrimaryDark</item>
+        <item name="colorAccent">@color/fuelAccent</item>
+        <item name="android:windowBackground">@color/fuelWindowBackground</item>
+        <item name="table_data_row_even">@color/fueldata_row_even</item>
+        <item name="table_data_row_odd">@color/fueldata_row_odd</item>
+        <item name="table_header_text">@color/fueldata_header_text</item>
+        <item name="tableView_headerColor">@color/fueldata_headerColor</item>
+        <item name="button_plus_color">@color/fueldata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
+        <item name="entry_text_color">#ffcb00</item>
+    </style>
+
+    <style name="Theme.Fuel.NoActionBar" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Neonight" parent="Theme.AppCompat" >
+        <item name="android:textColorPrimary">@color/neonighttextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/neonighttextColorSecondary</item>
+        <item name="android:textColorTertiary">@color/neonighttextColorTertiary</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/neonightnavigationBarColor</item>
+        <item name="colorPrimary">@color/neonightPrimary</item>
+        <item name="colorPrimaryDark">@color/neonightPrimaryDark</item>
+        <item name="colorAccent">@color/neonightAccent</item>
+        <item name="android:windowBackground">@color/neonightWindowBackground</item>
+        <item name="table_data_row_even">@color/neonightdata_row_even</item>
+        <item name="table_data_row_odd">@color/neonightdata_row_odd</item>
+        <item name="table_header_text">@color/neonightdata_header_text</item>
+        <item name="tableView_headerColor">@color/neonightdata_headerColor</item>
+        <item name="button_plus_color">@color/neonightdata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
+        <item name="entry_text_color">#ffcb00</item>
+    </style>
+
+    <style name="Theme.Neonight.NoActionBar" >
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

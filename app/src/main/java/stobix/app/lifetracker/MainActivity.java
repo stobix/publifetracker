@@ -238,6 +238,8 @@ public class MainActivity extends AppCompatActivity
                     c.add(new ThemeListItem("Cotton",R.style.Theme_Cotton_NoActionBar));
                     c.add(new ThemeListItem("Nicecream",R.style.Theme_Nicecream_NoActionBar));
                     c.add(new ThemeListItem("Strong",R.style.Theme_Strong_NoActionBar));
+                    c.add(new ThemeListItem("Fuel",R.style.Theme_Fuel_NoActionBar));
+                    c.add(new ThemeListItem("Neonight",R.style.Theme_Neonight_NoActionBar));
                     c.add(new ThemeListItem("default",R.style.AppTheme_NoActionBar));
                     c.add(new ThemeListItem("Hope",R.style.Hope_NoActionBar));
                     c.add(new ThemeListItem("Hjul",R.style.Hjul_NoActionBar));
