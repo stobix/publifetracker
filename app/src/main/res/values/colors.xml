@@ -140,8 +140,8 @@
     <color name="hopePrimaryDark">#4b7e3d</color>
     <color name="hopeAccent">#ae7de2</color>
     <color name="hopewindowBackground">#371264</color>
-    <color name="hopetable_data_row_even">#261f79</color>
-    <color name="hopetable_data_row_odd">#1e154d</color>
+    <color name="hopetable_data_row_even">#302a66</color>
+    <color name="hopetable_data_row_odd">#281d61</color>
     <color name="hopetable_header_text">#c7692b</color>
     <color name="hopetableView_headerColor">#2b145c</color>
     <color name="hopebutton_plus_color">#0f8626</color>
