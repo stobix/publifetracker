@@ -38,6 +38,7 @@
     <color name="joeldata_row_even">#201607</color>
     <color name="joeldata_header_text">#24bfbc</color>
     <color name="joeldata_headerColor">#304b54</color>
+    <color name="joeldata_button_plus">#ee00e2</color>
 
     <color name="madtextColorPrimary">#de06c8</color>
     <color name="madtextColorSecondary">#850094</color>
@@ -51,6 +52,7 @@
     <color name="maddata_row_even">#ff008c</color>
     <color name="maddata_header_text">#d700da</color>
     <color name="maddata_headerColor">#90ff00</color>
+    <color name="maddata_button_plus">#000000</color>
 
     <color name="nicecreamtextColorPrimary">#00e2b4</color>
     <color name="nicecreamtextColorSecondary">#00ef18</color>
@@ -64,6 +66,7 @@
     <color name="nicecreamdata_row_even">#fff6fb</color>
     <color name="nicecreamdata_header_text">#870189</color>
     <color name="nicecreamdata_headerColor">#ccff8a</color>
+    <color name="nicecreamdata_button_plus">#de06c8</color>
 
     <color name="cottontextColorPrimary">#de06c8</color>
     <color name="cottontextColorSecondary">#00d1a7</color>
@@ -77,6 +80,7 @@
     <color name="cottondata_row_even">#fff6fb</color>
     <color name="cottondata_header_text">#870189</color>
     <color name="cottondata_headerColor">#ccff8a</color>
+    <color name="cottondata_button_plus">#ccff8a</color>
 
     <color name="zimtextColorPrimary">#00ffcb</color>
     <color name="zimtextColorSecondary">#5ffc05</color>
@@ -90,6 +94,7 @@
     <color name="zimdata_row_even">#fff6fb</color>
     <color name="zimdata_header_text">#870189</color>
     <color name="zimdata_headerColor">#ccff8a</color>
+    <color name="zimdata_button_plus">#ff00a1</color>
 
     <color name="springtextColorPrimary">#036600</color>
     <color name="springtextColorSecondary">#ffc800</color>
@@ -103,6 +108,7 @@
     <color name="springdata_row_even">#ffffff</color>
     <color name="springdata_header_text">#737373</color>
     <color name="springdata_headerColor">#ccff8a</color>
+    <color name="springdata_button_plus">#ff8400</color>
 
     <color name="coldtextColorPrimary">#0093c9</color>
     <color name="coldtextColorSecondary">#59d4de</color>
@@ -116,6 +122,7 @@
     <color name="colddata_row_even">#f9f9f9</color>
     <color name="colddata_header_text">#565656</color>
     <color name="colddata_headerColor">#b6b6b6</color>
+    <color name="colddata_button_plus">#3b3b3b</color>
 
     <color name="strongtextColorPrimary">#ff00a1</color>
     <color name="strongtextColorSecondary">#59d4de</color>
@@ -129,6 +136,35 @@
     <color name="strongdata_row_even">#d20197</color>
     <color name="strongdata_header_text">#affff8</color>
     <color name="strongdata_headerColor">#d900f1</color>
+    <color name="strongdata_button_plus">#ee00e2</color>
+
+    <color name="fueltextColorPrimary">#ff0011</color>
+    <color name="fueltextColorSecondary">#0096a3</color>
+    <color name="fueltextColorTertiary">#b4b4b4</color>
+    <color name="fuelnavigationBarColor">#203840</color>
+    <color name="fuelAccent">#ff000d</color>
+    <color name="fuelPrimary">#000000</color>
+    <color name="fuelPrimaryDark">#000000</color>
+    <color name="fuelWindowBackground">#560e13</color>
+    <color name="fueldata_row_odd">#000000</color>
+    <color name="fueldata_row_even">#2b2b2b</color>
+    <color name="fueldata_header_text">#ffffff</color>
+    <color name="fueldata_headerColor">#6c6c6c</color>
+    <color name="fueldata_button_plus">#000000</color>
+
+    <color name="neonighttextColorPrimary">#ff0084</color>
+    <color name="neonighttextColorSecondary">#00ffcc</color>
+    <color name="neonighttextColorTertiary">#de90ff</color>
+    <color name="neonightnavigationBarColor">#203840</color>
+    <color name="neonightAccent">#fff980</color>
+    <color name="neonightPrimary">#000000</color>
+    <color name="neonightPrimaryDark">#000000</color>
+    <color name="neonightWindowBackground">#690043</color>
+    <color name="neonightdata_row_odd">#000000</color>
+    <color name="neonightdata_row_even">#2b2b2b</color>
+    <color name="neonightdata_header_text">#00ff11</color>
+    <color name="neonightdata_headerColor">#222222</color>
+    <color name="neonightdata_button_plus">#ff0084</color>
 
 
 

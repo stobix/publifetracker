@@ -25,4 +25,5 @@
     <string name="action_switch_theme">Byt färgtema</string>
     <string name="action_export_db">spara till fil</string>
     <string name="action_import_db">hämta från fil</string>
+    <string name="theme_picker_dialog_title">Välj ett färgtema</string>
 </resources>
