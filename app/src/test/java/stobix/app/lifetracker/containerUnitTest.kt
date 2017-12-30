@@ -5,54 +5,31 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.junit.Test
 import org.junit.Assert.assertEquals
+import stobix.app.lifetracker.Container.Companion.type
 
 class ContainerUnitTest{
-    val simpleObjStr ="{\"containerID\":0,\"contents\":[]}"
+    val simpleObjStr ="""{"containerID":0,"contents":[]}"""
+    val simpleObj = Container(0)
 
     @Test
     fun serializeSimpleContainer(){
-        val a = Container(0)
         val type = object : TypeToken<Container>() {}.type
-        fun toJSON() = Gson().toJson(a,type)
+        fun toJSON() = Gson().toJson(simpleObj,type)
 
         assertEquals(simpleObjStr,toJSON())
-        assertEquals(simpleObjStr,a.toJSON())
-        assertEquals(simpleObjStr,Container.toJSON(a))
+        assertEquals(simpleObjStr,simpleObj.toJSON())
+        assertEquals(simpleObjStr,Container.toJSON(simpleObj))
+        assertEquals(simpleObjStr,Container._toJSON(simpleObj))
     }
-
-    @Test
-    fun serializeSimpleCustomContainer(){
-        val a = Container(0)
-        assertEquals(simpleObjStr,Container._toJSON(a))
-    }
-
-    /*
-    @Test
-    fun serializeContainingCustomContainer(){
-        val a = Container(0)
-        a.addChild(type=ContainerContentType.PROPERTY)
-        assertEquals(simpleObjStr,Container._toJSON(a))
-    }
-
-    @Test
-    fun serializeContainerContainingCustomContainer(){
-        val a = Container(0)
-        val b = Container(1)
-        a.addChild(type=ContainerContentType.CONTAINER,recur=b)
-        assertEquals(simpleObjStr,Container._toJSON(a))
-    }
-    */
 
     @Test
     fun deserializeSimpleContainer(){
         val a = Container.fromJSON(simpleObjStr)
-        assertEquals(0,a.contents.size)
+        assert(a == simpleObj)
     }
 
-    val recurObjStr =
-            """{"containerID":0,"contents":[{"id":0,"type":"CONTAINER","recur":{"containerID":1,"contents":[]}}]}"""
     @Test
-    fun serializeRecursiveContainer(){
+    fun testRecursiveContainer(){
         val baseContainer = Container(0)
         val recurContainer = Container(1)
         val child = ContainerContent(
@@ -60,19 +37,10 @@ class ContainerUnitTest{
                 recur=recurContainer
         )
         baseContainer.contents.add(child)
-        assertEquals(recurObjStr,baseContainer.toJSON())
-    }
-
-    @Test
-    fun deserializeRecursiveContainer(){
-       val baseContainer = Container.fromJSON(recurObjStr)
-        assertEquals(1,baseContainer.contents[0].recur?.containerID)
+        assert(baseContainer == Container.fromJSON(baseContainer.toJSON()))
     }
 
 
-    val largeContainerStr = """
-        {"containerID":0,"contents":[{"id":1,"type":"INT","typeID":0,"amount":1},{"id":2,"type":"STRING"},{"id":3,"type":"PROPERTY"},{"id":4,"type":"CONTAINER","recur":{"containerID":1,"contents":[]}}]}
-        """.trimIndent()
     @Test
     fun testLargeContainer(){
         val baseContainer = Container(0)
@@ -81,7 +49,27 @@ class ContainerUnitTest{
         baseContainer.addChild(type=ContainerContentType.STRING)
         baseContainer.addChild(type=ContainerContentType.PROPERTY)
         baseContainer.addChild(type=ContainerContentType.CONTAINER,recur=recurContainer)
-        assertEquals(largeContainerStr,baseContainer.toJSON())
+        val recurContainer1 = Container(2)
+        recurContainer1.addChild(type=ContainerContentType.INT)
+        recurContainer.addChild(type=ContainerContentType.CONTAINER,recur=recurContainer1)
+
+        assert(baseContainer == Container.fromJSON(baseContainer.toJSON()))
+    }
+
+    @Test
+    fun testEquals(){
+        val c1 = Container(0)
+        val c2 = Container(0)
+        val c3 = Container(0)
+        val c4 = Container(0)
+        c1.addChild(0,ContainerContentType.INT,0,0,null)
+        c2.addChild(0,ContainerContentType.INT,0,0,null)
+        c4.addChild(0,ContainerContentType.INT,0,0,c1)
+        assert(c1==c1)
+        assert(c1.contents == c2.contents)
+        assert(c1==c2)
+        assert(c1!=c3)
+        assert(c1!=c4)
     }
 
 }

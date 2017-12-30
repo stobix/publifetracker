@@ -5,7 +5,6 @@ import android.arch.persistence.room.PrimaryKey
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import java.lang.reflect.Type
 
@@ -43,7 +42,14 @@ data class Container(
         fun _fromJSON(string: String) = g_alt.fromJson<Container>(string,type)
     }
 
+    override operator fun equals(other: Any?) = when(other){
+        is Container -> this.containerID == other.containerID && this.contents == other.contents
+        else -> false
+    }
+    override fun hashCode() = super.hashCode()
 }
+
+
 
 class ContainerContentDeserializer : JsonDeserializer<ContainerContent> {
     override fun deserialize(
@@ -106,8 +112,19 @@ open class ContainerContent(
         var typeID: Int?=null,
         var amount: Int?=null,
         var recur: Container?=null
-)
+) {
+    override operator fun equals(other: Any?): Boolean =
+            when(other){
+                is ContainerContent ->
+                    this.id == other.id
+                            && this.type == other.type
+                            && this.amount == other.amount
+                            && this.recur == other.recur
+                else -> false
+            }
 
+    override fun hashCode() = super.hashCode()
+}
 
 /*
  *
