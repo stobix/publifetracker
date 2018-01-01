@@ -44,13 +44,15 @@ class ContainerUnitTest{
     fun testLargeContainer(){
         val baseContainer = Container(0)
         val recurContainer = Container(1)
-        baseContainer.addChild(type=ContainerContentType.INT,typeID=0,amount=1)
-        baseContainer.addChild(type=ContainerContentType.STRING)
-        baseContainer.addChild(type=ContainerContentType.PROPERTY)
-        baseContainer.addChild(type=ContainerContentType.CONTAINER,recur=recurContainer)
+        baseContainer.addInt(50,"sugar level")
+        baseContainer.addContainer(recurContainer,2,description = "breakfast")
         val recurContainer1 = Container(2)
-        recurContainer1.addChild(type=ContainerContentType.INT)
-        recurContainer.addChild(type=ContainerContentType.CONTAINER,recur=recurContainer1)
+        recurContainer1.addString("bread")
+        recurContainer1.addString("cheese")
+        recurContainer1.addString("butter")
+        recurContainer.addString("tea")
+        recurContainer.addContainer(recurContainer1)
+        System.out.println("Large container: ${baseContainer.toJSON()}")
 
         baseContainer asEq  Container.fromJSON(baseContainer.toJSON())
     }
@@ -61,9 +63,9 @@ class ContainerUnitTest{
         val c2 = Container(0)
         val c3 = Container(0)
         val c4 = Container(0)
-        c1.addChild(0,ContainerContentType.INT,0,0,null)
-        c2.addChild(0,ContainerContentType.INT,0,0,null)
-        c4.addChild(0,ContainerContentType.INT,0,0,c1)
+        c1.addInt(0)
+        c2.addInt(0)
+        c4.addContainer(c1)
         c1 asEq c1
         c1.contents  asEq  c2.contents
         c1 asEq c2
@@ -74,14 +76,12 @@ class ContainerUnitTest{
     @Test
     fun factory(){
         val g = GsonBuilder().registerTypeAdapterFactory(ContainerAdapterFactory()).create()
-        val c = Container(0)
-        val cjson = g.toJson(c)
+        val c = Container()
+        val cjson = c.toJSON()
         val cc = ContainerContent(0,ContainerContentType.CONTAINER)
-        var ccjson = g.toJson(cc)
+        var ccjson = Container.g.toJson(cc)
         System.out.println("container: $cjson")
-        "[0,[]]" asEq cjson
-        """["CONTAINER",0,null,null]""" asEq ccjson
-        simpleObj asEq g.fromJson(cjson,Container.type)
+        Container() asEq g.fromJson(cjson,Container.type)
         cc asEq g.fromJson(ccjson,ContainerContent.type)
         System.out.println("contents: $ccjson")
         cc.recur = c

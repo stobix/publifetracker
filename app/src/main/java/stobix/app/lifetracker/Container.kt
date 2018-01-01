@@ -11,19 +11,44 @@ import java.lang.reflect.Type
 
 @Entity
 data class Container(
-        @PrimaryKey var containerID: Int,
+        @PrimaryKey(autoGenerate = true) var containerID: Int?=null,
         var contents: ArrayList<ContainerContent> = ArrayList()) {
 
     fun toJSON() = g.toJson(this,type)
 
     fun addChild(c:ContainerContent) = this.contents.add(c)
-    fun addChild(
+    private fun addChild(
             id: Int=contents.size+1,
             type: ContainerContentType=ContainerContentType.CONTAINER,
-            typeID: Int?=null,
             amount: Int?=null,
+            description: String?=null,
             recur: Container?=null) =
-            addChild(ContainerContent(id,type,typeID,amount,recur))
+            addChild(ContainerContent(
+                    id=id,
+                    type=type,
+                    amount=amount,
+                    description=description,
+                    recur=recur))
+
+    fun addContainer(c: Container,amount: Int?=null,description: String?=null){
+        addChild(recur=c,amount=amount,description = description)
+    }
+
+    fun addInt(i: Int,description: String?=null){
+        this.addChild(type=ContainerContentType.INT,amount=i,description = description)
+    }
+
+    fun addString(s: String,amount: Int?=null){
+        this.addChild(type=ContainerContentType.STRING,amount=amount,description = s)
+    }
+
+    // FIXME Is there a point to having this?
+    fun addProperty(s: String, amount: Int?=null,description: String?=null){
+        val c = Container()
+        c.addString(s)
+        c.addInt(-1,description)
+        this.addContainer(c,amount)
+    }
 
     companion object {
         val g = GsonBuilder()
@@ -51,6 +76,14 @@ class IntContent(id: Int,val intValue: Int) : ContainerContent(id) {
 
 class ContainerAdapterFactory : TypeAdapterFactory {
     override fun <T : Any?> create(gson: Gson?, type: TypeToken<T>?): TypeAdapter<T>? {
+        fun unlessNextNull(reader: JsonReader,f: () -> Unit){
+            if(reader.peek() == JsonToken.NULL) {
+                reader.nextNull()
+            } else {
+                f()
+            }
+
+        }
         return when(type?.type){
             Container.type -> {
                 val cadapter = gson!!.getAdapter(object : TypeToken<ContainerContent>() {})
@@ -72,8 +105,10 @@ class ContainerAdapterFactory : TypeAdapterFactory {
 
                     override fun read(reader: JsonReader?): Container {
                         reader!!.beginArray()
-                        val c = Container(0)
-                        c.containerID=reader.nextInt()
+                        val c = Container()
+                        unlessNextNull(reader) {
+                            c.containerID = reader.nextInt()
+                        }
                         reader.beginArray()
                         while (reader.hasNext()) {
                             val v = cadapter.read(reader)
@@ -94,7 +129,11 @@ class ContainerAdapterFactory : TypeAdapterFactory {
                         out.value(value.type.name)
                         out.value(value.id)
                         out.value(value.amount)
-                        cadapter.write(out,value.recur)
+                        out.value(value.description)
+                        when(value.type){
+                            ContainerContentType.CONTAINER ->
+                                cadapter.write(out,value.recur)
+                        }
                         out.endArray()
                     }
 
@@ -103,24 +142,21 @@ class ContainerAdapterFactory : TypeAdapterFactory {
                         val ctype = ContainerContentType.valueOf(reader.nextString() ?: "EMPTY")
                         val id = reader.nextInt()
                         val c = ContainerContent(id=id,type=ctype)
-                        mebbeh(reader) {
-                            c.amount = reader.nextInt()
-                        }
-                        mebbeh(reader){
-                            c.recur = cadapter.read(reader)
+                        arrayOf(
+                                { c.amount = reader.nextInt() },
+                                { c.description = reader.nextString() }
+                        ).map {unlessNextNull(reader,it)}
+
+                        when (ctype) {
+                            ContainerContentType.CONTAINER ->
+                                unlessNextNull(reader) {
+                                    c.recur = cadapter.read(reader)
+                                }
                         }
                         reader.endArray()
                         return c
                     }
 
-                    private fun mebbeh(reader: JsonReader,f: () -> Unit){
-                        if(reader.peek() == JsonToken.NULL) {
-                            reader.nextNull()
-                        } else {
-                            f()
-                        }
-
-                    }
 
                 }
                 adapter as TypeAdapter<T>
@@ -133,15 +169,15 @@ class ContainerAdapterFactory : TypeAdapterFactory {
 }
 
 enum class ContainerContentType {
-    INT, STRING, PROPERTY, CONTAINER,EMPTY
+    INT, STRING, PROPERTY, CONTAINER
 }
 
 @Entity
 open class ContainerContent(
         @PrimaryKey var id: Int,
         var type: ContainerContentType=ContainerContentType.CONTAINER,
-        var typeID: Int?=null,
         var amount: Int?=null,
+        var description: String?=null,
         var recur: Container?=null
 ) {
     override operator fun equals(other: Any?): Boolean =
