@@ -2,14 +2,17 @@ package stobix.app.lifetracker
 
 
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import org.junit.Assert.*
 import org.junit.Test
-import org.junit.Assert.assertEquals
-import stobix.app.lifetracker.Container.Companion.type
 
 class ContainerUnitTest{
     val simpleObjStr ="""{"containerID":0,"contents":[]}"""
     val simpleObj = Container(0)
+
+    private infix fun <A> A.asEq(a: A) = assertEquals(this,a)
+    private infix fun <A> A.asNEq(a: A) = assertNotEquals(this,a)
 
     @Test
     fun serializeSimpleContainer(){
@@ -25,7 +28,7 @@ class ContainerUnitTest{
     @Test
     fun deserializeSimpleContainer(){
         val a = Container.fromJSON(simpleObjStr)
-        assert(a == simpleObj)
+        a asEq  simpleObj
     }
 
     @Test
@@ -37,7 +40,7 @@ class ContainerUnitTest{
                 recur=recurContainer
         )
         baseContainer.contents.add(child)
-        assert(baseContainer == Container.fromJSON(baseContainer.toJSON()))
+        baseContainer asEq Container.fromJSON(baseContainer.toJSON())
     }
 
 
@@ -53,7 +56,7 @@ class ContainerUnitTest{
         recurContainer1.addChild(type=ContainerContentType.INT)
         recurContainer.addChild(type=ContainerContentType.CONTAINER,recur=recurContainer1)
 
-        assert(baseContainer == Container.fromJSON(baseContainer.toJSON()))
+        baseContainer asEq  Container.fromJSON(baseContainer.toJSON())
     }
 
     @Test
@@ -65,11 +68,34 @@ class ContainerUnitTest{
         c1.addChild(0,ContainerContentType.INT,0,0,null)
         c2.addChild(0,ContainerContentType.INT,0,0,null)
         c4.addChild(0,ContainerContentType.INT,0,0,c1)
-        assert(c1==c1)
-        assert(c1.contents == c2.contents)
-        assert(c1==c2)
-        assert(c1!=c3)
-        assert(c1!=c4)
+        c1 asEq c1
+        c1.contents  asEq  c2.contents
+        c1 asEq c2
+        c1 asNEq c3
+        c1 asNEq c4
+    }
+
+    @Test
+    fun factory(){
+        val g = GsonBuilder().registerTypeAdapterFactory(ContainerAdapterFactory()).create()
+        val c = Container(0)
+        val cjson = g.toJson(c)
+        val cc = ContainerContent(0,ContainerContentType.CONTAINER)
+        var ccjson = g.toJson(cc)
+        System.out.println("container: $cjson")
+        "[0,[]]" asEq cjson
+        """["CONTAINER",0,null,null]""" asEq ccjson
+        simpleObj asEq g.fromJson(cjson,Container.type)
+        cc asEq g.fromJson(ccjson,ContainerContent.type)
+        System.out.println("contents: $ccjson")
+        cc.recur = c
+        ccjson=g.toJson(cc)
+        System.out.println("recur contents: $ccjson")
+        val cc1 = g.fromJson<ContainerContent>(ccjson,ContainerContent.type)
+        System.out.println("cc1 recur is ${cc1.recur}")
+        val cc1json=g.toJson((cc1))
+        System.out.println("from contents: $cc1json")
+        cc asEq cc1
     }
 
 }

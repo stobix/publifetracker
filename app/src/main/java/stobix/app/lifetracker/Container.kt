@@ -5,6 +5,7 @@ import android.arch.persistence.room.PrimaryKey
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import java.lang.reflect.Type
 
@@ -98,7 +99,91 @@ class ContainerContentAdapter : TypeAdapter<ContainerContent>() {
         }
         writer.endObject()
     }
+}
 
+class ContainerAdapterFactory : TypeAdapterFactory {
+    override fun <T : Any?> create(gson: Gson?, type: TypeToken<T>?): TypeAdapter<T>? {
+        return when(type?.type){
+            Container.type -> {
+                val cadapter = gson!!.getAdapter(object : TypeToken<ContainerContent>() {})
+                (object : TypeAdapter<Container>() {
+                    override fun write(out: JsonWriter?, value: Container?) {
+                        if (value == null) {
+                            out?.nullValue()
+                            return
+                        }
+                        out?.beginArray()
+                        out?.value(value.containerID)
+                        out?.beginArray()
+                        value.contents.forEach {
+                            cadapter.write(out,it)
+                        }
+                        out?.endArray()
+                        out?.endArray()
+                    }
+
+                    override fun read(reader: JsonReader?): Container {
+                        reader!!.beginArray()
+                        val c = Container(0)
+                        c.containerID=reader.nextInt()
+                        reader.beginArray()
+                        while (reader.hasNext()) {
+                            val v =cadapter.read(reader)
+                            when (v){
+                                is ContainerContent -> c.addChild(v)
+                            }
+                        }
+                        reader.endArray()
+                        reader.endArray()
+                        return Container(0)
+                    }
+
+                }) as TypeAdapter<T>
+            }
+            ContainerContent.type -> {
+                val cadapter = gson!!.getAdapter(object : TypeToken<Container>() {})
+                val adapter = object : TypeAdapter<ContainerContent>() {
+                    override fun write(out: JsonWriter?, value: ContainerContent) {
+                        out!!.beginArray()
+                        out.value(value.type.name)
+                        out.value(value.id)
+                        out.value(value.amount)
+                        cadapter.write(out,value.recur)
+                        out.endArray()
+                    }
+
+                    override fun read(reader: JsonReader?): ContainerContent {
+                        reader!!.beginArray()
+                        val ctype = ContainerContentType.valueOf(reader.nextString() ?: "EMPTY")
+                        val id = reader.nextInt()
+                        val c = ContainerContent(id=id,type=ctype)
+                        mebbeh(reader) {
+                            c.amount = reader.nextInt()
+                        }
+                        mebbeh(reader){
+                            c.recur = cadapter.read(reader)
+                        }
+                        reader.endArray()
+                        return c
+                    }
+
+                    private fun mebbeh(reader: JsonReader,f: () -> Unit){
+                        if(reader.peek() == JsonToken.NULL) {
+                            reader.nextNull()
+                        } else {
+                            f()
+                        }
+
+                    }
+
+                }
+                adapter as TypeAdapter<T>
+            }
+            else -> {
+                null
+            }
+        }
+    }
 }
 
 enum class ContainerContentType {
@@ -124,6 +209,10 @@ open class ContainerContent(
             }
 
     override fun hashCode() = super.hashCode()
+
+    companion object {
+        val type = object : TypeToken<ContainerContent>() {}.type
+    }
 }
 
 /*
