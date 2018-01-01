@@ -26,21 +26,14 @@ data class Container(
             addChild(ContainerContent(id,type,typeID,amount,recur))
 
     companion object {
-        val g_alt = GsonBuilder()
-                .registerTypeAdapter(
-                        object : TypeToken<ContainerContent>() {}.type,
-                        ContainerContentAdapter().nullSafe())
+        val g = GsonBuilder()
+                .registerTypeAdapterFactory(ContainerAdapterFactory())
                 .create()
-        val g = Gson()
         val type = object : TypeToken<Container>() {}.type
         @JvmStatic
         fun toJSON(thing: Container) = g.toJson(thing,type)
         @JvmStatic
         fun fromJSON(string: String) = g.fromJson<Container>(string,type)
-        @JvmStatic
-        fun _toJSON(thing: Container) = g_alt.toJson(thing,type)
-        @JvmStatic
-        fun _fromJSON(string: String) = g_alt.fromJson<Container>(string,type)
     }
 
     override operator fun equals(other: Any?) = when(other){
@@ -52,53 +45,8 @@ data class Container(
 
 
 
-class ContainerContentDeserializer : JsonDeserializer<ContainerContent> {
-    override fun deserialize(
-            json: JsonElement?,
-            typeOfT: Type?,
-            context: JsonDeserializationContext?
-    ): ContainerContent {
-        return IntContent(0,0)
-    }
-}
-
 class IntContent(id: Int,val intValue: Int) : ContainerContent(id) {
 
-}
-// TODO Make an adapterFactory instead, for recursion.
-// http://www.javadoc.io/doc/com.google.code.gson/gson/2.8.2
-class ContainerContentAdapter : TypeAdapter<ContainerContent>() {
-
-    override fun read(reader: JsonReader): ContainerContent {
-        reader.nextNull()
-        return ContainerContent(0)
-    }
-
-    override fun write(writer: JsonWriter, value: ContainerContent) {
-        writer.beginObject()
-        writer.name("type")
-        writer.value("${value.type}")
-        writer.name("value")
-        when(value.type) {
-            ContainerContentType.CONTAINER ->{
-                writer.value(value.recur!!.toJSON())
-            }
-            ContainerContentType.PROPERTY -> {
-                writer.value("property")
-            }
-            ContainerContentType.STRING ->
-                writer.value("string")
-            ContainerContentType.INT ->
-                writer.value(3)
-            ContainerContentType.EMPTY ->
-                writer.nullValue()
-        }
-        if(value.amount!=null) {
-            writer.name("amount")
-            writer.value(value.amount)
-        }
-        writer.endObject()
-    }
 }
 
 class ContainerAdapterFactory : TypeAdapterFactory {
@@ -128,14 +76,12 @@ class ContainerAdapterFactory : TypeAdapterFactory {
                         c.containerID=reader.nextInt()
                         reader.beginArray()
                         while (reader.hasNext()) {
-                            val v =cadapter.read(reader)
-                            when (v){
-                                is ContainerContent -> c.addChild(v)
-                            }
+                            val v = cadapter.read(reader)
+                            c.addChild(v)
                         }
                         reader.endArray()
                         reader.endArray()
-                        return Container(0)
+                        return c
                     }
 
                 }) as TypeAdapter<T>

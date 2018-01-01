@@ -8,7 +8,7 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class ContainerUnitTest{
-    val simpleObjStr ="""{"containerID":0,"contents":[]}"""
+    val simpleObjStr ="[0,[]]"
     val simpleObj = Container(0)
 
     private infix fun <A> A.asEq(a: A) = assertEquals(this,a)
@@ -16,13 +16,9 @@ class ContainerUnitTest{
 
     @Test
     fun serializeSimpleContainer(){
-        val type = object : TypeToken<Container>() {}.type
-        fun toJSON() = Gson().toJson(simpleObj,type)
 
-        assertEquals(simpleObjStr,toJSON())
         assertEquals(simpleObjStr,simpleObj.toJSON())
         assertEquals(simpleObjStr,Container.toJSON(simpleObj))
-        assertEquals(simpleObjStr,Container._toJSON(simpleObj))
     }
 
     @Test
