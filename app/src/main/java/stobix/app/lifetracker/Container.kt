@@ -7,7 +7,6 @@ import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
-import java.lang.reflect.Type
 
 @Entity
 data class Container(
@@ -17,36 +16,24 @@ data class Container(
     fun toJSON() = g.toJson(this,type)
 
     fun addChild(c:ContainerContent) = this.contents.add(c)
-    private fun addChild(
-            id: Int=contents.size+1,
-            type: ContainerContentType=ContainerContentType.CONTAINER,
-            amount: Int?=null,
-            description: String?=null,
-            recur: Container?=null) =
-            addChild(ContainerContent(
-                    id=id,
-                    type=type,
-                    amount=amount,
-                    description=description,
-                    recur=recur))
 
     fun addContainer(c: Container,amount: Int?=null,description: String?=null){
-        addChild(recur=c,amount=amount,description = description)
+        addChild(ContainerContainerContent(value=c,amount=amount,description = description))
     }
 
-    fun addInt(i: Int,description: String?=null){
-        this.addChild(type=ContainerContentType.INT,amount=i,description = description)
+    fun addInt(i: Int, description: String?=null){
+        this.addChild(IntContent(value=i,description = description))
     }
 
-    fun addString(s: String,amount: Int?=null){
-        this.addChild(type=ContainerContentType.STRING,amount=amount,description = s)
+    fun addString(s: String,amount: Int?=null,description: String?=null){
+        this.addChild(StringContent(value=s,amount = amount,description = description))
     }
 
     // FIXME Is there a point to having this?
     fun addProperty(s: String, amount: Int?=null,description: String?=null){
         val c = Container()
         c.addString(s)
-        c.addInt(-1,description)
+        c.addInt(-1,description=description)
         this.addContainer(c,amount)
     }
 
@@ -68,12 +55,84 @@ data class Container(
     override fun hashCode() = super.hashCode()
 }
 
+@Entity
+open class ContainerContent(
+        @PrimaryKey var id: Int?=null,
+        var type: ContainerContentType=ContainerContentType.PROPERTY,
+        var description: String?=null
+        //var value: Container?=null
+) {
+    /*
+    override operator fun equals(other: Any?): Boolean =
+            when(other){
+                is ContainerContent ->
+                    this.id == other.id
+                            && this.type == other.type
+                            && this.amount == other.amount
+                            && this.description == other.description
+            //                   && this.value == other.value
+                else -> false
+            }
 
+    override fun hashCode() = super.hashCode()
+    */
 
-class IntContent(id: Int,val intValue: Int) : ContainerContent(id) {
-
+    companion object {
+        val type = object : TypeToken<ContainerContent>() {}.type
+    }
 }
 
+
+class IntContent(
+        var value: Int,
+        var amount: Int?=null,
+        description: String?=null,
+        id: Int?=null)
+    :
+        ContainerContent(
+                id=id,
+                description=description
+        ) {
+    init{
+        this.type=ContainerContentType.INT
+    }
+
+    override fun hashCode() = super.hashCode()
+}
+
+class StringContent(
+        var value: String,
+        var amount: Int?=null,
+        description: String?=null,
+        id: Int?=null)
+    :
+        ContainerContent(
+                id=id,
+                description=description
+        ) {
+    init{
+        this.type=ContainerContentType.STRING
+    }
+
+    override fun hashCode() = super.hashCode()
+}
+
+class ContainerContainerContent(
+        var value: Container?=null,
+        var amount: Int?=null,
+        description: String?=null,
+        id: Int?=null)
+    :
+        ContainerContent(
+                id=id,
+                description=description
+        ) {
+    init{
+        this.type=ContainerContentType.CONTAINER
+    }
+
+    override fun hashCode() = super.hashCode()
+}
 class ContainerAdapterFactory : TypeAdapterFactory {
     override fun <T : Any?> create(gson: Gson?, type: TypeToken<T>?): TypeAdapter<T>? {
         fun unlessNextNull(reader: JsonReader,f: () -> Unit){
@@ -111,7 +170,7 @@ class ContainerAdapterFactory : TypeAdapterFactory {
                         }
                         reader.beginArray()
                         while (reader.hasNext()) {
-                            val v = cadapter.read(reader)
+                            val v: ContainerContent = cadapter.read(reader)
                             c.addChild(v)
                         }
                         reader.endArray()
@@ -128,11 +187,27 @@ class ContainerAdapterFactory : TypeAdapterFactory {
                         out!!.beginArray()
                         out.value(value.type.name)
                         out.value(value.id)
-                        out.value(value.amount)
-                        out.value(value.description)
+
                         when(value.type){
-                            ContainerContentType.CONTAINER ->
-                                cadapter.write(out,value.recur)
+                            ContainerContentType.INT -> {
+                                val i = value as IntContent
+                                out.value(i.value)
+                            }
+                            ContainerContentType.CONTAINER -> {
+                                val c = value as ContainerContainerContent
+                                out.value(c.amount)
+                                out.value(c.description)
+                                cadapter.write(out, c.value)
+                            }
+                            ContainerContentType.STRING -> {
+                                val s = value as StringContent
+                                out.value(s.value)
+                                out.value(value.description)
+                            }
+                            else -> {
+                                out.value(value.description)
+                            }
+
                         }
                         out.endArray()
                     }
@@ -140,21 +215,42 @@ class ContainerAdapterFactory : TypeAdapterFactory {
                     override fun read(reader: JsonReader?): ContainerContent {
                         reader!!.beginArray()
                         val ctype = ContainerContentType.valueOf(reader.nextString() ?: "EMPTY")
-                        val id = reader.nextInt()
-                        val c = ContainerContent(id=id,type=ctype)
-                        arrayOf(
-                                { c.amount = reader.nextInt() },
-                                { c.description = reader.nextString() }
-                        ).map {unlessNextNull(reader,it)}
+                        var id :Int? = null
+                        unlessNextNull(reader){id = reader.nextInt()}
 
-                        when (ctype) {
-                            ContainerContentType.CONTAINER ->
+                        val ret: ContainerContent = when (ctype) {
+                            ContainerContentType.CONTAINER -> {
+                                val c = ContainerContainerContent(id=id)
+                                arrayOf(
+                                        { c.amount = reader.nextInt() },
+                                        { c.description = reader.nextString() }
+                                ).map {unlessNextNull(reader,it)}
                                 unlessNextNull(reader) {
-                                    c.recur = cadapter.read(reader)
+                                    c.value = cadapter.read(reader)
                                 }
+                                c
+                            }
+                            ContainerContentType.INT -> {
+                                IntContent(id = id, value = reader.nextInt())
+                            }
+                            ContainerContentType.STRING -> {
+                                val c = StringContent(id=id, value = reader.nextString())
+                                arrayOf(
+                                        { c.description = reader.nextString() }
+                                ).map {unlessNextNull(reader,it)}
+                                c
+
+                            }
+                            else -> {
+                                val c = ContainerContent(id=id,type=ctype)
+                                arrayOf(
+                                        { c.description = reader.nextString() }
+                                ).map {unlessNextNull(reader,it)}
+                                c
+                            }
                         }
                         reader.endArray()
-                        return c
+                        return ret
                     }
 
 
@@ -172,30 +268,6 @@ enum class ContainerContentType {
     INT, STRING, PROPERTY, CONTAINER
 }
 
-@Entity
-open class ContainerContent(
-        @PrimaryKey var id: Int,
-        var type: ContainerContentType=ContainerContentType.CONTAINER,
-        var amount: Int?=null,
-        var description: String?=null,
-        var recur: Container?=null
-) {
-    override operator fun equals(other: Any?): Boolean =
-            when(other){
-                is ContainerContent ->
-                    this.id == other.id
-                            && this.type == other.type
-                            && this.amount == other.amount
-                            && this.recur == other.recur
-                else -> false
-            }
-
-    override fun hashCode() = super.hashCode()
-
-    companion object {
-        val type = object : TypeToken<ContainerContent>() {}.type
-    }
-}
 
 /*
  *
