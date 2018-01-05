@@ -15,19 +15,19 @@ data class Container(
 
     fun toJSON() = g.toJson(this,type)
 
-    fun addChild(c:ContainerContent) = this.contents.add(c)
-
-    fun addContainer(c: Container,amount: Int?=null,description: String?=null){
-        addChild(ContainerContainerContent(value=c,amount=amount,description = description))
+    fun addChild(c:ContainerContent) : Container {
+        this.contents.add(c)
+        return this
     }
 
-    fun addInt(i: Int, description: String?=null){
-        this.addChild(IntContent(value=i,description = description))
-    }
+    fun addContainer(c: Container,amount: Int?=null,description: String?=null) =
+            addChild(ContainerContainerContent(value=c,amount=amount,description = description))
 
-    fun addString(s: String,amount: Int?=null,description: String?=null){
-        this.addChild(StringContent(value=s,amount = amount,description = description))
-    }
+    fun addInt(i: Int, description: String?=null) =
+            addChild(IntContent(value=i,description = description))
+
+    fun addString(s: String,amount: Int?=null,description: String?=null) =
+            addChild(StringContent(value=s,amount = amount,description = description))
 
     // FIXME Is there a point to having this?
     fun addProperty(s: String, amount: Int?=null,description: String?=null){
@@ -91,7 +91,6 @@ open class ContainerContent(
 
 class IntContent(
         var value: Int?=null,
-        var amount: Int?=null,
         description: String?=null,
         id: Int?=null)
     :
@@ -108,7 +107,6 @@ class IntContent(
                 is IntContent ->
                     this.id == other.id
                             && this.type == other.type
-                            && this.amount == other.amount
                             && this.description == other.description
                             && this.value == other.value
                 else -> false
@@ -145,7 +143,6 @@ class StringContent(
                 else -> false
             }
 
-    override fun hashCode() = super.hashCode()
 }
 
 class ContainerContainerContent(
