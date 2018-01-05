@@ -49,7 +49,15 @@ data class Container(
     }
 
     override operator fun equals(other: Any?) = when(other){
-        is Container -> this.containerID == other.containerID && this.contents == other.contents
+        is Container -> {
+            if (this.contents.size == other.contents.size) {
+                var g = true
+                for ((i, v) in this.contents.withIndex()) {
+                    g = g && v == other.contents[i]
+                }
+                g && this.containerID == other.containerID
+            } else false
+        }
         else -> false
     }
     override fun hashCode() = super.hashCode()
@@ -60,22 +68,20 @@ open class ContainerContent(
         @PrimaryKey var id: Int?=null,
         var type: ContainerContentType=ContainerContentType.PROPERTY,
         var description: String?=null
-        //var value: Container?=null
 ) {
-    /*
-    override operator fun equals(other: Any?): Boolean =
-            when(other){
-                is ContainerContent ->
-                    this.id == other.id
-                            && this.type == other.type
-                            && this.amount == other.amount
-                            && this.description == other.description
-            //                   && this.value == other.value
-                else -> false
-            }
 
     override fun hashCode() = super.hashCode()
-    */
+
+    override fun equals(other: Any?): Boolean =
+            when(other){
+                is ContainerContent -> {
+                    System.out.println("got called")
+                    this.id == other.id
+                            && this.type == other.type
+                            && this.description == other.description
+                }
+                else -> false
+            }
 
     companion object {
         val type = object : TypeToken<ContainerContent>() {}.type
@@ -84,7 +90,7 @@ open class ContainerContent(
 
 
 class IntContent(
-        var value: Int,
+        var value: Int?=null,
         var amount: Int?=null,
         description: String?=null,
         id: Int?=null)
@@ -97,11 +103,26 @@ class IntContent(
         this.type=ContainerContentType.INT
     }
 
+    override fun equals(other: Any?): Boolean =
+            when(other){
+                is IntContent ->
+                    this.id == other.id
+                            && this.type == other.type
+                            && this.amount == other.amount
+                            && this.description == other.description
+                            && this.value == other.value
+                else -> false
+            }
+
     override fun hashCode() = super.hashCode()
+
+    companion object {
+        val type = object : TypeToken<ContainerContent>() {}.type
+    }
 }
 
 class StringContent(
-        var value: String,
+        var value: String?=null,
         var amount: Int?=null,
         description: String?=null,
         id: Int?=null)
@@ -113,6 +134,16 @@ class StringContent(
     init{
         this.type=ContainerContentType.STRING
     }
+    override fun equals(other: Any?): Boolean =
+            when(other){
+                is StringContent ->
+                    this.id == other.id
+                            && this.type == other.type
+                            && this.amount == other.amount
+                            && this.description == other.description
+                            && this.value == other.value
+                else -> false
+            }
 
     override fun hashCode() = super.hashCode()
 }
@@ -131,6 +162,17 @@ class ContainerContainerContent(
         this.type=ContainerContentType.CONTAINER
     }
 
+    override fun equals(other: Any?): Boolean =
+            when(other){
+                is ContainerContainerContent ->
+                    this.id == other.id
+                            && this.type == other.type
+                            && this.amount == other.amount
+                            && this.description == other.description
+                            && this.value == other.value
+                else -> false
+            }
+
     override fun hashCode() = super.hashCode()
 }
 class ContainerAdapterFactory : TypeAdapterFactory {
@@ -146,7 +188,7 @@ class ContainerAdapterFactory : TypeAdapterFactory {
         return when(type?.type){
             Container.type -> {
                 val cadapter = gson!!.getAdapter(object : TypeToken<ContainerContent>() {})
-                (object : TypeAdapter<Container>() {
+                val adapter = (object : TypeAdapter<Container>() {
                     override fun write(out: JsonWriter?, value: Container?) {
                         if (value == null) {
                             out?.nullValue()
@@ -178,7 +220,8 @@ class ContainerAdapterFactory : TypeAdapterFactory {
                         return c
                     }
 
-                }) as TypeAdapter<T>
+                })
+                adapter as TypeAdapter<T>
             }
             ContainerContent.type -> {
                 val cadapter = gson!!.getAdapter(object : TypeToken<Container>() {})
@@ -192,6 +235,7 @@ class ContainerAdapterFactory : TypeAdapterFactory {
                             ContainerContentType.INT -> {
                                 val i = value as IntContent
                                 out.value(i.value)
+                                out.value(i.description)
                             }
                             ContainerContentType.CONTAINER -> {
                                 val c = value as ContainerContainerContent
@@ -204,9 +248,7 @@ class ContainerAdapterFactory : TypeAdapterFactory {
                                 out.value(s.value)
                                 out.value(value.description)
                             }
-                            else -> {
-                                out.value(value.description)
-                            }
+                            else -> error("unhandled content type")
 
                         }
                         out.endArray()
@@ -214,7 +256,7 @@ class ContainerAdapterFactory : TypeAdapterFactory {
 
                     override fun read(reader: JsonReader?): ContainerContent {
                         reader!!.beginArray()
-                        val ctype = ContainerContentType.valueOf(reader.nextString() ?: "EMPTY")
+                        val ctype = ContainerContentType.valueOf(reader.nextString())
                         var id :Int? = null
                         unlessNextNull(reader){id = reader.nextInt()}
 
@@ -231,23 +273,23 @@ class ContainerAdapterFactory : TypeAdapterFactory {
                                 c
                             }
                             ContainerContentType.INT -> {
-                                IntContent(id = id, value = reader.nextInt())
+                                val c = IntContent(id=id)
+                                arrayOf(
+                                        { c.value = reader.nextInt() },
+                                        { c.description = reader.nextString() }
+                                ).map {unlessNextNull(reader,it)}
+                                c
                             }
                             ContainerContentType.STRING -> {
-                                val c = StringContent(id=id, value = reader.nextString())
+                                val c = StringContent(id=id)
                                 arrayOf(
+                                        { c.value = reader.nextString() },
                                         { c.description = reader.nextString() }
                                 ).map {unlessNextNull(reader,it)}
                                 c
 
                             }
-                            else -> {
-                                val c = ContainerContent(id=id,type=ctype)
-                                arrayOf(
-                                        { c.description = reader.nextString() }
-                                ).map {unlessNextNull(reader,it)}
-                                c
-                            }
+                            else -> error("unhandled content type")
                         }
                         reader.endArray()
                         return ret
