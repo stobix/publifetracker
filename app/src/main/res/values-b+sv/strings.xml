@@ -27,4 +27,5 @@
     <string name="action_import_db">hämta från fil</string>
     <string name="edit_dialog_button_delete">Ta bort</string>
     <string name="theme_picker_dialog_title">Välj ett färgtema</string>
+    <string name="number_picker_cancel_button">Avbryt</string>
 </resources>

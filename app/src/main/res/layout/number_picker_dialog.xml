@@ -49,35 +49,5 @@
             tools:ignore="MissingConstraints" />
     </FrameLayout>
 
-    <LinearLayout
-        android:id="@+id/buttonbar"
-        style="?android:attr/buttonBarStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:gravity="end"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/pickerFrame">
-
-        <Button
-            android:id="@+id/numberPickerClearButton"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/number_picker_clear_button" />
-
-        <Button
-            android:id="@+id/numberPickerOkButton"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/number_picker_ok_button" />
-    </LinearLayout>
-
-
 
 </android.support.constraint.ConstraintLayout>

@@ -1,53 +1,83 @@
 package stobix.app.lifetracker
 
-import android.app.Dialog
 import android.content.Context
-import android.widget.Button
+import android.content.DialogInterface
+import android.support.v7.app.AlertDialog
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.NumberPicker
 import android.widget.NumberPicker.OnValueChangeListener
 
 class NumberPickerDialog (
         ctx: Context,
         val listener: OnNumberSetListener?,
-        val values: Pair<Int,Int> = Pair(4,2),
-        val minVal: Int = 0,
-        val maxVal: Int = 100
+        values: Pair<Int,Int> = Pair(4,2),
+        minVal: Int = 0,
+        maxVal: Int = 100
 ) :
-        Dialog(ctx),
-        OnValueChangeListener
+        AlertDialog(ctx),
+        OnValueChangeListener,
+        DialogInterface.OnClickListener
 {
 
-    override fun show() {
-        super.show()
-        //this.setTitle(context.getString(R.string.number_picker_sugar_level))
-        this.setContentView(R.layout.number_picker_dialog)
+    val heltalspicker: NumberPicker
+    val decimalpicker: NumberPicker
+
+    init {
+        // This mostly echoes what is done in TimePickerDialog
+        val inflater =LayoutInflater.from(context)
+        val view = inflater.inflate(R.layout.number_picker_dialog,null)
+        setView(view)
+
+        setButton(BUTTON_POSITIVE,
+                context.getText(R.string.number_picker_ok_button),this)
+        setButton(BUTTON_NEUTRAL,
+                context.getText(R.string.number_picker_clear_button),this)
+        setButton(BUTTON_NEGATIVE,
+                context.getString(R.string.number_picker_cancel_button),this)
 
         val (heltalsdel,decimaldel)=values
-        val okButton: Button = this.findViewById(R.id.numberPickerOkButton)
-        val clearButton: Button = this.findViewById(R.id.numberPickerClearButton)
-        val heltalspicker: NumberPicker = this.findViewById(R.id.numberPickerHeltal)
+
+        heltalspicker = view.findViewById(R.id.numberPickerHeltal)
+        decimalpicker = view.findViewById(R.id.numberPickerDecimal)
+
         heltalspicker.maxValue =  maxVal
         heltalspicker.minValue = minVal
         heltalspicker.value = heltalsdel
         heltalspicker.wrapSelectorWheel = false
 
-        val decimalpicker: NumberPicker = this.findViewById(R.id.numberPickerDecimal)
         decimalpicker.maxValue =  9
         decimalpicker.minValue = 0
         decimalpicker.value = decimaldel
         decimalpicker.wrapSelectorWheel = false
 
-        okButton.setOnClickListener {
-            listener?.onNumberSet(this,Pair(heltalspicker.value,decimalpicker.value))
-            this.dismiss()
-        }
-
-        clearButton.setOnClickListener {
-            listener?.onNumberClear(this)
-            this.dismiss()
-        }
-
+        val attrs = window.attributes
+        attrs.width = ViewGroup.LayoutParams.WRAP_CONTENT
+        window.attributes=attrs
     }
+
+
+    override fun show() {
+        super.show()
+    }
+
+    override fun onClick(dialog: DialogInterface?, which: Int) {
+        when(which){
+            BUTTON_POSITIVE -> {
+                listener?.onNumberSet(this,Pair(heltalspicker.value,decimalpicker.value))
+                this.dismiss()
+            }
+
+            BUTTON_NEUTRAL -> {
+                listener?.onNumberClear(this)
+                this.dismiss()
+            }
+
+            BUTTON_NEGATIVE -> cancel()
+
+        }
+    }
+
     override fun onValueChange(picker: NumberPicker?, oldVal: Int, newVal: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
