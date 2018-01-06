@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
-import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.*
 import android.widget.NumberPicker
 import android.widget.NumberPicker.OnValueChangeListener
 
@@ -51,9 +51,8 @@ class NumberPickerDialog (
         decimalpicker.value = decimaldel
         decimalpicker.wrapSelectorWheel = false
 
-        val attrs = window.attributes
-        attrs.width = ViewGroup.LayoutParams.WRAP_CONTENT
-        window.attributes=attrs
+        // This does not seem to work for API 22, and is useless for newer ones.
+        //window.setLayout( WRAP_CONTENT, WRAP_CONTENT)
     }
 
 
