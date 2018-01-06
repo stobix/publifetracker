@@ -52,7 +52,7 @@ class NumberPickerDialog (
         decimalpicker.wrapSelectorWheel = false
 
         // This does not seem to work for API 22, and is useless for newer ones.
-        //window.setLayout( WRAP_CONTENT, WRAP_CONTENT)
+        // window.setLayout( WRAP_CONTENT, WRAP_CONTENT)
     }
 
 

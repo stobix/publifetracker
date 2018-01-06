@@ -3,6 +3,7 @@ package stobix.app.lifetracker;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.arch.persistence.room.Room;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -13,6 +14,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.ImageViewCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -301,7 +303,18 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         public void onSugarEntryDeleted(@NotNull SugarEntry s) {
-            sugarEntryDeleted(s);
+            // Taken from https://stackoverflow.com/questions/2115758/how-do-i-display-an-alert-dialog-on-android#2115770
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Delete entry")
+                    .setMessage("Are you sure you want to delete this entry?")
+                    .setPositiveButton(android.R.string.yes,
+                            (dialog, which) -> sugarEntryDeleted(s))
+                    .setNegativeButton(android.R.string.no,
+                            (dialog, which) -> {
+                        // do nothing
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
         }
 
         // Called when the user has selected a sugar entry for deletion.
