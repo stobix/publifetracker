@@ -1,4 +1,5 @@
-package stobix.views
+package stobix.view.containerview
+
 
 import android.os.Bundle
 import android.os.PersistableBundle

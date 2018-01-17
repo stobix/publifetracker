@@ -1,1 +1,1 @@
-include ':app',':thingpicker', ':compat'
+include ':app',':thingpicker', ':compat', ':containerview'

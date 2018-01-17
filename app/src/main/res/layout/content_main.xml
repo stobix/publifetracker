@@ -76,16 +76,32 @@
         app:layout_constraintStart_toEndOf="@+id/editText3" />
 
 -->
-    <stobix.app.lifetracker.SortableSugarEntryTableView
-        android:id="@+id/tableView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="visible"
-        app:layout_constraintStart_toStartOf="parent"
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteY="511dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:tableView_columnCount="4"
-        tools:layout_editor_absoluteX="0dp"
-        />
+        >
+
+        <stobix.view.containerview.ContainerView
+            android:id="@+id/containerView2"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_marginTop="8dp"
+            />
+
+        <stobix.app.lifetracker.SortableSugarEntryTableView
+            android:id="@+id/tableView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"
+            app:tableView_columnCount="4">
+
+        </stobix.app.lifetracker.SortableSugarEntryTableView>
+
+    </LinearLayout>
 
 
 </android.support.constraint.ConstraintLayout>
