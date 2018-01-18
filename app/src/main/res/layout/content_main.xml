@@ -90,6 +90,7 @@
             android:layout_width="match_parent"
             android:layout_height="20dp"
             android:layout_marginTop="8dp"
+            app:textSize="18sp"
             />
 
         <stobix.app.lifetracker.SortableSugarEntryTableView
