@@ -27,8 +27,8 @@ import android.widget.ListView;
 import stobix.compat.functions.Consumer;
 import stobix.compat.functions.BiConsumer;
 
-import com.flask.colorpicker.ColorPickerView;
-import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+//import com.flask.colorpicker.ColorPickerView;
+//import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
+
 
 
             SharedPreferences preferences = getSharedPreferences("colorsNstuff",MODE_PRIVATE);
