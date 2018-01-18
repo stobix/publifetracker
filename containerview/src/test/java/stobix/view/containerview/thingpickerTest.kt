@@ -1,4 +1,4 @@
-package stobix.views
+package stobix.view.containerview
 
 import org.junit.Assert.*
 import org.junit.Test
@@ -12,9 +12,9 @@ import org.robolectric.annotation.Config
 class thingpickerTest{
 
     @Test
-    fun appShouldntCrashWhenLoadingThingpicker(){
-        val a = Robolectric.setupActivity(MainActivity::class.java)
-        val t = a.findViewById<ThingPicker>(R.id.thingPicker)
+    fun appShouldntCrashWhenLoadingContainerView(){
+        val a = Robolectric.setupActivity(TestActivity::class.java)
+        val t = a.findViewById<ContainerView>(R.id.containerView)
         assertTrue(t.isLaidOut)
 
     }
