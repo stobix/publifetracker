@@ -4,8 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/compat/compat.iml" filepath="$PROJECT_DIR$/compat/compat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/containerview/containerview.iml" filepath="$PROJECT_DIR$/containerview/containerview.iml" />
       <module fileurl="file://$PROJECT_DIR$/lifetracker.iml" filepath="$PROJECT_DIR$/lifetracker.iml" />
-      <module fileurl="file://$PROJECT_DIR$/thingpicker/thingpicker.iml" filepath="$PROJECT_DIR$/thingpicker/thingpicker.iml" />
     </modules>
   </component>
 </project>
