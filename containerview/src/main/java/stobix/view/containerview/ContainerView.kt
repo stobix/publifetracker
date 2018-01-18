@@ -32,11 +32,15 @@ open class ContainerView(context: Context,attrs: AttributeSet) : View(context, a
             invalidateIfExternal()
         }
     var rectColorLight: Int = 0
-        set(value) {
-            field =value
-            rectColorLightPaint.color=value
-            invalidateIfExternal()
-        }
+        set(value) = update {
+                field =value
+                rectColorLightPaint.color=value
+            }
+
+    private fun update (f:()->Unit) {
+        f()
+        invalidateIfExternal()
+    }
 
     private fun rehashIfExternal(){
         if(isExternalSet) {
@@ -56,6 +60,8 @@ open class ContainerView(context: Context,attrs: AttributeSet) : View(context, a
         f()
         isExternalSet=true
     }
+
+
     var textSize = -1f
         set(value) {
             field=value
