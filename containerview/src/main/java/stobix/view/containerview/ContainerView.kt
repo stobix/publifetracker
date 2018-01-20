@@ -114,6 +114,12 @@ open class ContainerView(context: Context,attrs: AttributeSet) : View(context, a
             //textPaint.textSize = TextAppearance.size.toFloat()
             //Log.d("TEXT","size after: ${textPaint.textSize}")
             textPaint.textSize = textSize
+
+            container.addInt(3,"lol")
+            container.addString("hej",3,"lel")
+            var c1 = Container()
+            c1.addProperty("meh",4,"hm")
+            container.addContainer(c1)
         }
 
         fillPaint.style=Paint.Style.FILL
@@ -128,9 +134,27 @@ open class ContainerView(context: Context,attrs: AttributeSet) : View(context, a
         super.onDraw(canvas)
         Log.d("ContainerView draw","text size: $textSize")
         canvas.drawColor(backColor)
-        canvas.drawText("test!",10f,textSize,textPaint)
-        // Todo Draw the contents of the container
+        val drawThis = stringifyContainer(container)
+        Log.d("ContainerView draw","draw this $drawThis")
+        canvas.drawText(drawThis,10f,textSize,textPaint)
     }
 
+    fun stringifyContainer(container: Container?):  String{
+        var string = ""
+        container ?: return ""
+        for(c in container.contents) when (c) {
+            is IntContent -> {
+                string += ", ${c.value} (${c.description?:""})"
+            }
+            is StringContent -> {
+                string += ", ${c.amount?:""} ${c.value} (${c.description?:""})"
+            }
+            is ContainerContainerContent -> {
+                string += ", ${c.amount?:""} [${stringifyContainer(c.value)}] (${c.description?:""})"
+            }
+        }
+        string = string.drop(1)
+        return string
+    }
 
 }
