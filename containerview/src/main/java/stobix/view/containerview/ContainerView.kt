@@ -115,11 +115,19 @@ open class ContainerView(context: Context,attrs: AttributeSet) : View(context, a
             //Log.d("TEXT","size after: ${textPaint.textSize}")
             textPaint.textSize = textSize
 
-            container.addInt(3,"lol")
-            container.addString("hej",3,"lel")
+            container.addInt(3,"insulin")
+            container.addString("godis",3,"mums")
             var c1 = Container()
-            c1.addProperty("meh",4,"hm")
-            container.addContainer(c1)
+            c1.addString("mte")
+            c1.addContainer(
+                    Container()
+                            .addString("bröd",1,"energibröd")
+                            .addString("ost",1,"cheddar")
+                            .addString("smör",description="bregott")
+                    ,1
+                    ,"smörgås"
+            )
+            container.addContainer(c1,description = "frukost")
         }
 
         fillPaint.style=Paint.Style.FILL
@@ -136,24 +144,67 @@ open class ContainerView(context: Context,attrs: AttributeSet) : View(context, a
         canvas.drawColor(backColor)
         val drawThis = stringifyContainer(container)
         Log.d("ContainerView draw","draw this $drawThis")
-        canvas.drawText(drawThis,10f,textSize,textPaint)
+        canvas.drawText(drawThis?:"",10f,textSize,textPaint)
     }
 
-    fun stringifyContainer(container: Container?):  String{
-        var string = ""
+    open var recurLevel = 1
+        set(value) = update { field = value }
+
+    open var showDescriptions = false
+        set(value) = update { field = value }
+    open var showTags = false
+        set(value) = update { field = value }
+    open var showContents = false
+        set(value) = update { field = value }
+    open var showContentDescriptions = false
+        set(value) = update { field = value }
+
+    private fun Any?.drawAt(level: Int) = if (recurLevel>=level) this else null
+    private fun Any?.inParens() = if(this!=null) "($this)" else null
+    private fun Any?.inBracks() = if(this!=null) "[$this]" else null
+    private fun Any?.inBraces() = if(this!=null) "{$this}" else null
+    private fun Any?.drawIf(b:Boolean) = if(b) this else null
+    private fun Any?.drawOr(b:Boolean,that: Any?) = if(b) this else that
+
+    private fun Any?.intersperce(that:Any?,chars: String) =
+            if (this != null)
+                if (that != null) "$this"+chars+"$that"
+                else "$this"
+            else
+                if (that != null) "$that"
+                else null
+
+    private infix fun Any?.space(that:Any?) = this.intersperce(that," ")
+    private infix fun Any?.colon(that:Any?) = this.intersperce(that,": ")
+    private infix fun Any?.equals(that:Any?) = this.intersperce(that," = ")
+    private infix fun Any?.comma(that:Any?) = this.intersperce(that,", ")
+
+    fun stringifyContainer(container: Container?,currRecurLevel: Int=0):  String?{
+        var string = null as String?
         container ?: return ""
         for(c in container.contents) when (c) {
             is IntContent -> {
-                string += ", ${c.value} (${c.description?:""})"
+                val intString = c.value space c.description.drawIf(showTags)
+                string = string comma intString
             }
             is StringContent -> {
-                string += ", ${c.amount?:""} ${c.value} (${c.description?:""})"
+                val stringString = c.amount space c.value space c.description.inParens().drawIf(showDescriptions)
+                string = string comma stringString
             }
             is ContainerContainerContent -> {
-                string += ", ${c.amount?:""} [${stringifyContainer(c.value)}] (${c.description?:""})"
+                // TODO only show description if necessary unless the user has put on some verbose thing
+                val recurDesc =
+                        if (recurLevel > currRecurLevel)
+                            if (showContents)
+                                c.description.drawIf(showContentDescriptions) equals stringifyContainer(c.value,currRecurLevel+1).inBracks()
+                            else
+                                c.description ?: stringifyContainer(c.value,currRecurLevel+1).inBracks()
+                        else
+                            c.description
+                val containerString = c.amount space recurDesc
+                string = string comma containerString
             }
         }
-        string = string.drop(1)
         return string
     }
 

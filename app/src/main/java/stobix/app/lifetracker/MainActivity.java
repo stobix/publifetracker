@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ListView;
 
 import stobix.compat.functions.Consumer;
@@ -41,6 +42,7 @@ import java.util.List;
 
 import de.codecrafters.tableview.TableDataAdapter;
 import kotlin.Pair;
+import stobix.view.containerview.ContainerView;
 
 import static android.util.Log.d;
 
@@ -165,6 +167,15 @@ public class MainActivity extends AppCompatActivity
             Thread dbInitThread = new Thread(initiateDB);
             dbInitThread.start();
 
+            ContainerView v = findViewById(R.id.containerView2);
+            //v.setRecurLevel(2);
+
+            findViewById(R.id.checkTags).setOnClickListener( (View b) -> v.setShowTags(((CheckBox) b).isChecked()));
+            findViewById(R.id.checkDescr).setOnClickListener( (View b) -> v.setShowDescriptions(((CheckBox) b).isChecked()));
+            findViewById(R.id.checkRecur).setOnClickListener( (View b) -> v.setShowContents(((CheckBox) b).isChecked()));
+            findViewById(R.id.checkRecDesc).setOnClickListener( (View b) -> v.setShowContentDescriptions(((CheckBox) b).isChecked()));
+            findViewById(R.id.checkRecDeep).setOnClickListener( (View b) -> v.setRecurLevel(((CheckBox) b).isChecked() ? 2 : 1)
+            );
         }
 
         @Override

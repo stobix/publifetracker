@@ -23,6 +23,49 @@
     <include layout="@layout/content_main" />
 
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/checkTags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="T" />
+
+        <CheckBox
+            android:id="@+id/checkDescr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="D" />
+
+        <CheckBox
+            android:id="@+id/checkRecur"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="R" />
+
+        <CheckBox
+            android:id="@+id/checkRecDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="RD" />
+
+        <CheckBox
+            android:id="@+id/checkRecDeep"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="++" />
+
+    </LinearLayout>
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
