@@ -1,4 +1,4 @@
-package stobix.app.lifetracker
+package stobix.view.containerview
 
 
 import org.junit.Assert.*

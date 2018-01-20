@@ -53,6 +53,11 @@ open class ContainerView(context: Context,attrs: AttributeSet) : View(context, a
                 textPaint.textSize = value
         }
 
+    var container: Container = Container()
+        set(value) = update {
+            field = value
+        }
+
 
     private fun update (f:()->Unit) {
         f()
@@ -124,6 +129,7 @@ open class ContainerView(context: Context,attrs: AttributeSet) : View(context, a
         Log.d("ContainerView draw","text size: $textSize")
         canvas.drawColor(backColor)
         canvas.drawText("test!",10f,textSize,textPaint)
+        // Todo Draw the contents of the container
     }
 
 

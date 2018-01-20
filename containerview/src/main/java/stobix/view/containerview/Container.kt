@@ -1,4 +1,4 @@
-package stobix.app.lifetracker
+package stobix.view.containerview
 
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
@@ -13,21 +13,21 @@ data class Container(
         @PrimaryKey(autoGenerate = true) var containerID: Int?=null,
         var contents: ArrayList<ContainerContent> = ArrayList()) {
 
-    fun toJSON() = g.toJson(this,type)
+    fun toJSON() = g.toJson(this, type)
 
-    fun addChild(c:ContainerContent) : Container {
+    fun addChild(c: ContainerContent) : Container {
         this.contents.add(c)
         return this
     }
 
-    fun addContainer(c: Container,amount: Int?=null,description: String?=null) =
-            addChild(ContainerContainerContent(value=c,amount=amount,description = description))
+    fun addContainer(c: Container, amount: Int?=null, description: String?=null) =
+            addChild(ContainerContainerContent(value = c, amount = amount, description = description))
 
     fun addInt(i: Int, description: String?=null) =
-            addChild(IntContent(value=i,description = description))
+            addChild(IntContent(value = i, description = description))
 
     fun addString(s: String,amount: Int?=null,description: String?=null) =
-            addChild(StringContent(value=s,amount = amount,description = description))
+            addChild(StringContent(value = s, amount = amount, description = description))
 
     // FIXME Is there a point to having this?
     fun addProperty(s: String, amount: Int?=null,description: String?=null){
@@ -43,9 +43,9 @@ data class Container(
                 .create()
         val type = object : TypeToken<Container>() {}.type
         @JvmStatic
-        fun toJSON(thing: Container) = g.toJson(thing,type)
+        fun toJSON(thing: Container) = g.toJson(thing, type)
         @JvmStatic
-        fun fromJSON(string: String) = g.fromJson<Container>(string,type)
+        fun fromJSON(string: String) = g.fromJson<Container>(string, type)
     }
 
     override operator fun equals(other: Any?) = when(other){
@@ -66,7 +66,7 @@ data class Container(
 @Entity
 open class ContainerContent(
         @PrimaryKey var id: Int?=null,
-        var type: ContainerContentType=ContainerContentType.PROPERTY,
+        var type: ContainerContentType = ContainerContentType.PROPERTY,
         var description: String?=null
 ) {
 
@@ -99,7 +99,7 @@ class IntContent(
                 description=description
         ) {
     init{
-        this.type=ContainerContentType.INT
+        this.type= ContainerContentType.INT
     }
 
     override fun equals(other: Any?): Boolean =
@@ -130,7 +130,7 @@ class StringContent(
                 description=description
         ) {
     init{
-        this.type=ContainerContentType.STRING
+        this.type= ContainerContentType.STRING
     }
     override fun equals(other: Any?): Boolean =
             when(other){
@@ -156,7 +156,7 @@ class ContainerContainerContent(
                 description=description
         ) {
     init{
-        this.type=ContainerContentType.CONTAINER
+        this.type= ContainerContentType.CONTAINER
     }
 
     override fun equals(other: Any?): Boolean =
@@ -259,7 +259,7 @@ class ContainerAdapterFactory : TypeAdapterFactory {
 
                         val ret: ContainerContent = when (ctype) {
                             ContainerContentType.CONTAINER -> {
-                                val c = ContainerContainerContent(id=id)
+                                val c = ContainerContainerContent(id = id)
                                 arrayOf(
                                         { c.amount = reader.nextInt() },
                                         { c.description = reader.nextString() }
@@ -270,7 +270,7 @@ class ContainerAdapterFactory : TypeAdapterFactory {
                                 c
                             }
                             ContainerContentType.INT -> {
-                                val c = IntContent(id=id)
+                                val c = IntContent(id = id)
                                 arrayOf(
                                         { c.value = reader.nextInt() },
                                         { c.description = reader.nextString() }
@@ -278,7 +278,7 @@ class ContainerAdapterFactory : TypeAdapterFactory {
                                 c
                             }
                             ContainerContentType.STRING -> {
-                                val c = StringContent(id=id)
+                                val c = StringContent(id = id)
                                 arrayOf(
                                         { c.value = reader.nextString() },
                                         { c.description = reader.nextString() }
