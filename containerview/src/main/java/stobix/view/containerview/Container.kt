@@ -78,7 +78,7 @@ open class Content( var type: ContentType ) {
             }
 
     companion object {
-        val type = object : TypeToken<Content>() {}.type
+        @JvmStatic val type = object : TypeToken<Content>() {}.type
     }
 }
 
@@ -103,9 +103,6 @@ class IntContent @JvmOverloads constructor(
 
     override fun hashCode() = super.hashCode()
 
-    companion object {
-        @JvmStatic val type = object : TypeToken<IntContent>() {}.type
-    }
 }
 
 @Entity(tableName="string_content")
@@ -128,9 +125,6 @@ class StringContent(
                 else -> false
             }
 
-    companion object {
-        @JvmStatic val type = object : TypeToken<StringContent>() {}.type
-    }
 }
 
 
@@ -155,9 +149,6 @@ class ContainerContent(
             }
 
     override fun hashCode() = super.hashCode()
-    companion object {
-        @JvmStatic val type = object : TypeToken<ContainerContent>() {}.type
-    }
 }
 class ContainerAdapterFactory : TypeAdapterFactory {
     override fun <T : Any?> create(gson: Gson?, type: TypeToken<T>?): TypeAdapter<T>? {
@@ -171,7 +162,7 @@ class ContainerAdapterFactory : TypeAdapterFactory {
         }
         return when(type?.type){
             Container.type -> {
-                val cadapter = gson!!.getAdapter(object : TypeToken<Content>() {})
+                val contentAdapter = gson!!.getAdapter(object : TypeToken<Content>() {})
                 val adapter = (object : TypeAdapter<Container>() {
                     override fun write(out: JsonWriter?, value: Container?) {
                         if (value == null) {
@@ -182,7 +173,7 @@ class ContainerAdapterFactory : TypeAdapterFactory {
                         out?.value(value.containerID)
                         out?.beginArray()
                         value.contents.forEach {
-                            cadapter.write(out,it)
+                            contentAdapter.write(out,it)
                         }
                         out?.endArray()
                         out?.endArray()
@@ -196,7 +187,7 @@ class ContainerAdapterFactory : TypeAdapterFactory {
                         }
                         reader.beginArray()
                         while (reader.hasNext()) {
-                            val v: Content = cadapter.read(reader)
+                            val v: Content = contentAdapter.read(reader)
                             c.addChild(v)
                         }
                         reader.endArray()
@@ -208,7 +199,7 @@ class ContainerAdapterFactory : TypeAdapterFactory {
                 adapter as TypeAdapter<T>
             }
             Content.type -> {
-                val cadapter = gson!!.getAdapter(object : TypeToken<Container>() {})
+                val containerAdapter = gson!!.getAdapter(object : TypeToken<Container>() {})
                 val adapter = object : TypeAdapter<Content>() {
                     override fun write(out: JsonWriter?, value: Content) {
                         out!!.beginArray()
@@ -226,7 +217,7 @@ class ContainerAdapterFactory : TypeAdapterFactory {
                                 out.value(c.id)
                                 out.value(c.amount)
                                 out.value(c.description)
-                                cadapter.write(out, c.value)
+                                containerAdapter.write(out, c.value)
                             }
                             STRING -> {
                                 val s = value as StringContent
@@ -244,46 +235,42 @@ class ContainerAdapterFactory : TypeAdapterFactory {
                     override fun read(reader: JsonReader?): Content {
                         reader!!.beginArray()
                         val ctype = ContentType.valueOf(reader.nextString())
-                        var id :Int? = null
-                        unlessNextNull(reader){id = reader.nextInt()}
 
                         val ret: Content = when (ctype) {
                             CONTAINER -> {
-                                val c = ContainerContent(id = id)
+                                val c = ContainerContent()
                                 arrayOf(
+                                        { c.id = reader.nextInt()},
                                         { c.amount = reader.nextInt() },
-                                        { c.description = reader.nextString() }
+                                        { c.description = reader.nextString() },
+                                        { c.value = containerAdapter.read(reader) }
                                 ).map {unlessNextNull(reader,it)}
-                                unlessNextNull(reader) {
-                                    c.value = cadapter.read(reader)
-                                }
                                 c
                             }
                             INT -> {
-                                val c = IntContent(id = id)
+                                val c = IntContent()
                                 arrayOf(
+                                        { c.id = reader.nextInt()},
                                         { c.value = reader.nextInt() },
                                         { c.description = reader.nextString() }
                                 ).map {unlessNextNull(reader,it)}
                                 c
                             }
                             STRING -> {
-                                val c = StringContent(id = id)
+                                val c = StringContent()
                                 arrayOf(
+                                        { c.id = reader.nextInt()},
                                         { c.amount = reader.nextInt() },
                                         { c.value = reader.nextString() },
                                         { c.description = reader.nextString() }
                                 ).map {unlessNextNull(reader,it)}
                                 c
-
                             }
                             else -> error("unhandled content type")
                         }
                         reader.endArray()
                         return ret
                     }
-
-
                 }
                 adapter as TypeAdapter<T>
             }
