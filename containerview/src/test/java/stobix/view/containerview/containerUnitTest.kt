@@ -33,10 +33,8 @@ class ContainerUnitTest{
         c.addInt(0,description="inte ger, tar")
         c.addString("fjorton",14)
         c.addProperty("skolbuss",2,"resa till staden")
-        System.out.println("Klasser: ${c.toJSON()}")
         val d = Container.fromJSON(c.toJSON())
         c.toJSON() asEq d.toJSON()
-        // TODO get the equals function of c to be recursively valid for equivalent contents
         c asEq d
     }
 
@@ -44,9 +42,7 @@ class ContainerUnitTest{
     fun minIntContent(){
         val c = Container()
         c.addInt(0)
-        System.out.println(c.toJSON())
         val d = Container.fromJSON(c.toJSON())
-        System.out.println(d.toJSON())
         assertTrue(when(c.contents[0]){
             is IntContent ->
                 true
@@ -65,9 +61,7 @@ class ContainerUnitTest{
     fun fullIntContent(){
         val c = Container()
         c.addInt(0,"int")
-        System.out.println(c.toJSON())
         val d = Container.fromJSON(c.toJSON())
-        System.out.println(d.toJSON())
         assertTrue(when(c.contents[0]){
             is IntContent ->
                 true
@@ -86,9 +80,7 @@ class ContainerUnitTest{
     fun minStringContent(){
         val c = Container()
         c.addString("0")
-        System.out.println(c.toJSON())
         val d = Container.fromJSON(c.toJSON())
-        System.out.println(d.toJSON())
         assertTrue(when(c.contents[0]){
             is StringContent ->
                 true
@@ -107,9 +99,7 @@ class ContainerUnitTest{
     fun fullStringContent(){
         val c = Container()
         c.addString("0",3,"string")
-        System.out.println(c.toJSON())
         val d = Container.fromJSON(c.toJSON())
-        System.out.println(d.toJSON())
 
         assertTrue(when(c.contents[0]){
             is StringContent -> {
@@ -127,8 +117,7 @@ class ContainerUnitTest{
             else -> false
         } )
         c.toJSON() asEq d.toJSON()
-        // FIXME This does not work!! Is it due to kotlin choosing a hash function instead of equals for too large obects?
-        // c asEq d
+        c asEq d
     }
 
 
@@ -136,16 +125,14 @@ class ContainerUnitTest{
     fun minEmptyContainerContent(){
         val c = Container()
         c.addContainer(Container())
-        System.out.println(c.toJSON())
         val d = Container.fromJSON(c.toJSON())
-        System.out.println(d.toJSON())
         assertTrue(when(c.contents[0]){
-            is ContainerContainerContent ->
+            is ContainerContent ->
                 true
             else -> false
         } )
         assertTrue(when(d.contents[0]){
-            is ContainerContainerContent ->
+            is ContainerContent ->
                 true
             else -> false
         } )
@@ -157,16 +144,14 @@ class ContainerUnitTest{
     fun fullEmptyContainerContent(){
         val c = Container()
         c.addContainer(Container(),3,"container")
-        System.out.println(c.toJSON())
         val d = Container.fromJSON(c.toJSON())
-        System.out.println(d.toJSON())
         assertTrue(when(c.contents[0]){
-            is ContainerContainerContent ->
+            is ContainerContent ->
                 true
             else -> false
         } )
         assertTrue(when(d.contents[0]){
-            is ContainerContainerContent ->
+            is ContainerContent ->
                 true
             else -> false
         } )
@@ -178,16 +163,14 @@ class ContainerUnitTest{
     fun intContainerContainer(){
         val c = Container()
         c.addContainer(Container().addInt(0))
-        System.out.println(c.toJSON())
         val d = Container.fromJSON(c.toJSON())
-        System.out.println(d.toJSON())
         assertTrue(when(c.contents[0]){
-            is ContainerContainerContent ->
+            is ContainerContent ->
                 true
             else -> false
         } )
         assertTrue(when(d.contents[0]){
-            is ContainerContainerContent ->
+            is ContainerContent ->
                 true
             else -> false
         } )
@@ -199,20 +182,18 @@ class ContainerUnitTest{
     fun stringContainerContainer(){
         val c = Container()
         c.addContainer(Container().addString("0"))
-        System.out.println(c.toJSON())
         val d = Container.fromJSON(c.toJSON())
-        System.out.println(d.toJSON())
         assertTrue(when(c.contents[0]){
-            is ContainerContainerContent ->
-                when((c.contents[0] as ContainerContainerContent).value?.contents?.get(0)){
+            is ContainerContent ->
+                when((c.contents[0] as ContainerContent).value?.contents?.get(0)){
                     is StringContent -> true
                     else -> false
                 }
             else -> false
         } )
         assertTrue(when(d.contents[0]){
-            is ContainerContainerContent ->
-                when((d.contents[0] as ContainerContainerContent).value?.contents?.get(0)){
+            is ContainerContent ->
+                when((d.contents[0] as ContainerContent).value?.contents?.get(0)){
                     is StringContent -> true
                     else -> false
                 }
@@ -234,8 +215,6 @@ class ContainerUnitTest{
         recurContainer1.addString("butter")
         recurContainer.addString("tea")
         recurContainer.addContainer(recurContainer1)
-        System.out.println("Large container: ${baseContainer.toJSON()}")
-
         baseContainer asEq  Container.fromJSON(baseContainer.toJSON())
     }
 }
