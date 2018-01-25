@@ -4,9 +4,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.support.v4.content.ContextCompat
-import android.support.v7.appcompat.R.styleable.TextAppearance
-import android.text.style.TextAppearanceSpan
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
@@ -191,7 +188,7 @@ open class ContainerView(context: Context,attrs: AttributeSet) : View(context, a
                 val stringString = c.amount space c.value space c.description.inParens().drawIf(showDescriptions)
                 string = string comma stringString
             }
-            is ContainerContainerContent -> {
+            is ContainerContent -> {
                 // TODO only show description if necessary unless the user has put on some verbose thing
                 val recurDesc =
                         if (recurLevel > currRecurLevel)
