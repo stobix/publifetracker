@@ -110,6 +110,10 @@ public class MainActivity extends AppCompatActivity
             else
                 fab.setImageResource(R.drawable.ic_add_24dp);
 
+            if(BuildConfig.containers){
+                // TODO FIXME Magically include a container that isn't otherwise present in the main layout.
+            }
+
             fab.setOnClickListener(view -> showSugarEntryCreationDialog() );
 
             SortableSugarEntryTableView tv = tableView;

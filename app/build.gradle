@@ -17,6 +17,18 @@ android {
                 cppFlags ""
             }
         }
+        buildConfigField "boolean","containers", "false"
+    }
+    productFlavors{
+        flavorDimensions "variant"
+        normal {
+            dimension "variant"
+        }
+        containersTest {
+            dimension "variant"
+            applicationId 'stobix.app.lifetracker.containers'
+            buildConfigField "boolean","containers","true"
+        }
     }
     buildTypes {
         release {
