@@ -112,17 +112,6 @@ public class MainActivity extends AppCompatActivity
             else
                 fab.setImageResource(R.drawable.ic_add_24dp);
 
-            if(BuildConfig.containers){
-                // TODO FIXME Magically include a container that isn't otherwise present in the main layout.
-            } else {
-                TextView t = new TextView(this);
-                t.setText("lolmuhej");
-                addContentView(t,new LinearLayoutCompat.LayoutParams(
-                        LinearLayoutCompat.LayoutParams.WRAP_CONTENT,
-                        LinearLayoutCompat.LayoutParams.WRAP_CONTENT
-                ));
-            }
-
             fab.setOnClickListener(view -> showSugarEntryCreationDialog() );
 
             SortableSugarEntryTableView tv = tableView;
@@ -180,15 +169,7 @@ public class MainActivity extends AppCompatActivity
             Thread dbInitThread = new Thread(initiateDB);
             dbInitThread.start();
 
-            ContainerView v = findViewById(R.id.containerView2);
-            //v.setRecurLevel(2);
-
-            findViewById(R.id.checkTags).setOnClickListener( (View b) -> v.setShowTags(((CheckBox) b).isChecked()));
-            findViewById(R.id.checkDescr).setOnClickListener( (View b) -> v.setShowDescriptions(((CheckBox) b).isChecked()));
-            findViewById(R.id.checkRecur).setOnClickListener( (View b) -> v.setShowContents(((CheckBox) b).isChecked()));
-            findViewById(R.id.checkRecDesc).setOnClickListener( (View b) -> v.setShowContentDescriptions(((CheckBox) b).isChecked()));
-            findViewById(R.id.checkRecDeep).setOnClickListener( (View b) -> v.setRecurLevel(((CheckBox) b).isChecked() ? 2 : 1)
-            );
+            BuildVairantSpecificCode.onLoad(this);
         }
 
         @Override

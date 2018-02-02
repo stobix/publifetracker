@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="stobix.app.lifetracker.SugarEntryCreationActivity" >
+    <!--
+        Putting SugarEntryCreationActivity above here seems to do nothing.
+        I must be missing some info.
+    -->
+
+    <EditText
+        android:id="@+id/entryCreatorDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:clickable="true"
+        android:ems="10"
+        android:focusable="false"
+        android:inputType="none"
+        android:singleLine="true"
+        android:text="@string/input_date"
+        android:textColor="?android:textColorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="KeyboardInaccessibleWidget,TextFields" />
+
+    <EditText
+        android:textColor="?android:textColorPrimary"
+        android:id="@+id/entryCreatorTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:focusable="false"
+        android:clickable="true"
+        android:inputType="none"
+        android:ems="10"
+        android:singleLine="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/entryCreatorDate"
+        tools:text="Time"
+        tools:ignore="KeyboardInaccessibleWidget" />
+
+    <EditText
+        android:textColor="?android:textColorPrimary"
+        android:id="@+id/entryCreatorSugar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:focusable="false"
+        android:clickable="true"
+        android:inputType="none"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView3"
+        app:layout_constraintTop_toBottomOf="@+id/entryCreatorTime"
+        tools:text="@string/input_sugar"
+        tools:ignore="KeyboardInaccessibleWidget" />
+
+    <EditText
+        android:textColor="?android:textColorPrimary"
+        android:id="@+id/entryCreatorExtra"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="text"
+        android:selectAllOnFocus="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView4"
+        app:layout_constraintTop_toBottomOf="@+id/entryCreatorSugar"
+        tools:clickable="false"
+        tools:text="@string/input_extra" />
+
+    <Button
+        android:id="@+id/entryAddClose"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:textColor="?colorAccent"
+        android:text="@string/creation_dialog_button_add_close"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/entryCreatorExtra" />
+
+    <Button
+        android:id="@+id/entryAdd"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:textColor="?colorAccent"
+        android:text="@string/creation_dialog_button_add"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/entryAddClose"
+        app:layout_constraintTop_toBottomOf="@+id/entryCreatorExtra" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:labelFor="@id/entryCreatorDate"
+        android:text="@string/input_date"
+        android:textColor="?attr/entry_labels_color"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/entryCreatorDate" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:labelFor="@+id/entryCreatorTime"
+        android:textColor="?attr/entry_labels_color"
+        android:text="@string/input_time"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/entryCreatorTime" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:labelFor="@+id/entryCreatorSugar"
+        android:textColor="?attr/entry_labels_color"
+        android:text="@string/input_sugar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/entryCreatorSugar" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:labelFor="@+id/entryCreatorExtra"
+        android:textColor="?attr/entry_labels_color"
+        android:text="@string/input_extra"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/entryCreatorExtra" />
+
+
+</android.support.constraint.ConstraintLayout>

@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">LifeTracker</string>
     <string name="action_settings">Settings</string>
     <string-array name="headers">
         <item>Date</item>
