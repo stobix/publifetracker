@@ -16,6 +16,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.ImageViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -24,6 +25,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import stobix.compat.functions.Consumer;
 import stobix.compat.functions.BiConsumer;
@@ -67,7 +69,7 @@ public class MainActivity extends AppCompatActivity
         // each time in each function.
         private SortableSugarEntryTableView tableView;
 
-        // Used for all data base related operatoins once initiated in onCreate
+        // Used for all data base related operations once initiated in onCreate
         private SugarEntryDao dao;
 
         // Used to keep track of the next UID that a SugarEntry can have to not
@@ -112,6 +114,13 @@ public class MainActivity extends AppCompatActivity
 
             if(BuildConfig.containers){
                 // TODO FIXME Magically include a container that isn't otherwise present in the main layout.
+            } else {
+                TextView t = new TextView(this);
+                t.setText("lolmuhej");
+                addContentView(t,new LinearLayoutCompat.LayoutParams(
+                        LinearLayoutCompat.LayoutParams.WRAP_CONTENT,
+                        LinearLayoutCompat.LayoutParams.WRAP_CONTENT
+                ));
             }
 
             fab.setOnClickListener(view -> showSugarEntryCreationDialog() );

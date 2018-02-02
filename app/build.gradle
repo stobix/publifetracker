@@ -2,12 +2,12 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId 'stobix.app.lifetracker'
         minSdkVersion 19
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -21,12 +21,15 @@ android {
     }
     productFlavors{
         flavorDimensions "variant"
-        normal {
+        simple {
             dimension "variant"
+            applicationIdSuffix ".simple"
+            versionNameSuffix "(simple)"
         }
-        containersTest {
+        containers {
             dimension "variant"
-            applicationId 'stobix.app.lifetracker.containers'
+            applicationIdSuffix ".containers"
+            versionNameSuffix "(containers)"
             buildConfigField "boolean","containers","true"
         }
     }
@@ -34,6 +37,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
         }
     }
     compileOptions {
@@ -54,9 +61,9 @@ dependencies {
     // Maybe better colorpicker
     //compile 'com.github.QuadFlask:colorpicker:0.0.13'
     compile 'com.google.code.gson:gson:2.8.0'
-    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile 'com.android.support:appcompat-v7:27.0.2'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:design:26.1.0'
+    compile 'com.android.support:design:27.0.2'
     compile 'de.codecrafters.tableview:tableview:2.8.0'
     testCompile 'junit:junit:4.12'
     implementation 'android.arch.persistence.room:runtime:1.0.0'
