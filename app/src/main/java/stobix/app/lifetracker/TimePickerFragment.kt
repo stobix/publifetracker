@@ -13,8 +13,9 @@ class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSetListener 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Use the current date as the default date in the picker
         val c = Calendar.getInstance()
-        val hour = arguments.getInt("hour", c.get(Calendar.HOUR) )
-        val minute = arguments.getInt("minute", c.get(Calendar.MINUTE))
+        val args=arguments ?: error("Null bundle")
+        val hour = args.getInt("hour", c.get(Calendar.HOUR) )
+        val minute = args.getInt("minute", c.get(Calendar.MINUTE))
 
         // Create a new instance of DatePickerDialog and return it
         return TimePickerDialog(activity, this, hour, minute, true)

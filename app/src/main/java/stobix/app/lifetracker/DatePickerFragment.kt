@@ -13,9 +13,10 @@ class DatePickerFragment : DialogFragment(), DatePickerDialog.OnDateSetListener 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Use the current date as the default date in the picker
         val c = Calendar.getInstance()
-        val year = arguments.getInt("year",c.get(Calendar.YEAR))
-        val month = arguments.getInt("month", c.get(Calendar.MONTH))
-        val day = arguments.getInt("day", c.get(Calendar.DAY_OF_MONTH))
+        val args=arguments ?: error("Null bundle")
+        val year = args.getInt("year",c.get(Calendar.YEAR))
+        val month = args.getInt("month", c.get(Calendar.MONTH))
+        val day = args.getInt("day", c.get(Calendar.DAY_OF_MONTH))
 
         // Create a new instance of DatePickerDialog and return it
         return DatePickerDialog(activity, this, year, month, day)
