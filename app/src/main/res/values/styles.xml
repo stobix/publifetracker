@@ -1,11 +1,9 @@
-<resources>
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+    >
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+    <style name="AppTheme" parent="DefaultTheme">
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -16,5 +14,299 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="DefaultTheme" parent="Theme.AppCompat">
+        <item name="button_plus_color">?android:attr/textColor</item>
+    </style>
+
+    <style name="DefaultTheme.Light" parent="Theme.AppCompat.Light">
+        <item name="button_plus_color">?android:attr/colorPrimary</item>
+    </style>
+
+    <style name="DefaultTheme.Light.DarkActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="button_plus_color">?android:attr/colorPrimary</item>
+    </style>
+
+    <style name="DefaultTheme.NoActionBar" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Joel" parent="DefaultTheme" >
+        <item name="android:textColorPrimary">@color/joeltextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/joeltextColorSecondary</item>
+        <item name="android:textColorTertiary">@color/joeltextColorTertiary</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/joelnavigationBarColor</item>
+        <item name="colorPrimary">@color/joelPrimary</item>
+        <item name="colorPrimaryDark">@color/joelPrimaryDark</item>
+        <item name="colorAccent">@color/joelAccent</item>
+        <item name="android:windowBackground">@color/joelWindowBackground</item>
+        <item name="table_data_row_even">@color/joeldata_row_even</item>
+        <item name="table_data_row_odd">@color/joeldata_row_odd</item>
+        <item name="table_header_text">@color/joeldata_header_text</item>
+        <item name="tableView_headerColor">@color/joeldata_headerColor</item>
+        <item name="button_plus_color">@color/joeldata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
+        <item name="entry_text_color">#ffcb00</item>
+    </style>
+
+    <style name="Joel.NoActionBar" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+
+    <style name="Theme.Mad" parent="DefaultTheme.Light.DarkActionBar" >
+        <item name="android:textColorPrimary">@color/madtextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/madtextColorSecondary</item>
+        <item name="android:textColorTertiary">@color/madtextColorTertiary</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/madnavigationBarColor</item>
+        <item name="colorPrimary">@color/madPrimary</item>
+        <item name="colorPrimaryDark">@color/madPrimaryDark</item>
+        <item name="colorAccent">@color/madAccent</item>
+        <item name="android:windowBackground">@color/madWindowBackground</item>
+        <item name="table_data_row_even">@color/maddata_row_even</item>
+        <item name="table_data_row_odd">@color/maddata_row_odd</item>
+        <item name="table_header_text">@color/maddata_header_text</item>
+        <item name="tableView_headerColor">@color/maddata_headerColor</item>
+        <item name="button_plus_color">@color/maddata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
+        <item name="entry_text_color">#ffcb00</item>
+    </style>
+
+    <style name="Theme.Mad.NoActionBar" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Zimmik" parent="DefaultTheme" >
+        <item name="android:textColorPrimary">@color/zimtextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/zimtextColorSecondary</item>
+        <item name="android:textColorTertiary">@color/zimtextColorTertiary</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/zimnavigationBarColor</item>
+        <item name="colorPrimary">@color/zimPrimary</item>
+        <item name="colorPrimaryDark">@color/zimPrimaryDark</item>
+        <item name="colorAccent">@color/zimAccent</item>
+        <item name="android:windowBackground">@color/zimWindowBackground</item>
+        <item name="table_data_row_even">@color/zimdata_row_even</item>
+        <item name="table_data_row_odd">@color/zimdata_row_odd</item>
+        <item name="table_header_text">@color/zimdata_header_text</item>
+        <item name="tableView_headerColor">@color/zimdata_headerColor</item>
+        <item name="button_plus_color">@color/zimdata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
+        <item name="entry_text_color">#ffcb00</item>
+    </style>
+
+    <style name="Theme.Zimmik.NoActionBar" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Spring" parent="DefaultTheme.Light.DarkActionBar" >
+        <item name="android:textColorPrimary">@color/springtextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/springtextColorSecondary</item>
+        <item name="android:textColorTertiary">@color/springtextColorTertiary</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/springnavigationBarColor</item>
+        <item name="colorPrimary">@color/springPrimary</item>
+        <item name="colorPrimaryDark">@color/springPrimaryDark</item>
+        <item name="colorAccent">@color/springAccent</item>
+        <item name="android:windowBackground">@color/springWindowBackground</item>
+        <item name="table_data_row_even">@color/springdata_row_even</item>
+        <item name="table_data_row_odd">@color/springdata_row_odd</item>
+        <item name="table_header_text">@color/springdata_header_text</item>
+        <item name="tableView_headerColor">@color/springdata_headerColor</item>
+        <item name="button_plus_color">@color/springdata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
+        <item name="entry_text_color">#ffcb00</item>
+    </style>
+
+    <style name="Theme.Spring.NoActionBar" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Cold" parent="DefaultTheme.Light.DarkActionBar" >
+        <item name="android:textColorPrimary">@color/coldtextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/coldtextColorSecondary</item>
+        <item name="android:textColorTertiary">@color/coldtextColorTertiary</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/coldnavigationBarColor</item>
+        <item name="colorPrimary">@color/coldPrimary</item>
+        <item name="colorPrimaryDark">@color/coldPrimaryDark</item>
+        <item name="colorAccent">@color/coldAccent</item>
+        <item name="android:windowBackground">@color/coldWindowBackground</item>
+        <item name="table_data_row_even">@color/colddata_row_even</item>
+        <item name="table_data_row_odd">@color/colddata_row_odd</item>
+        <item name="table_header_text">@color/colddata_header_text</item>
+        <item name="tableView_headerColor">@color/colddata_headerColor</item>
+        <item name="button_plus_color">@color/colddata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
+        <item name="entry_text_color">#ffcb00</item>
+    </style>
+
+    <style name="Theme.Cold.NoActionBar" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Cotton" parent="DefaultTheme.Light.DarkActionBar" >
+        <item name="android:textColorPrimary">@color/cottontextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/cottontextColorSecondary</item>
+        <item name="android:textColorTertiary">@color/cottontextColorTertiary</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/cottonnavigationBarColor</item>
+        <item name="colorPrimary">@color/cottonPrimary</item>
+        <item name="colorPrimaryDark">@color/cottonPrimaryDark</item>
+        <item name="colorAccent">@color/cottonAccent</item>
+        <item name="android:windowBackground">@color/cottonWindowBackground</item>
+        <item name="table_data_row_even">@color/cottondata_row_even</item>
+        <item name="table_data_row_odd">@color/cottondata_row_odd</item>
+        <item name="table_header_text">@color/cottondata_header_text</item>
+        <item name="tableView_headerColor">@color/cottondata_headerColor</item>
+        <item name="button_plus_color">@color/cottondata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
+        <item name="entry_text_color">#ffcb00</item>
+    </style>
+
+    <style name="Theme.Cotton.NoActionBar" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Nicecream" parent="DefaultTheme.Light.DarkActionBar" >
+        <item name="android:textColorPrimary">@color/nicecreamtextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/nicecreamtextColorSecondary</item>
+        <item name="android:textColorTertiary">@color/nicecreamtextColorTertiary</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/nicecreamnavigationBarColor</item>
+        <item name="colorPrimary">@color/nicecreamPrimary</item>
+        <item name="colorPrimaryDark">@color/nicecreamPrimaryDark</item>
+        <item name="colorAccent">@color/nicecreamAccent</item>
+        <item name="android:windowBackground">@color/nicecreamWindowBackground</item>
+        <item name="table_data_row_even">@color/nicecreamdata_row_even</item>
+        <item name="table_data_row_odd">@color/nicecreamdata_row_odd</item>
+        <item name="table_header_text">@color/nicecreamdata_header_text</item>
+        <item name="tableView_headerColor">@color/nicecreamdata_headerColor</item>
+        <item name="button_plus_color">@color/nicecreamdata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
+        <item name="entry_text_color">#ffcb00</item>
+    </style>
+
+    <style name="Theme.Nicecream.NoActionBar" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Strong" parent="Theme.AppCompat" >
+        <item name="android:textColorPrimary">@color/strongtextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/strongtextColorSecondary</item>
+        <item name="android:textColorTertiary">@color/strongtextColorTertiary</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/strongnavigationBarColor</item>
+        <item name="colorPrimary">@color/strongPrimary</item>
+        <item name="colorPrimaryDark">@color/strongPrimaryDark</item>
+        <item name="colorAccent">@color/strongAccent</item>
+        <item name="android:windowBackground">@color/strongWindowBackground</item>
+        <item name="table_data_row_even">@color/strongdata_row_even</item>
+        <item name="table_data_row_odd">@color/strongdata_row_odd</item>
+        <item name="table_header_text">@color/strongdata_header_text</item>
+        <item name="tableView_headerColor">@color/strongdata_headerColor</item>
+        <item name="button_plus_color">@color/strongdata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
+        <item name="entry_text_color">#ffcb00</item>
+    </style>
+
+    <style name="Theme.Strong.NoActionBar" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Fuel" parent="Theme.AppCompat" >
+        <item name="android:textColorPrimary">@color/fueltextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/fueltextColorSecondary</item>
+        <item name="android:textColorTertiary">@color/fueltextColorTertiary</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/fuelnavigationBarColor</item>
+        <item name="colorPrimary">@color/fuelPrimary</item>
+        <item name="colorPrimaryDark">@color/fuelPrimaryDark</item>
+        <item name="colorAccent">@color/fuelAccent</item>
+        <item name="android:windowBackground">@color/fuelWindowBackground</item>
+        <item name="table_data_row_even">@color/fueldata_row_even</item>
+        <item name="table_data_row_odd">@color/fueldata_row_odd</item>
+        <item name="table_header_text">@color/fueldata_header_text</item>
+        <item name="tableView_headerColor">@color/fueldata_headerColor</item>
+        <item name="button_plus_color">@color/fueldata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
+        <item name="entry_text_color">#ffcb00</item>
+    </style>
+
+    <style name="Theme.Fuel.NoActionBar" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Neonight" parent="Theme.AppCompat" >
+        <item name="android:textColorPrimary">@color/neonighttextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/neonighttextColorSecondary</item>
+        <item name="android:textColorTertiary">@color/neonighttextColorTertiary</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/neonightnavigationBarColor</item>
+        <item name="colorPrimary">@color/neonightPrimary</item>
+        <item name="colorPrimaryDark">@color/neonightPrimaryDark</item>
+        <item name="colorAccent">@color/neonightAccent</item>
+        <item name="android:windowBackground">@color/neonightWindowBackground</item>
+        <item name="table_data_row_even">@color/neonightdata_row_even</item>
+        <item name="table_data_row_odd">@color/neonightdata_row_odd</item>
+        <item name="table_header_text">@color/neonightdata_header_text</item>
+        <item name="tableView_headerColor">@color/neonightdata_headerColor</item>
+        <item name="button_plus_color">@color/neonightdata_button_plus</item>
+        <item name="entry_labels_color">?android:colorAccent</item>
+        <item name="entry_text_color">#ffcb00</item>
+    </style>
+
+    <style name="Theme.Neonight.NoActionBar" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Hope" parent="DefaultTheme" >
+        <item name="android:textColorPrimary">@color/hopetextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/hopetextColorSecondary</item>
+        <item name="android:textColorTertiary">@color/hopetextColorTertiary</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/hopenavigationBarColor</item>
+        <item name="colorPrimary">@color/hopePrimary</item>
+        <item name="colorPrimaryDark">@color/hopePrimaryDark</item>
+        <item name="colorAccent">@color/hopeAccent</item>
+        <item name="android:windowBackground">@color/hopewindowBackground</item>
+        <item name="table_data_row_even">@color/hopetable_data_row_even</item>
+        <item name="table_data_row_odd">@color/hopetable_data_row_odd</item>
+        <item name="table_header_text">@color/hopetable_header_text</item>
+        <item name="tableView_headerColor">@color/hopetableView_headerColor</item>
+        <item name="button_plus_color">@color/hopebutton_plus_color</item>
+        <item name="entry_labels_color">@color/hopeentry_labels_color</item>>
+        <item name="entry_text_color">@color/hopeentry_text_color</item>
+    </style>
+
+    <style name="Hope.NoActionBar" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Hjul" parent="DefaultTheme" >
+        <item name="android:textColorPrimary">@color/hjultextColorPrimary</item>
+        <item name="android:textColorSecondary">@color/hjultextColorSecondary</item>
+        <item name="android:textColorTertiary">@color/hjultextColorTertiary</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/hjulnavigationBarColor</item>
+        <item name="colorPrimary">@color/hjulPrimary</item>
+        <item name="colorPrimaryDark">@color/hjulPrimaryDark</item>
+        <item name="colorAccent">@color/hjulAccent</item>
+        <item name="android:windowBackground">@color/hjulwindowBackground</item>
+        <item name="table_data_row_even">@color/hjultable_data_row_even</item>
+        <item name="table_data_row_odd">@color/hjultable_data_row_odd</item>
+        <item name="table_header_text">@color/hjultable_header_text</item>
+        <item name="tableView_headerColor">@color/hjultableView_headerColor</item>
+        <item name="button_plus_color">@color/hjulbutton_plus_color</item>
+        <item name="entry_labels_color">@color/hjulentry_labels_color</item>>
+        <item name="entry_text_color">@color/hjulentry_text_color</item>
+    </style>
+
+    <style name="Hjul.NoActionBar" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 
 </resources>

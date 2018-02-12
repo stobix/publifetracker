@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">LifeTracker</string>
     <string name="action_settings">Settings</string>
     <string-array name="headers">
         <item>Date</item>
@@ -18,4 +17,12 @@
     <string name="number_picker_ok_button">Apply</string>
     <string name="number_picker_clear_button">Clear</string>
     <string name="edit_dialog_button_update">update</string>
+    <string name="number_picker_sugar_level">Sugar Level</string>
+    <string name="action_colors">Color Settings</string>
+    <string name="action_switch_theme">Switch Theme</string>
+    <string name="action_export_db">export db</string>
+    <string name="action_import_db">import db</string>
+    <string name="theme_picker_dialog_title">Pick a color theme</string>
+    <string name="edit_dialog_button_delete">Delete</string>
+    <string name="number_picker_cancel_button">@android:string/cancel</string>
 </resources>

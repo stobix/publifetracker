@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_settings">Inställningar</string>
+    <string-array name="headers">
+        <item>Datum</item>
+        <item>Socker</item>
+        <item>Extra</item>
+    </string-array>
+    <string name="input_date">Datum</string>
+    <string name="input_sugar">Socker</string>
+    <string name="input_extra">Övrigt</string>
+    <string name="dateTimeFormat">yyyy dd/MM kk:mm</string>
+    <string name="creation_dialog_button_add_close">Lägg till och stäng</string>
+    <string name="input_time">Klockslag</string>
+    <string name="creation_dialog_button_close">Stäng</string>
+    <string name="creation_dialog_button_add">Lägg till</string>
+    <string name="number_picker_separator_comma">,</string>
+    <string name="decimal_point">,</string>
+    <string name="number_picker_clear_button">Rensa</string>
+    <string name="number_picker_ok_button">Ok</string>
+    <string name="edit_dialog_button_update">Uppdatera</string>
+    <string name="number_picker_sugar_level">Blodsockernivå</string>
+    <string name="action_colors">Färginställningar</string>
+    <string name="action_switch_theme">Byt färgtema</string>
+    <string name="action_export_db">spara till fil</string>
+    <string name="action_import_db">hämta från fil</string>
+    <string name="edit_dialog_button_delete">Ta bort</string>
+    <string name="theme_picker_dialog_title">Välj ett färgtema</string>
+    <string name="number_picker_cancel_button">Avbryt</string>
+</resources>

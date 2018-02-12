@@ -2,19 +2,35 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     buildToolsVersion '26.0.2'
     defaultConfig {
-        applicationId "com.example.stobix.myapplication"
-        minSdkVersion 21
-        targetSdkVersion 26
+        applicationId 'stobix.app.lifetracker'
+        minSdkVersion 19
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
         externalNativeBuild {
             cmake {
                 cppFlags ""
             }
+        }
+        buildConfigField "boolean","containers", "false"
+    }
+    productFlavors{
+        flavorDimensions "variant"
+        simple {
+            dimension "variant"
+            applicationIdSuffix ".simple"
+            versionNameSuffix "(simple)"
+        }
+        containers {
+            dimension "variant"
+            applicationIdSuffix ".containers"
+            versionNameSuffix "(containers)"
+            buildConfigField "boolean","containers","true"
         }
     }
     buildTypes {
@@ -22,10 +38,16 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+        }
     }
     compileOptions {
-        targetCompatibility 1.8
-        sourceCompatibility 1.8
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
+    }
+    productFlavors {
     }
 }
 
@@ -34,15 +56,21 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:26.1.0'
+    // ColorPickerView
+    //compile 'com.github.danielnilsson9:color-picker-view:1.4.0@aar'
+    // Maybe better colorpicker
+    //compile 'com.github.QuadFlask:colorpicker:0.0.13'
+    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'com.android.support:appcompat-v7:27.0.2'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:design:26.1.0'
-    compile 'de.codecrafters.tableview:tableview:2.6.+'
+    compile 'com.android.support:design:27.0.2'
+    compile 'de.codecrafters.tableview:tableview:2.8.0'
     testCompile 'junit:junit:4.12'
     implementation 'android.arch.persistence.room:runtime:1.0.0'
     annotationProcessor 'android.arch.persistence.room:compiler:1.0.0'
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    compile project(':containerview')
+    compile project(':compat')
 }
 repositories {
     mavenCentral()
