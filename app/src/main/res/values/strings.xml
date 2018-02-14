@@ -5,6 +5,7 @@
         <item>Sugar</item>
         <item>Extra</item>
     </string-array>
+    <string name="dateTimeFormat">yyyy MM/dd hh:mm aa</string>
     <string name="input_date">Date</string>
     <string name="input_time">Time</string>
     <string name="input_sugar">Sugar</string>

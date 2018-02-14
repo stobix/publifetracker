@@ -9,7 +9,8 @@
     <string name="input_date">Datum</string>
     <string name="input_sugar">Socker</string>
     <string name="input_extra">Övrigt</string>
-    <string name="dateTimeFormat">yyyy dd/MM kk:mm</string>
+    <!-- http://www.unicode.org/reports/tr35/tr35-dates.html#Date_Format_Patterns -->
+    <string name="dateTimeFormat">yyyy dd/MM HH:mm</string>
     <string name="creation_dialog_button_add_close">Lägg till och stäng</string>
     <string name="input_time">Klockslag</string>
     <string name="creation_dialog_button_close">Stäng</string>
