@@ -8,6 +8,8 @@ import android.os.Parcelable
 
 import android.arch.persistence.room.ColumnInfo.INTEGER
 
+// The Room database entry class/TableView row class that acts as a glue between the two.
+
 @Entity(tableName = "sugar_entries")
 /*
     room wants an empty constructor in kotlin to be able to parse the file.

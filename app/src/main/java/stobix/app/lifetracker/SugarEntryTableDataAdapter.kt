@@ -11,7 +11,7 @@ import de.codecrafters.tableview.TableDataAdapter
 
 /**
  * Created by stobix on 11/11/17.
- *
+ * This class tells the table how to display a SugarEntry
  */
 
 class SugarEntryTableDataAdapter(

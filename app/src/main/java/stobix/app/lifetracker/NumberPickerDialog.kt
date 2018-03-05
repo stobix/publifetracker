@@ -8,6 +8,8 @@ import android.view.ViewGroup.LayoutParams.*
 import android.widget.NumberPicker
 import android.widget.NumberPicker.OnValueChangeListener
 
+// A dialog to pick an xx…x.y number using dials.
+
 class NumberPickerDialog (
         ctx: Context,
         val listener: OnNumberSetListener?,

@@ -8,6 +8,8 @@ import android.support.v4.app.ActivityCompat.startActivityForResult
 import android.util.Log
 import java.io.*
 
+// Groups together in a handy utility class all actions we need to take on a file
+
 class FileActions (val activity: Activity, val createHandler: FileCreateHandler, val openHandler: FileOpenHandler){
 
     constructor(activity: Activity): this(activity,activity as FileCreateHandler,activity as FileOpenHandler)
@@ -99,6 +101,7 @@ class FileActions (val activity: Activity, val createHandler: FileCreateHandler,
         }
     }
 
+    // These can probably be any value; I chose 42 and 43 because random IIRC.
     companion object {
         @JvmField val OPEN_REQUEST: Int = 42
         @JvmField val CREATE_REQUEST: Int = 43

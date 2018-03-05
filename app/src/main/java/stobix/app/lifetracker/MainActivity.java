@@ -307,6 +307,10 @@ public class MainActivity extends AppCompatActivity
             );
         }
 
+        // Called when the user has selected a sugar entry for deletion.
+        //
+        // The function is an "Are you sure you want to delete this" glue before
+        // sugarEntryDeleted is called
         @Override
         public void onSugarEntryDeleted(@NotNull SugarEntry s) {
             // Taken from https://stackoverflow.com/questions/2115758/how-do-i-display-an-alert-dialog-on-android#2115770
@@ -323,7 +327,7 @@ public class MainActivity extends AppCompatActivity
                     .show();
         }
 
-        // Called when the user has selected a sugar entry for deletion.
+        // Called when the user has selected a sugar entry for deletion, and clicked "yes" on the "are you sure" dialog.
         public void sugarEntryDeleted(@NotNull SugarEntry s){
             sugarEntryGeneralAction(s,
                     (sugarEntry) -> dao.delete(sugarEntry),
@@ -371,7 +375,8 @@ public class MainActivity extends AppCompatActivity
 
 
 
-        // Made static (i.e. no outer scope references) to prevent memory issues, since lint complained about the anonymous class instance.
+        // Made static (i.e. no outer scope references) to prevent memory issues,
+        // since lint complained about the anonymous class instance.
         // See https://stackoverflow.com/questions/11407943/this-handler-class-should-be-static-or-leaks-might-occur-incominghandler
         private static class EntryHandler extends Handler {
             final SortableSugarEntryTableView tableView;
@@ -393,7 +398,8 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-        // Made static (i.e. no outer scope references) to prevent memory issues, since lint complained about the anonymous class instance.
+        // Made static (i.e. no outer scope references) to prevent memory issues,
+        // since lint complained about the anonymous class instance.
         // See https://stackoverflow.com/questions/11407943/this-handler-class-should-be-static-or-leaks-might-occur-incominghandler
         private static class DataLoadHandler extends Handler {
             final MainActivity context;
@@ -445,14 +451,6 @@ public class MainActivity extends AppCompatActivity
             n.show(getSupportFragmentManager(), "numberPicker");
         }
 
-        /*
-        public void showNumberPicker() {
-            new NumberPickerDialog(MainActivity.this,MainActivity.this).show();
-        }
-        */
-
-        private FileActions fa = new FileActions(this);
-
         private SugarEntryCreationActivity creationActivity(){
             return (SugarEntryCreationActivity) getFragmentManager().findFragmentByTag("dialog");
         }
@@ -475,6 +473,10 @@ public class MainActivity extends AppCompatActivity
         public void handleNumberClear() {
             creationActivity().onNumberClear();
         }
+
+
+        // Used to glue together all pieces of code that handles import/export of the database to/from a JSON file
+        private FileActions fa = new FileActions(this);
 
         @Override
         public void handleFileCreated(@NotNull Uri uri) {
