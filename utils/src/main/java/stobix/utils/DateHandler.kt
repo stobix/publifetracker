@@ -1,13 +1,12 @@
-package stobix.app.lifetracker
+package stobix.utils
 
 import java.util.Calendar
 
 /**
- * Created by stobix on 11/28/17.
- * A class to simplify and abstract the time handling that is needed in this project.
+ * A class to simplify and abstract time handling tasks
  */
 
-class DateHandler internal constructor() {
+class DateHandler() {
 
     private var internal_cal: Calendar = Calendar.getInstance() // TODO Localize!
 
@@ -15,17 +14,12 @@ class DateHandler internal constructor() {
         internal_cal.timeInMillis=timestamp
     }
 
-    internal fun setTime(hour: Int, minute: Int) {
+    fun setTime(hour: Int, minute: Int) {
         internal_cal.set(Calendar.HOUR_OF_DAY, hour)
         internal_cal.set(Calendar.MINUTE, minute)
     }
 
-    internal fun setDate(year: Int, month: Int, day: Int) = internal_cal.set(year,month,day)
-   /* {
-        internal_cal.set(Calendar.YEAR,year)
-        internal_cal.set(Calendar.MONTH,month)
-        internal_cal.set(Calendar.DAY_OF_MONTH,day)
-    } */
+    fun setDate(year: Int, month: Int, day: Int) = internal_cal.set(year,month,day)
 
     var hour
         get() = internal_cal.get(Calendar.HOUR_OF_DAY)

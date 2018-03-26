@@ -2,80 +2,139 @@ package stobix.view.containerview
 
 import android.arch.persistence.room.*
 
-/**
- * Created by stobix on 2018-03-05.
- */
-@Entity(foreignKeys =[
+/*
+@Database(
+        entities = [
+            Submission::class,
+            Entry::class,
+            EntryTag::class,
+            Tag::class,
+            Measurement::class,
+            MesUnit::class,
+            UnitConversion::class],
+        version=1
+)
+abstract class AltAltDatabase : RoomDatabase(){
+    abstract fun containerDao(): AltAltContainerDao
+}
+
+@Dao
+interface AltAltContainerDao{
+    @Query("select * from submissions where timestamp == :timestamp limit 1")
+    fun getSubmission(timestamp:Long): Submission
+    @Query("select * from collections where collId == :collId limit 1")
+    fun getCollection(collId: Long): Collection
+    @Query("select * from entries where collId == :collId order by pos")
+    fun getEntriesFor(collId: Long): List<Entry>
+    @Query("select tagId from entry_tags where collId == :collId and pos == :pos")
+    fun getEntryTagsFor(collId: Long,pos: Long): List<Long>
+    @Query("select tags.* from entry_tags join tags using ( tagId ) where collId == :collId and pos == :pos")
+    fun getTagsFor(collId: Long,pos: Long): List<Tag>
+
+    @Insert
+    fun insertSubmission(submission:Submission)
+    @Insert
+    fun insertCollection(collection: Collection)
+    @Insert
+    fun insertEntry(entry:Entry)
+    @Insert
+    fun insertEntries(entries:List<Entry>)
+    @Insert
+    fun insertEntryTag(entryTag: EntryTag)
+    @Insert
+    fun insertEntryTag(pos: Long,collId: Long,tagId: Long)
+    @Insert
+    fun insertTag(tag: Tag)
+    @Insert
+    fun insertMeasurement(measurement: Measurement)
+    @Insert
+    fun insertMesUnit(mesUnit: MesUnit)
+    @Insert
+    fun insertUnitConversion(unitConversion: UnitConversion)
+}
+*/
+
+@Entity(tableName="submissions",
+        foreignKeys =[
             ForeignKey(entity=Collection::class,
-                    parentColumns= ["id"],
-                    childColumns = ["collId"])])
-data class Submission(
+                    parentColumns= ["collId"],
+                    childColumns = ["collId"])]
+        , indices = [Index("collId")] )
+data class Submission constructor(
         @PrimaryKey
-        var timestamp: Long,
+        var timestamp: Long=0,
+        var collId: Long=0
+)
+
+@Entity(tableName = "collections")
+data class Collection constructor(
+        @PrimaryKey
         var collId: Long
 )
 
-@Entity
-data class Collection(
-        @PrimaryKey
-        var id: Long
-)
-
-@Entity(primaryKeys = ["pos", "collId"],
+@Entity(tableName = "entries",
+        primaryKeys = ["pos", "collId"],
         foreignKeys = [
                 ForeignKey(
                         entity = Collection::class,
-                        parentColumns = ["id"],
-                        childColumns = ["collID"])])
-data class Entry(
+                        parentColumns = ["collId"],
+                        childColumns = ["collId"])]
+        , indices = [Index("collId")] )
+data class Entry constructor(
         var pos: Long,
-        var collId: Long,
-        var type: Long,
+        var collId: Long=0,
+        var type: Int=0,
         // A foreign key from either the collection or measurement table, depending on the contents of "type" above
-        var extId: Long
+        var extId: Long=0
 )
 
-@Entity(primaryKeys = ["pos", "collId"],
+enum class EntryTypes{ MEASURE, COLLECTION }
+
+@Entity(tableName = "entry_tags",
+        primaryKeys = ["pos", "collId"],
         indices = [Index("tagId")])
-data class EntryTag(
-        var pos: Long,
-        var collId: Long,
-        var tagId: Long
+data class EntryTag constructor(
+        var pos: Long=0,
+        var collId: Long=0,
+        var tagId: Long=0
 )
 
-@Entity
-data class Tag(
+@Entity(tableName = "tags")
+data class Tag constructor(
         @PrimaryKey
-        var id: Long,
-        var tag: String,
-        var description: String
+        var tagId: Long=0,
+        var tag: String="",
+        var description: String=""
 )
 
-@Entity(foreignKeys = [
+@Entity(tableName = "measurements",
+        foreignKeys = [
             ForeignKey(
                     entity = MesUnit::class,
-                    parentColumns = ["id"],
-                    childColumns = ["unitId"])])
-data class Measurement(
+                    parentColumns = ["unitId"],
+                    childColumns = ["unitId"])],
+        indices = [Index("unitId")] )
+data class Measurement constructor(
         @PrimaryKey
-        var id: Long,
-        var value: Float,
-        var unitId: Long
+        var mesId: Long=0,
+        var value: Float=0f,
+        var unitId: Long=0
 )
 
-@Entity
-data class MesUnit(
+@Entity(tableName = "measurement_units")
+data class MesUnit constructor(
         @PrimaryKey
-        var id: Long,
-        var shortForm: String,
-        var description: String
+        var unitId: Long=0,
+        var shortForm: String="",
+        var description: String=""
 )
 
-@Entity(primaryKeys = ["from"],
+@Entity(tableName = "unit_conversions",
+        primaryKeys = ["from"],
         indices = [Index(value = ["from","to"])])
-data class UnitConversion(
-        var from: Long,
-        var to: Long,
-        var formula: String
+data class UnitConversion constructor(
+        var from: Long=0,
+        var to: Long=0,
+        var formula: String=""
 )
 

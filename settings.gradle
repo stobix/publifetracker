@@ -1,1 +1,1 @@
-include ':app',':compat', ':containerview'
+include ':app',':compat', ':containerview', ':utils'

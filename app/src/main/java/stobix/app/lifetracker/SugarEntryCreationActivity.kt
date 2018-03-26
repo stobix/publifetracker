@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import stobix.utils.DateHandler
 
 /**
  * A dialog for creating an entry to the blood sugar database
