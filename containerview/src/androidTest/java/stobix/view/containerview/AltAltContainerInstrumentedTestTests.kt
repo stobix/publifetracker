@@ -1,19 +1,9 @@
 package stobix.view.containerview
 
-import android.arch.persistence.room.Room
-import android.support.test.InstrumentationRegistry
-import android.support.test.filters.MediumTest
-import android.support.test.filters.SmallTest
-import android.support.test.runner.AndroidJUnit4
 import android.util.Log
 import org.junit.*
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertEquals
-import org.junit.runner.RunWith
-import org.junit.runners.MethodSorters
-import stobix.utils.DateHandler
-import stobix.view.containerview.*
-import java.io.Console
 
 /**
  * Apparently I can't do an instrumented test from Kotlin at this point in time. This file is now
@@ -29,9 +19,9 @@ open class AltAltContainerInstrumentedTestTests(val db: AltAltDatabase,val dao: 
     open fun setEntries(): Boolean{
         dao.insertCollection(Collection(collId = 0))
         dao.insertSubmission(Submission(timestamp = 1234567890,collId = 0))
-        dao.insertEntry(Entry(pos=0,collId=0,type= EntryTypes.COLLECTION.ordinal,extId = 1))
+        dao.insertEntry(Entry(pos =0, collId =0, type = EntryTypes.COLLECTION, extId = 1))
         dao.insertCollection(Collection(collId = 1))
-        dao.insertEntry(Entry(pos=0,collId=1,type=EntryTypes.MEASURE.ordinal,extId = 0))
+        dao.insertEntry(Entry(pos =0, collId =1, type =EntryTypes.MEASURE, extId = 0))
         dao.insertMesUnit(MesUnit(0,"m","meter"))
         dao.insertMeasurement(Measurement(0,1.3f,0))
         dao.insertTag(Tag(0,"one","first"))
