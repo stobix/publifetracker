@@ -36,7 +36,7 @@ public interface AltAltContainerDao {
     @Query("select * from measurements where mesId == :mesId")
     List<Measurement> getMeasurementsFor(Long mesId);
 
-    @Query("select measurements.* " +
+    @Query("select measurement_units.* " +
             "from measurements join measurement_units using (unitId) " +
             "where mesId == :mesId limit 1")
     MesUnit getMesUnitFor(Long mesId);
