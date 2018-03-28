@@ -19,7 +19,8 @@ data class Submission constructor(
                 . sortedBy {it.pos}
                 . map {it.convertToClass(dao)}
 
-        val tags = dao.getTagsFor( collId, 0 ).map{it.convertToClass(dao)}
+        val tags = dao.getTagsFor( collId, 0 )
+                . map {it.convertToClass(dao)}
 
         return CSubmission(
                 timestamp=timestamp,
@@ -36,7 +37,7 @@ data class Submission constructor(
 // entries directly.
 @Entity(tableName = "collections")
 data class Collection constructor(
-        @PrimaryKey
+        @PrimaryKey(autoGenerate = true)
         var collId: Long
 )
 
@@ -108,7 +109,7 @@ class EntryConverters {
 
 @Entity(tableName = "tags")
 data class Tag constructor(
-        @PrimaryKey
+        @PrimaryKey(autoGenerate = true)
         var tagId: Long=0,
         var tag: String="",
         var description: String=""
@@ -129,7 +130,7 @@ data class Tag constructor(
                     childColumns = ["unitId"])],
         indices = [Index("unitId")] )
 data class Measurement constructor(
-        @PrimaryKey
+        @PrimaryKey(autoGenerate = true)
         var mesId: Long=0,
         var value: Float=0f,
         var unitId: Long=0
@@ -137,7 +138,7 @@ data class Measurement constructor(
 
 @Entity(tableName = "measurement_units")
 data class MesUnit constructor(
-        @PrimaryKey
+        @PrimaryKey(autoGenerate = true)
         var unitId: Long=0,
         var shortForm: String="",
         var description: String=""
