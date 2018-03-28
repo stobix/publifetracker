@@ -12,10 +12,28 @@ data class Submission constructor(
         @PrimaryKey
         var timestamp: Long=0,
         var collId: Long=0
-)
+){
+    fun convertToClass(dao: AltAltContainerDao): CSubmission {
+        val contents : List<CContent> =
+                dao.getEntriesFor(collId)
+                . sortedBy {it.pos}
+                . map {it.convertToClass(dao)}
 
-// This table is neccessary simply since we can have a collection of zero entries,
-// which means that we can't make collId for submissions a foreign key from entries directly.
+        val tags = dao.getTagsFor( collId, 0 ).map{it.convertToClass(dao)}
+
+        return CSubmission(
+                timestamp=timestamp,
+                collection=CCollection(
+                        myCollId = collId,
+                        contents = contents,
+                        tags= tags),
+                contentId=collId)
+    }
+}
+
+// This table is necessary simply since we can have a collection of zero entries,
+// which means that we can't make collId for submissions a foreign key from
+// entries directly.
 @Entity(tableName = "collections")
 data class Collection constructor(
         @PrimaryKey
@@ -33,11 +51,35 @@ data class Collection constructor(
 data class Entry (
         var pos: Long=0,
         var collId: Long=0,
-        @TypeConverters(value=EntryConverters::class)
+        @TypeConverters(value=[EntryConverters::class])
         var type: EntryTypes = EntryTypes.COLLECTION,
         // A foreign key from either the collection or measurement table, depending on the contents of "type" above
         var extId: Long=0
-)
+) {
+    fun convertToClass(dao: AltAltContainerDao): CContent=
+        when (type){
+            EntryTypes.COLLECTION ->
+                CCollection(
+                        myCollId = extId,
+                        contents = dao.getEntriesFor(extId)
+                                .sortedBy { it.pos }
+                                .map { it.convertToClass(dao) },
+                        tags = dao.getTagsFor(extId, pos)
+                                .map { it.convertToClass(dao)}
+                )
+
+            EntryTypes.MEASURE ->
+                CMeasurement(
+                        measurementId = extId,
+                        mesUnit = dao.getMesUnitFor(extId).convertToClass(dao),
+                        tags = dao.getTagsFor(extId,pos)
+                                .map { it.convertToClass(dao)}
+                )
+
+
+
+        }
+}
 
 enum class EntryTypes{ MEASURE, COLLECTION }
 
@@ -70,7 +112,14 @@ data class Tag constructor(
         var tagId: Long=0,
         var tag: String="",
         var description: String=""
-)
+) {
+    fun convertToClass(dao: AltAltContainerDao): CTag =
+            CTag(
+                    tagId = tagId,
+                    tagName = tag,
+                    description = description
+            )
+}
 
 @Entity(tableName = "measurements",
         foreignKeys = [
@@ -92,7 +141,17 @@ data class MesUnit constructor(
         var unitId: Long=0,
         var shortForm: String="",
         var description: String=""
-)
+) {
+    fun convertToClass(dao: AltAltContainerDao): CMesUnit =
+            CMesUnit(
+                    unitId = unitId,
+                    shortForm = shortForm,
+                    description = description,
+                    conversions = dao.getConversionsForUnit(unitId)
+                            .map {it.convertToClass(dao)}
+            )
+
+}
 
 @Entity(tableName = "unit_conversions",
         primaryKeys = ["from"],
@@ -101,5 +160,8 @@ data class UnitConversion constructor(
         var from: Long=0,
         var to: Long=0,
         var formula: String=""
-)
+) {
+    fun convertToClass(dao: AltAltContainerDao): CConversion =
+            CConversion( fromId = from, toId = to, formula = formula )
+}
 
