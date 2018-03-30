@@ -25,7 +25,11 @@ class BuildVairantSpecificCode {
           //((View b) -> v.setShowContentDescriptions(((CheckBox) b).isChecked()))
             c.findViewById<CheckBox>(R.id.checkRecDeep).setOnClickListener{b -> v.recurLevel=if((b as CheckBox).isChecked) 2 else 1}
           //((View b) -> v.setRecurLevel(((CheckBox) b).isChecked() ? 2 : 1) )
+
+
+
         }
+
 
     }
 }

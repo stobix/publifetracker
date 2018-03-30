@@ -1,6 +1,8 @@
 package stobix.view.containerview
 
 import android.app.ActivityManager
+import android.util.Log
+import stobix.utils.DateHandler
 
 /**
  * Created by stobix on 2018-03-26.
@@ -24,6 +26,14 @@ class AltAltContainer(){
 
         @JvmStatic fun putSubmission(dao: AltAltContainerDao, submission: CSubmission) =
                 submission.submitToDb(dao)
+
+        /*
+        TODO
+        @JvmStatic fun getConversions(dao: AltAltContainerDao, mesUnit: CMesUnit)
+        @JvmStatic fun putConversions(dao: AltAltContainerDao, mesUnit: CMesUnit,conversions: List<CConversion>)
+        @JvmStatic fun putConversion(dao: AltAltContainerDao, mesUnit: CMesUnit,conversion: CConversion)
+        */
+
     }
 }
 
@@ -35,11 +45,71 @@ data class CSubmission(
 {
     fun submitToDb(dao: AltAltContainerDao) {
         // make sure the collection exists
+        Log.d("db op","insert Collection $contentId")
         dao.insertCollection(Collection(collId = contentId))
         // recursively insert all (null or more) entries from the collection into the entries table
         collection.submitToDb(dao,0,contentId)
         // insert the submission into the submissions table
         dao.insertSubmission(Submission(timestamp=timestamp,collId=contentId))
+    }
+
+    companion object {
+        @JvmStatic fun testCase()=
+                CSubmission(
+                        timestamp = DateHandler().timestamp,
+                        contentId = 0,
+                        collection = CCollection(
+                                myCollId = 0,
+                                tags = listOf(),
+                                contents = listOf(
+                                        CCollection(
+                                                myCollId = 1,
+                                                tags= listOf(),
+                                                contents = listOf()
+                                        ),
+                                        CMeasurement(
+                                                measurementId = 0,
+                                                tags = listOf(
+                                                        CTag(
+                                                                tagId = 0,
+                                                                tagName = "vikt",
+                                                                description = "hur mycket jag väger"
+                                                        )
+                                                ),
+                                                mesUnit = CMesUnit(
+                                                        unitId = 0,
+                                                        shortForm = "kg",
+                                                        description = "lol",
+                                                        conversions = listOf()
+                                                )
+                                        ),
+                                        CMeasurement(
+                                                measurementId = 1,
+                                                tags = listOf(
+                                                        CTag(
+                                                                tagId = 0,
+                                                                tagName = "blodsocker",
+                                                                description = "blodsockernivå"
+                                                        )
+                                                ),
+                                                mesUnit = CMesUnit(
+                                                        unitId = 0,
+                                                        shortForm = "mmol/l",
+                                                        description = "standardformat för blodsocker i delar av Europa",
+                                                        conversions = listOf(
+                                                                /*
+                                                                CConversion(
+                                                                        fromId = 0,
+                                                                        toId = ??,
+                                                                        formula = " x / 18 "
+                                                                )
+                                                                */
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                )
     }
 }
 
@@ -62,9 +132,8 @@ data class CCollection (
         override var tags: List<CTag>
 ) : CContent {
     override fun submitToDb(dao: AltAltContainerDao,index: Int,collId: Long) {
-        dao.insertEntry(
-                Entry(pos=index.toLong(), collId=collId, type=EntryTypes.COLLECTION)
-        )
+        // Must insert collection before entries to satisfy db foreign key conditions
+        Log.d("db op","insert Collection collId $collId")
         dao.insertCollection(Collection(collId=myCollId))
         for((i,c) in contents.withIndex()){
             c.submitToDb(dao,i,myCollId)
@@ -74,6 +143,10 @@ data class CCollection (
                     EntryTag( pos=index.toLong(), collId = collId, tagId = t.tagId )
             )
         }
+        Log.d("db op","insert Entry ix $index, collId $collId, type ${EntryTypes.COLLECTION}")
+        dao.insertEntry(
+                Entry(pos=index.toLong(), collId=collId, type=EntryTypes.COLLECTION)
+        )
     }
 }
 
@@ -116,3 +189,23 @@ class CTagStore {
     }
 }
 */
+
+data class CThing(
+        var thingId: Long,
+        var shortDec: String,
+        override var tags: List<CTag>,
+        var description: String
+) : CContent {
+    /*
+    // TODO this might be a better way to do it later, to do it more memoizable or so.
+    override var tags: List<CTag>
+        get() = TODO("not implemented")
+        set(value) {}
+        */
+
+    override fun submitToDb(dao: AltAltContainerDao, index: Int, collId: Long) {
+        dao.insertThing(Thing(thingId=thingId,shortDesc = shortDec,description = description))
+    }
+}
+
+

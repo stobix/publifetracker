@@ -18,10 +18,11 @@ import android.arch.persistence.room.TypeConverters;
                 Tag.class,
                 Measurement.class,
                 MesUnit.class,
-                UnitConversion.class
+                UnitConversion.class,
+                Thing.class
         },
         version=1
 )
 public abstract class AltAltDatabase extends RoomDatabase{
-    abstract AltAltContainerDao containerDao();
+    public abstract AltAltContainerDao containerDao();
 }

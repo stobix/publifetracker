@@ -54,7 +54,7 @@ data class Entry (
         var collId: Long=0,
         @TypeConverters(value=[EntryConverters::class])
         var type: EntryTypes = EntryTypes.COLLECTION,
-        // A foreign key from either the collection or measurement table, depending on the contents of "type" above
+        // A "foreign key" from either the collection or measurement table, depending on the contents of "type" above
         var extId: Long=0
 ) {
     fun convertToClass(dao: AltAltContainerDao): CContent=
@@ -77,12 +77,35 @@ data class Entry (
                                 .map { it.convertToClass(dao)}
                 )
 
-
-
+            EntryTypes.THING -> {
+                val thing=dao.getThing(extId)
+                CThing(
+                        thingId=extId,
+                        shortDec = thing.shortDesc,
+                        description = thing.description,
+                        tags = dao.getTagsFor(extId,pos)
+                                .map { it.convertToClass(dao) }
+                )
+            }
         }
 }
 
-enum class EntryTypes{ MEASURE, COLLECTION }
+/*
+    A Thing in this context is anything that is something and has a description.
+    (Basically an empty collection with an internal tag)
+    Any quantities and units are provided by putting the "thing" in a collection together with
+    a Measurement and other Things
+ */
+@Entity(tableName = "things")
+data class Thing constructor(
+        @PrimaryKey(autoGenerate = true)
+        var thingId: Long=0,
+        var shortDesc: String="",
+        var description: String=""
+        )
+
+
+enum class EntryTypes{ MEASURE, COLLECTION, THING }
 
 
 @Entity(tableName = "entry_tags",

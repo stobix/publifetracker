@@ -149,6 +149,8 @@ public class MainActivity extends AppCompatActivity
                                 SugarEntryDatabase.class,
                                 "sugarApp").build();
 
+
+
                 dao = db.userDao();
 
                 List<SugarEntry> entries = dao.getAll();
