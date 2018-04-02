@@ -3,11 +3,7 @@ package stobix.view.containerview
 import android.arch.persistence.room.*
 
 @Entity(tableName="submissions",
-        foreignKeys =[
-            ForeignKey(entity=Collection::class,
-                    parentColumns= ["collId"],
-                    childColumns = ["collId"])]
-        , indices = [Index("collId")] )
+        indices = [Index("collId")] )
 data class Submission constructor(
         @PrimaryKey
         var timestamp: Long=0,
@@ -43,12 +39,7 @@ data class Collection constructor(
 
 @Entity(tableName = "entries",
         primaryKeys = ["pos", "collId"],
-        foreignKeys = [
-                ForeignKey(
-                        entity = Collection::class,
-                        parentColumns = ["collId"],
-                        childColumns = ["collId"])]
-        , indices = [Index("collId")] )
+        indices = [Index("collId")] )
 data class Entry (
         var pos: Long=0,
         var collId: Long=0,
@@ -146,11 +137,6 @@ data class Tag constructor(
 }
 
 @Entity(tableName = "measurements",
-        foreignKeys = [
-            ForeignKey(
-                    entity = MesUnit::class,
-                    parentColumns = ["unitId"],
-                    childColumns = ["unitId"])],
         indices = [Index("unitId")] )
 data class Measurement constructor(
         @PrimaryKey(autoGenerate = true)
