@@ -59,11 +59,11 @@ data class CSubmission(
                         timestamp = DateHandler().timestamp,
                         contentId = 0,
                         collection = CCollection(
-                                myCollId = 0,
+                                myCollId = 1,
                                 tags = listOf(),
                                 contents = listOf(
                                         CCollection(
-                                                myCollId = 1,
+                                                myCollId = 2,
                                                 tags= listOf(),
                                                 contents = listOf()
                                         ),
@@ -135,18 +135,20 @@ data class CCollection (
         // Must insert collection before entries to satisfy db foreign key conditions
         Log.d("db op","insert Collection collId $collId")
         dao.insertCollection(Collection(collId=myCollId))
+        Log.d("db op","inserting all children for collId $collId")
         for((i,c) in contents.withIndex()){
             c.submitToDb(dao,i,myCollId)
         }
+        Log.d("db op","insert Collection Entry for ix $index, collId $collId")
+        dao.insertEntry(
+                Entry(pos=index.toLong(), collId=collId, type=EntryTypes.COLLECTION)
+        )
         for(t in tags){
+            Log.d("db op","insert Entry Tag ${t.tagId} for $index, collId $collId")
             dao.insertEntryTag(
                     EntryTag( pos=index.toLong(), collId = collId, tagId = t.tagId )
             )
         }
-        Log.d("db op","insert Entry ix $index, collId $collId, type ${EntryTypes.COLLECTION}")
-        dao.insertEntry(
-                Entry(pos=index.toLong(), collId=collId, type=EntryTypes.COLLECTION)
-        )
     }
 }
 
@@ -156,8 +158,13 @@ data class CMeasurement (
         override var tags: List<CTag>
 ) : CContent {
     override fun submitToDb(dao: AltAltContainerDao, index: Int,collId:Long) {
+        Log.d("db op","insert Measurement & Entry for ix $index, collId $collId")
         dao.insertEntry(
                 Entry(pos=index.toLong(), collId=collId, type=EntryTypes.MEASURE))
+        dao.insertMeasurement(
+                Measurement(mesId = measurementId, unitId = mesUnit.unitId)
+        )
+        mesUnit.submitToDb(dao)
     }
 }
 
@@ -166,13 +173,24 @@ data class CMesUnit (
         var shortForm: String,
         var description: String,
         var conversions: List<CConversion>
-)
+) {
+    fun submitToDb(dao: AltAltContainerDao){
+        Log.d("db op","insert Measurement Unit $unitId ($shortForm) ($description)")
+        dao.insertMesUnit(MesUnit(unitId=unitId,shortForm = shortForm,description = description))
+        conversions.forEach { it.submitToDb(dao) }
+    }
+}
 
 data class CConversion (
         var fromId: Long,
         var toId: Long,
         var formula: String // TODO replace this with something more suitable, maybe
-)
+) {
+    fun submitToDb(dao: AltAltContainerDao) {
+        Log.d("db op","insert Unit conversion from $fromId to $toId ($formula)")
+        dao.insertUnitConversion(UnitConversion(from=fromId,to=toId,formula = formula))
+    }
+}
 
 data class CTag(
         var tagId: Long,
