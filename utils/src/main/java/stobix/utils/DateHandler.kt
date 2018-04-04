@@ -44,4 +44,24 @@ class DateHandler() {
     var timestamp
         get()=internal_cal.timeInMillis
         set(value) {internal_cal.timeInMillis=value}
+
+    fun clone() = DateHandler(internal_cal.timeInMillis)
+
+    fun addHours(hours: Int) = addThing(Calendar.HOUR_OF_DAY,hours)
+    fun addMinutes(minutes: Int) = addThing(Calendar.MINUTE,minutes)
+    fun addDays(days: Int) = addThing(Calendar.DAY_OF_MONTH,days)
+    fun addMonths(months: Int) = addThing(Calendar.MONTH,months)
+    fun addYears(years: Int) = addThing(Calendar.MONTH,years)
+
+    fun subtractHours(hours: Int) = addThing(Calendar.HOUR_OF_DAY,-hours)
+    fun subtractMinutes(minutes: Int) = addThing(Calendar.MINUTE,-minutes)
+    fun subtractDays(days: Int) = addThing(Calendar.DAY_OF_MONTH,-days)
+    fun subtractMonths(months: Int) = addThing(Calendar.MONTH,-months)
+    fun subtractYears(years: Int) = addThing(Calendar.MONTH,-years)
+
+    private fun addThing(thingField:Int,thing: Int) : DateHandler {
+        internal_cal.add(thingField,thing)
+        return this
+    }
+
 }
