@@ -41,12 +41,15 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import de.codecrafters.tableview.TableDataAdapter;
 import kotlin.Pair;
+import stobix.utils.DateHandler;
 import stobix.view.containerview.ContainerView;
 
 import static android.util.Log.d;
+import static android.util.Log.i;
 
 public class MainActivity extends AppCompatActivity
         implements
@@ -234,11 +237,73 @@ public class MainActivity extends AppCompatActivity
                     return true;
                     */
 
+
+                case R.id.show_stats:
+                    Handler h = new MainHandler(
+                            this,
+                            (main,b) ->{
+                                String message = b.getString("message");
+                                AlertDialog.Builder builder = new AlertDialog.Builder(main);
+                                builder.setTitle(R.string.stat_window_title)
+                                        .setMessage(message)
+                                        .setPositiveButton(android.R.string.yes,
+                                                (dialog, which) -> {
+                                                })
+                                        .setIcon(android.R.drawable.ic_dialog_info)
+                                        .show();
+                            });
+
+                    Runnable getStats = () -> {
+                        Message m = h.obtainMessage();
+                        Bundle b = new Bundle();
+                        String message="";
+
+                        // Get all sugar levels mean
+                        List<Long> levels  = dao.getAllSugarLevels();
+                        Long s = 0L;
+                        for (Long l : levels) s += l;
+                        message += getString(R.string.stat_window_header_total_bs)+"\n";
+                        if ( s == 0 )
+                            message += getString(R.string.stat_window_no_bs)+"\n";
+                        else {
+                            double totAvg = s.doubleValue() / (levels.size()*10);
+                            message += String.format(Locale.getDefault(),
+                                    "\t"+getString(R.string.stat_window_avg_bs)+"\n" , totAvg);
+                            message += "\t"+getString(R.string.stat_window_bs_entries)+levels.size()+"\n";
+                        }
+
+                        // Get previous 30 days sugar levels mean
+                        DateHandler dateHandler = new DateHandler();
+                        levels = dao.getAllSugarLevels(
+                                dateHandler.clone().subtractDays(30).getTimestamp(),
+                                dateHandler.getTimestamp()
+                        );
+                        message += getString(R.string.stat_window_header_total_bs_30)+"\n";
+                        s=0L;
+                        for (Long l : levels) s += l;
+                        if ( s == 0 )
+                            message += getString(R.string.stat_window_no_bs)+"\n";
+                        else {
+                            double totAvg = s.doubleValue() / (levels.size()*10);
+                            message += String.format(Locale.getDefault(),"\t"+
+                                    getString(R.string.stat_window_avg_bs)+"\n" , totAvg);
+                            message += "\t"+getString(R.string.stat_window_bs_entries)+levels.size()+"\n";
+                        }
+
+                        b.putString("message",message);
+                        m.setData(b);
+                        h.sendMessage(m);
+                    };
+                    Thread getStatsT= new Thread(getStats);
+                    getStatsT.start();
+                    return true;
+
+
                 case R.id.action_switch_theme:
 
                     ArrayList<ThemeListItem> c = new ArrayList<>();
                     //
-                    // TODO Put more color themes here
+                    // TODO Put more color themes here, extract this to a build variant common file.
                     //
                     c.add(new ThemeListItem("Zimmik",R.style.Theme_Zimmik_NoActionBar));
                     c.add(new ThemeListItem("Joel",R.style.Joel_NoActionBar));
@@ -396,6 +461,20 @@ public class MainActivity extends AppCompatActivity
                 Bundle b = msg.getData();
                 SugarEntry s = b.getParcelable("entry");
                 sf.accept(s,tableView.getDataAdapter());
+            }
+        }
+
+        private static class MainHandler extends Handler {
+            final MainActivity activity;
+            final BiConsumer<MainActivity,Bundle> bundleConsumer;
+            MainHandler(MainActivity a,BiConsumer<MainActivity,Bundle> messageHandler) {
+                activity=a;
+                bundleConsumer=messageHandler;
+            }
+            @Override
+            public void handleMessage(Message msg) {
+                Bundle b = msg.getData();
+                bundleConsumer.accept(activity,b);
             }
         }
 

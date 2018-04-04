@@ -19,6 +19,12 @@ public interface SugarEntryDao {
     @Query("Select max(uid) from sugar_entries")
     int getMaxUID();
 
+    @Query("select sugar from sugar_entries where sugar > -1")
+    List<Long> getAllSugarLevels();
+
+    @Query("select sugar from sugar_entries where sugar > -1 and timestamp between :firstDate and :secondDate")
+    List<Long> getAllSugarLevels(long firstDate,long secondDate);
+
     @Update
     void update(SugarEntry sugarEntry);
     @Insert

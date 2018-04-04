@@ -25,4 +25,13 @@
     <string name="theme_picker_dialog_title">Pick a color theme</string>
     <string name="edit_dialog_button_delete">Delete</string>
     <string name="number_picker_cancel_button">@android:string/cancel</string>
+    <string name="show_stats">Show Statistics</string>
+    <string name="stat_window_title">Statistics</string>
+    <string name="stat_window_bs_entries">Blood sugar entries</string>
+    <string name="stat_window_avg_bs">Avg blood sugar level: %1$.2f</string>
+    <string name="stat_window_bs_entries_30">Blood sugar entries last 30 days</string>
+    <string name="stat_window_avg_bs_30">Avg blood sugar level last 30 days: %1$.2f</string>
+    <string name="stat_window_no_bs">No sugar levels!</string>
+    <string name="stat_window_header_total_bs">In Total:</string>
+    <string name="stat_window_header_total_bs_30">Last 30 days:</string>
 </resources>

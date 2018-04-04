@@ -27,4 +27,13 @@
     <string name="edit_dialog_button_delete">Ta bort</string>
     <string name="theme_picker_dialog_title">Välj ett färgtema</string>
     <string name="number_picker_cancel_button">Avbryt</string>
+    <string name="show_stats">Visa statistik</string>
+    <string name="stat_window_title">Statistik</string>
+    <string name="stat_window_avg_bs">Blodsockermedelvärde: %1$.2f</string>
+    <string name="stat_window_bs_entries">Antal mätningar:</string>
+    <string name="stat_window_avg_bs_30">Blodsockermedelvärde för de senaste 30 dagarna: %1$.2f</string>
+    <string name="stat_window_bs_entries_30">Antal mätningar senaste 30 dagarna:</string>
+    <string name="stat_window_no_bs">Inga blodsockermätningar gjorda!</string>
+    <string name="stat_window_header_total_bs">Totalt:</string>
+    <string name="stat_window_header_total_bs_30">Senaste 30 dagarna:</string>
 </resources>

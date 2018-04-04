@@ -11,6 +11,9 @@
         android:id="@+id/action_switch_theme"
         android:title="@string/action_switch_theme" />
     <item
+        android:id="@+id/show_stats"
+        android:title="@string/show_stats" />
+    <item
         android:id="@+id/action_import_db"
         android:title="@string/action_import_db"/>
     <item
