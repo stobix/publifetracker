@@ -27,6 +27,7 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import de.codecrafters.tableview.SortingOrder;
 import stobix.compat.functions.Consumer;
 import stobix.compat.functions.BiConsumer;
 
@@ -464,6 +465,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+
         private static class MainHandler extends Handler {
             final MainActivity activity;
             final BiConsumer<MainActivity,Bundle> bundleConsumer;
@@ -495,8 +497,10 @@ public class MainActivity extends AppCompatActivity
             public void handleMessage(Message msg) {
                 Bundle b = msg.getData();
                 ArrayList<SugarEntry> arrayEntries = b.getParcelableArrayList("entries");
-                if(arrayEntries!=null)
+                if(arrayEntries!=null) {
                     tableView.setDataAdapter(new SugarEntryTableDataAdapter(context, arrayEntries));
+                    tableView.sort(0, SortingOrder.DESCENDING);
+                }
             }
         }
 
@@ -587,6 +591,7 @@ public class MainActivity extends AppCompatActivity
             adapter.getData().clear();
             adapter.addAll(entries);
             adapter.notifyDataSetChanged();
+            tableView.sort(0,SortingOrder.DESCENDING);
             new Thread(() -> {
                 dao.clear_sugar_entries();
                 dao.insertAll(entries);
