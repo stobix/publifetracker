@@ -21,6 +21,16 @@ class DateHandler() {
 
     fun setDate(year: Int, month: Int, day: Int) = internal_cal.set(year,month,day)
 
+    var date
+        get() = Triple(year,month,hour)
+        set(value) {
+            val (year, month, hour) = value
+            setDate(year, month, hour)
+        }
+
+    val dateObject
+        get() = internal_cal.time
+
     var hour
         get() = internal_cal.get(Calendar.HOUR_OF_DAY)
         set(value) {internal_cal.set(Calendar.HOUR_OF_DAY,value)}
