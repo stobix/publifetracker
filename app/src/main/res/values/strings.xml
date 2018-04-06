@@ -34,4 +34,5 @@
     <string name="stat_window_no_bs">No sugar levels!</string>
     <string name="stat_window_header_total_bs">In Total:</string>
     <string name="stat_window_header_total_bs_30">Last 30 days:</string>
+    <string name="show_graphs">Show Graphs</string>
 </resources>

@@ -1,13 +1,21 @@
 package stobix.app.lifetracker;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Relation;
+import android.arch.persistence.room.TypeConverter;
+import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.Update;
+
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.util.List;
 
+//@TypeConverters(SugarConverters.class)
 @Dao
 public interface SugarEntryDao {
     @Query("select * from sugar_entries")
@@ -24,6 +32,17 @@ public interface SugarEntryDao {
 
     @Query("select sugar from sugar_entries where sugar > -1 and timestamp between :firstDate and :secondDate")
     List<Long> getAllSugarLevels(long firstDate,long secondDate);
+
+    /*
+    // This won't work since DataPoints aren't Parcelable and I need to transform them
+    using Bundle inside a Message…
+    @Query("select timestamp as x,sugar as y from sugar_entries where sugar > -1 order by timestamp")
+    List<DataPoint> getAllSugarPoints();
+    */
+
+    @Query("select * from sugar_entries where sugar > -1 order by timestamp")
+    List<SugarEntry> getAllSugarPoints();
+
 
     @Update
     void update(SugarEntry sugarEntry);

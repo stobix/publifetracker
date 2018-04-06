@@ -36,4 +36,5 @@
     <string name="stat_window_no_bs">Inga blodsockermätningar gjorda!</string>
     <string name="stat_window_header_total_bs">Totalt:</string>
     <string name="stat_window_header_total_bs_30">Senaste 30 dagarna:</string>
+    <string name="show_graphs">Visa grafer</string>
 </resources>
