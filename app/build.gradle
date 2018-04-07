@@ -3,7 +3,6 @@ apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId 'stobix.app.lifetracker'
         minSdkVersion 19
@@ -52,27 +51,28 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestImplementation(
+            'com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     // ColorPickerView
     //compile 'com.github.danielnilsson9:color-picker-view:1.4.0@aar'
     // Maybe better colorpicker
     //compile 'com.github.QuadFlask:colorpicker:0.0.13'
-    compile 'com.google.code.gson:gson:2.8.0'
-    compile 'com.android.support:appcompat-v7:27.0.2'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:design:27.0.2'
-    compile 'com.jjoe64:graphview:4.2.1'
-    compile 'de.codecrafters.tableview:tableview:2.8.0'
-    testCompile 'junit:junit:4.12'
+    implementation 'com.google.code.gson:gson:2.8.0'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.jjoe64:graphview:4.2.1'
+    implementation 'de.codecrafters.tableview:tableview:2.8.0'
+    testImplementation 'junit:junit:4.12'
     implementation 'android.arch.persistence.room:runtime:1.0.0'
     annotationProcessor 'android.arch.persistence.room:compiler:1.0.0'
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    compile project(':utils')
-    compile project(':containerview')
-    compile project(':compat')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation project(':utils')
+    implementation project(':containerview')
+    implementation project(':compat')
 }
 repositories {
     mavenCentral()
