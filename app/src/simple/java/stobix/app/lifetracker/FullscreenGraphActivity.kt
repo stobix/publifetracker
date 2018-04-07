@@ -68,6 +68,9 @@ class FullscreenGraphActivity : Activity() {
         mVisible = true
 
         // Set up the user interaction to manually show or hide the system UI.
+        // XXX
+        // This is a horrid idea when using a graph!
+        //  TODO Fix something better, like a drag-down thing
         //fullscreen_graph.setOnClickListener { toggle() }
 
         // Upon interacting with UI controls, delay any scheduled hide()
@@ -87,30 +90,41 @@ class FullscreenGraphActivity : Activity() {
         )
         bareSeries.color = Color.GREEN
 
-        val e1 = entries
-                .map {
-                    val cal = Calendar.getInstance()
-                    cal.timeInMillis=it.epochTimestamp
-                    Pair(it, Pair(cal.get(Calendar.YEAR),cal.get(Calendar.WEEK_OF_YEAR)))
-                }
-                .sortedWith(compareBy({it.second.first},{it.second.second}))
-        val e2 = e1 .groupBy( { it.second } )
-        val e3 = e2 .map {
-            Triple(
-                    it.value.sortedBy { it.first.epochTimestamp }.first().first.epochTimestamp
-                    ,
-                    it.value.sumBy {it.first.sugarLevel} .toDouble() / (it.value.size * 10.0)
-                    , it
-            ) }
-        val e4 = e3 .sortedBy { it.first }
-        val meanPerDayPoints = e4
 
-        meanPerDayPoints.forEach {
-            Log.d("points","$it")
-        }
         val meanPerDaySeries = LineGraphSeries<DataPoint>(
-                meanPerDayPoints.map {DataPoint(DateHandler(it.first).dateObject,it.second)}.toTypedArray()
+                entries
+                        // get the year and week of each entry
+                        .map {
+                            val cal = Calendar.getInstance()
+                            cal.timeInMillis=it.epochTimestamp
+                            Pair(it, Pair(cal.get(Calendar.YEAR),cal.get(Calendar.WEEK_OF_YEAR)))
+                        }
+                        // sort the entries by year & week
+                        .sortedWith(compareBy({it.second.first},{it.second.second}))
+                        // group by year & week
+                        .groupBy( { it.second } )
+                        //
+                        .map {
+                            Triple(
+                                    // For now, use the first entry in the week as timestamp.
+                                    // For later, it's probably best to have a timestamp
+                                    // corresponding to the start of the week or so
+                                    it.value.sortedBy { it.first.epochTimestamp }.first().first.epochTimestamp
+                                    ,
+                                    // mean value for the week
+                                    it.value.sumBy {it.first.sugarLevel} .toDouble() / (it.value.size * 10.0)
+                                    // for debugging purposes only
+                                    , it
+                            ) }
+                        // sort by timestamp. because somehow the data manages to get unsorted again (?)
+                        .sortedBy { it.first }
+                        // make DataPoints of the timestamp and week mean
+                        .map {DataPoint(DateHandler(it.first).dateObject,it.second)}
+                        // get a DataPoint array so LineGraphSeries gets happy
+                        .toTypedArray()
+
         )
+
         /*
         val meanPerDaySeries =LineGraphSeries<DataPoint>(
                 entries
