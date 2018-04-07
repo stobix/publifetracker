@@ -16,9 +16,9 @@ android {
                 cppFlags ""
             }
         }
-        buildConfigField "boolean","containers", "false"
+        buildConfigField "boolean", "containers", "false"
     }
-    productFlavors{
+    productFlavors {
         flavorDimensions "variant"
         simple {
             dimension "variant"
@@ -29,7 +29,7 @@ android {
             dimension "variant"
             applicationIdSuffix ".containers"
             versionNameSuffix "(containers)"
-            buildConfigField "boolean","containers","true"
+            buildConfigField "boolean", "containers", "true"
         }
     }
     buildTypes {
@@ -52,6 +52,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:support-v4:27.1.1'
     androidTestImplementation(
             'com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
@@ -77,3 +78,5 @@ dependencies {
 repositories {
     mavenCentral()
 }
+
+apply plugin: 'kotlin-android-extensions'

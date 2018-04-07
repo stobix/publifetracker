@@ -14,12 +14,16 @@ class DateHandler() {
         internal_cal.timeInMillis=timestamp
     }
 
-    fun setTime(hour: Int, minute: Int) {
+    fun setTime(hour: Int, minute: Int) : DateHandler {
         internal_cal.set(Calendar.HOUR_OF_DAY, hour)
         internal_cal.set(Calendar.MINUTE, minute)
+        return this
     }
 
-    fun setDate(year: Int, month: Int, day: Int) = internal_cal.set(year,month,day)
+    fun setDate(year: Int, month: Int, day: Int) : DateHandler  {
+        internal_cal.set(year, month, day)
+        return this
+    }
 
     var date
         get() = Triple(year,month,hour)
@@ -73,5 +77,4 @@ class DateHandler() {
         internal_cal.add(thingField,thing)
         return this
     }
-
 }

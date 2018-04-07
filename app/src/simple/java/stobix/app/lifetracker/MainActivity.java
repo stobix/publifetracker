@@ -1,33 +1,22 @@
 package stobix.app.lifetracker;
 
-import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.arch.persistence.room.Room;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.widget.ImageViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import de.codecrafters.tableview.SortingOrder;
 import stobix.compat.functions.Consumer;
@@ -37,9 +26,6 @@ import stobix.compat.functions.BiConsumer;
 //import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
 
 
 import org.jetbrains.annotations.NotNull;
@@ -52,7 +38,6 @@ import java.util.Locale;
 import de.codecrafters.tableview.TableDataAdapter;
 import kotlin.Pair;
 import stobix.utils.DateHandler;
-import stobix.view.containerview.ContainerView;
 
 import static android.util.Log.d;
 import static android.util.Log.i;
@@ -305,47 +290,29 @@ public class MainActivity extends AppCompatActivity
                     return true;
 
                 case R.id.show_graphs:
-                    MainHandler graphHandler = new MainHandler(this,(mainActivity, bundle) -> {
-                        Log.d("graph","got bundle");
-                        FragmentTransaction ft = getFragmentManager().beginTransaction();
-                        Fragment prev = getFragmentManager().findFragmentByTag("graph");
-                        if (prev != null) {
-                            ft.remove(prev);
-                        }
-                        ft.addToBackStack(null);
+                    MainHandler graphHandler =
+                            new MainHandler(this,(mainActivity, bundle) -> {
+                                Log.d("graph","got bundle");
+                                Intent i = new Intent(this, FullscreenGraphActivity.class);
+                                i.putExtras(bundle);
+                                startActivity(i);
+                            });
 
-                        GraphFragment gf = new GraphFragment();
-                        gf.setArguments(bundle);
-                        gf.show(ft,"graph");
+                    new Thread(
+                            () -> {
+                                Log.d("graph","got request");
+                                Message m = graphHandler.obtainMessage();
+                                Bundle b = new Bundle();
+                                List<SugarEntry> entries = dao.getAllSugarPoints();
+                                Log.d("graph"," request");
+                                ArrayList<SugarEntry> entryArrayList = new ArrayList<>(entries);
+                                b.putParcelableArrayList("entries", entryArrayList);
+                                m.setData(b);
+                                Log.d("graph","sending bundle");
+                                graphHandler.sendMessage(m);
+                            }
+                            ).start();
 
-                        /*
-                        GraphView graph = mainActivity.findViewById(R.id.graph);
-                        ArrayList<SugarEntry> entryArrayList = bundle.getParcelableArrayList("entries");
-                        DataPoint[] points = new DataPoint[entryArrayList.size()];
-                        int i=0;
-                        for(SugarEntry e:entryArrayList) {
-                            points[i]=new DataPoint(e.getEpochTimestamp(),e.getSugarLevel());
-                        }
-                        LineGraphSeries<DataPoint> gs =new LineGraphSeries<>(points);
-                        graph.addSeries(gs);
-                        DialogFragment.instantiate(mainActivity,
-                        */
-                    });
-
-                    Runnable getGraphData = () -> {
-                        Log.d("graph","got request");
-                        Message m = graphHandler.obtainMessage();
-                        Bundle b = new Bundle();
-                        List<SugarEntry> entries = dao.getAllSugarPoints();
-                        Log.d("graph"," request");
-
-                        ArrayList<SugarEntry> entryArrayList = new ArrayList<>(entries);
-                        b.putParcelableArrayList("entries", entryArrayList);
-                        m.setData(b);
-                        Log.d("graph","sending bundle");
-                        graphHandler.sendMessage(m);
-                    };
-                    new Thread(getGraphData).start();
                     return true;
 
 

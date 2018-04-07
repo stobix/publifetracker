@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <activity
+            android:name="stobix.app.lifetracker.FullscreenGraphActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_fullscreen_graph"
+            android:parentActivityName="stobix.app.lifetracker.MainActivity"
+            android:theme="@style/FullscreenTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="stobix.app.lifetracker.MainActivity" />
+        </activity>
+    </application>
+
+</manifest>
