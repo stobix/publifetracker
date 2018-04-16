@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -322,19 +323,84 @@ public class MainActivity extends AppCompatActivity
                     //
                     // TODO Put more color themes here, extract this to a build variant common file.
                     //
-                    c.add(new ThemeListItem("Zimmik",R.style.Theme_Zimmik_NoActionBar));
-                    c.add(new ThemeListItem("Joel",R.style.Joel_NoActionBar));
-                    c.add(new ThemeListItem("Mad!",R.style.Theme_Mad_NoActionBar));
-                    c.add(new ThemeListItem("Cold",R.style.Theme_Cold_NoActionBar));
-                    c.add(new ThemeListItem("Spring",R.style.Theme_Spring_NoActionBar));
-                    c.add(new ThemeListItem("Cotton",R.style.Theme_Cotton_NoActionBar));
-                    c.add(new ThemeListItem("Nicecream",R.style.Theme_Nicecream_NoActionBar));
-                    c.add(new ThemeListItem("Strong",R.style.Theme_Strong_NoActionBar));
-                    c.add(new ThemeListItem("Fuel",R.style.Theme_Fuel_NoActionBar));
-                    c.add(new ThemeListItem("Neonight",R.style.Theme_Neonight_NoActionBar));
-                    c.add(new ThemeListItem("default",R.style.AppTheme_NoActionBar));
-                    c.add(new ThemeListItem("Hope",R.style.Hope_NoActionBar));
-                    c.add(new ThemeListItem("Hjul",R.style.Hjul_NoActionBar));
+                    c.add(new ThemeListItem( "Zimmik", R.style.Theme_Zimmik_NoActionBar, this,
+                            R.color.zimPrimary,
+                            R.color.zimAccent,
+                            R.color.zimPrimaryDark,
+                            R.color.zimtextColorPrimary,
+                            R.color.zimWindowBackground ));
+                    c.add(new ThemeListItem( "Joel", R.style.Joel_NoActionBar, this,
+                            R.color.joeldata_row_even,
+                            R.color.joeltextColorSecondary,
+                            R.color.joeltextColorTertiary,
+                            R.color.joeldata_header_text,
+                            R.color.joeldata_row_odd ));
+                    c.add(new ThemeListItem("Mad!",R.style.Theme_Mad_NoActionBar,this,
+                            R.color.madPrimary,
+                            R.color.madnavigationBarColor,
+                            R.color.madAccent,
+                            R.color.madtextColorPrimary,
+                            R.color.madWindowBackground));
+                    c.add(new ThemeListItem("Cold",R.style.Theme_Cold_NoActionBar,this,
+                            R.color.coldPrimary,
+                            R.color.coldnavigationBarColor,
+                            R.color.coldAccent,
+                            R.color.coldtextColorPrimary,
+                            R.color.coldWindowBackground));
+                    c.add(new ThemeListItem("Spring",R.style.Theme_Spring_NoActionBar,this,
+                            R.color.springnavigationBarColor,
+                            R.color.springAccent,
+                            R.color.springPrimary,
+                            R.color.springtextColorPrimary,
+                            R.color.springWindowBackground));
+                    c.add(new ThemeListItem("Cotton",R.style.Theme_Cotton_NoActionBar,this,
+                            R.color.cottonnavigationBarColor,
+                            R.color.cottonAccent,
+                            R.color.cottonPrimary,
+                            R.color.cottontextColorPrimary,
+                            R.color.cottonWindowBackground));
+                    c.add(new ThemeListItem("Nicecream",R.style.Theme_Nicecream_NoActionBar,this,
+                            R.color.nicecreamnavigationBarColor,
+                            R.color.nicecreamAccent,
+                            R.color.nicecreamPrimary,
+                            R.color.nicecreamtextColorPrimary,
+                            R.color.nicecreamWindowBackground));
+                    c.add(new ThemeListItem("Strong",R.style.Theme_Strong_NoActionBar,this,
+                            R.color.strongnavigationBarColor,
+                            R.color.strongAccent,
+                            R.color.strongPrimary,
+                            R.color.strongtextColorPrimary,
+                            R.color.strongWindowBackground));
+                    c.add(new ThemeListItem("Fuel",R.style.Theme_Fuel_NoActionBar,this,
+                            R.color.fuelnavigationBarColor,
+                            R.color.fuelAccent,
+                            R.color.fuelPrimary,
+                            R.color.fueltextColorPrimary,
+                            R.color.fuelWindowBackground));
+                    c.add(new ThemeListItem("Neonight",R.style.Theme_Neonight_NoActionBar,this,
+                            R.color.neonightnavigationBarColor,
+                            R.color.neonightAccent,
+                            R.color.neonightPrimary,
+                            R.color.neonighttextColorPrimary,
+                            R.color.neonightWindowBackground));
+                    c.add(new ThemeListItem("default",R.style.AppTheme_NoActionBar,this,
+                            R.color.colorPrimary,
+                            R.color.colorPrimaryDark,
+                            R.color.colorAccent,
+                            R.color.joelPrimaryDark,
+                            R.color.zimWindowBackground));
+                    c.add(new ThemeListItem("Hope",R.style.Hope_NoActionBar,this,
+                            R.color.hopenavigationBarColor,
+                            R.color.hopeAccent,
+                            R.color.hopePrimary,
+                            R.color.hopetextColorPrimary,
+                            R.color.hopewindowBackground));
+                    c.add(new ThemeListItem("Hjul",R.style.Hjul_NoActionBar,this,
+                            R.color.hjulnavigationBarColor,
+                            R.color.hjulAccent,
+                            R.color.hjulPrimary,
+                            R.color.hjultextColorPrimary,
+                            R.color.hjulwindowBackground));
 
 
                     new ThemePickerDialog(this, c).show();
