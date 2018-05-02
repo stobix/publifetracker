@@ -12,6 +12,14 @@ public class ThemeListItem{
             mcolor3 =Color.WHITE,
             mtextcolor =Color.BLACK,
             mbackcolor=Color.WHITE;
+    private boolean
+            isColor1Set=false,
+            isColor2Set=false,
+            isColor3Set=false,
+            isBackColorSet=false,
+            isTextColorSet=false;
+
+
     public ThemeListItem(String colorThemeName, int r_theme_value){
         this.colorThemeName=colorThemeName;
         this.r_theme_value=r_theme_value;
@@ -38,10 +46,36 @@ public class ThemeListItem{
         return r_theme_value;
     }
     // TODO Return the three "primary colors" for the theme.
+    public ThemeListItem setColor1(int color){
+        mcolor1 = color;
+        isColor1Set=true;
+        return this;
+    }
+    public ThemeListItem setColor2(int color){
+        mcolor2 = color;
+        isColor2Set=true;
+        return this;
+    }
+    public ThemeListItem setColor3(int color){
+        mcolor3 = color;
+        isColor3Set=true;
+        return this;
+    }
+    public ThemeListItem setTextColor(int color){
+        mtextcolor = color;
+        isTextColorSet=true;
+        return this;
+    }
+    public ThemeListItem setBackgroundColor(int color){
+        mbackcolor = color;
+        isBackColorSet=true;
+        return this;
+    }
+
     public int getColor1(){return mcolor1;}
     public int getColor2(){return mcolor2;}
     public int getColor3(){return mcolor3;}
-    public int getTextcolor(){return mtextcolor;}
-    public int getBackgroundcolor(){return mbackcolor;}
+    public int getTextColor(){return mtextcolor;}
+    public int getBackgroundColor(){return mbackcolor;}
 
 }

@@ -2,7 +2,9 @@ package stobix.app.lifetracker
 
 import android.app.Dialog
 import android.content.Context
+import android.graphics.Color
 import android.graphics.PorterDuff
+import android.support.v7.view.ContextThemeWrapper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -18,14 +20,12 @@ class ThemePickerDialog
         this.setTitle(context.getString(R.string.theme_picker_dialog_title))
         val themesList = this.findViewById<ListView>(R.id.themePickerList)
 
-        val adapter  = ThemeArrayAdapter(ctx, ArrayList())
-        for(t in themes)
-            adapter.add(t)
+        val adapter  = ThemeArrayAdapter(ctx, themes)
         themesList.adapter = adapter
         themesList.onItemClickListener = AdapterView.OnItemClickListener {
             _: AdapterView<*>, _: View, _viewedRow: Int, index: Long ->
             Log.d("click","$index, which is ${themes[index.toInt()]}")
-            (ctx as MainActivity).doSetTheme(themes[index.toInt()].getThemeResourceValue())
+            (ctx as MainActivity).doSetTheme(themes[index.toInt()].themeResourceValue)
             dismiss()
         }
 
@@ -41,25 +41,53 @@ class ThemeArrayAdapter(ctx: Context,  items: ArrayList<ThemeListItem>)
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val theme = getItem(position)
         val view = convertView ?: LayoutInflater.from(context)!!.inflate(layout,parent,false)
-        val colorPrimary = view.findViewById<ImageView>(R.id.themeViewPrimaryColor)
-        val colorAccent = view.findViewById<ImageView>(R.id.themeViewAccentColor)
-        val colorPrimaryDark = view.findViewById<ImageView>(R.id.themeViewPrimaryDark)
+        val color1 = view.findViewById<ImageView>(R.id.themeViewColor1)
+        val color2 = view.findViewById<ImageView>(R.id.themeViewColor2)
+        val color3 = view.findViewById<ImageView>(R.id.themeViewColor3)
         val textView = view.findViewById<TextView>(R.id.themeViewText)
-        colorPrimary.setColorFilter(theme.color1,PorterDuff.Mode.SRC)
-        colorAccent.setColorFilter(theme.color2,PorterDuff.Mode.SRC)
-        colorPrimaryDark.setColorFilter(theme.color3,PorterDuff.Mode.SRC)
-        /*
-        colorPrimaryDark.setColorFilter(
-                ResourcesCompat.getColor(
-                        ctx.resources,
-                        android.R.color.primary_text_dark,
-                        R.style.Theme_Cotton <-- TODO fix this later for automagic styling; How to get style info from an R.style?
-                ),
-                PorterDuff.Mode.SRC)
-                */
-        textView.setText(theme.colorThemeName)
-        textView.setTextColor(theme.textcolor)
-        view.setBackgroundColor(theme.backgroundcolor)
+        val slantedBarFill = view.findViewById<ImageView>(R.id.themeViewSlantedBarFill)
+        val slantedBar1 = view.findViewById<ImageView>(R.id.themeViewSlantedBar1)
+        val slantedBar2 = view.findViewById<ImageView>(R.id.themeViewSlantedBar2)
+        val slantedBar3 = view.findViewById<ImageView>(R.id.themeViewSlantedBar3)
+        val themeWrapper = ContextThemeWrapper(context,theme.themeResourceValue)
+        val themeAttributes =
+                listOf(R.attr.colorPrimary,
+                        R.attr.colorAccent,
+                        android.R.attr.textColorPrimary,
+                        R.attr.table_data_row_even,
+                        R.attr.tableView_headerColor,
+                        android.R.attr.textColorTertiary,
+                        R.attr.table_header_text,
+                        R.attr.table_data_row_odd,
+                        R.attr.button_plus_color
+                ).sorted().toIntArray()
+        themeWrapper.theme.obtainStyledAttributes( themeAttributes ).also {
+            fun getCol(attr:Int) = it.getColor(
+                    it.getIndex(
+                            themeAttributes.indexOf(attr)
+                    ),
+                    Color.MAGENTA
+            )
+            fun ImageView.setCol(attr:Int) = this.setColorFilter(getCol(attr),PorterDuff.Mode.SRC)
+            fun TextView.setCol(attr:Int) = this.setTextColor(getCol(attr))
+            fun ImageView.setColAtop(attr:Int) = this.setColorFilter(getCol(attr),PorterDuff.Mode.SRC_ATOP)
+
+            color1.setCol(R.attr.table_header_text)
+            slantedBar1.setColAtop(R.attr.tableView_headerColor)
+
+            color2.setCol(android.R.attr.textColorPrimary)
+            slantedBar2.setColAtop(R.attr.colorPrimary)
+
+            color3.setCol(R.attr.button_plus_color)
+            slantedBar3.setColAtop(R.attr.colorAccent)
+
+            textView.setCol(android.R.attr.textColorTertiary)
+            view.setBackgroundColor(getCol(R.attr.table_data_row_odd))
+            slantedBarFill.setColAtop(R.attr.table_data_row_even)
+
+        }.recycle()
+
+        textView.text = theme.colorThemeName
         return view
     }
 
