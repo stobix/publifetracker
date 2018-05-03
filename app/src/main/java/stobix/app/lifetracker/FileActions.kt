@@ -10,16 +10,28 @@ import java.io.*
 
 // Groups together in a handy utility class all actions we need to take on a file
 
-class FileActions (val activity: Activity, val createHandler: FileCreateHandler, val openHandler: FileOpenHandler){
+class FileActions (
+        val activity: Activity,
+        val createHandler: FileCreateHandler,
+        val openHandler: FileOpenHandler
+){
 
-    constructor(activity: Activity): this(activity,activity as FileCreateHandler,activity as FileOpenHandler)
+    constructor(activity: Activity): this(
+            activity,
+            activity as FileCreateHandler,
+            activity as FileOpenHandler)
 
-    fun userOpenFile() {
+
+
+    fun userFileOpen(requestCode: Int) {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "text/json" // Required, apparently.
-        startActivityForResult(activity, intent, OPEN_REQUEST, null)
+        startActivityForResult(activity, intent, requestCode, null)
     }
+
+    fun userReplaceDb() = userFileOpen(DB_FILE_REPLACE_REQUEST)
+    fun userMergeDb() = userFileOpen(DB_FILE_MERGE_REQUEST)
 
     fun userCreateFile() {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
@@ -31,15 +43,15 @@ class FileActions (val activity: Activity, val createHandler: FileCreateHandler,
     }
 
     fun isFileAction(requestCode: Int) = when(requestCode){
-        OPEN_REQUEST, CREATE_REQUEST -> true
+        DB_FILE_REPLACE_REQUEST, DB_FILE_MERGE_REQUEST, CREATE_REQUEST -> true
         else -> false
 
     }
 
-    private fun systemGetUserOpenedFile(resultCode: Int, resultData: Intent?) : Boolean {
+    private fun systemGetUserOpenedFile(resultCode: Int, resultData: Intent?,what:String) : Boolean {
         if(resultCode == Activity.RESULT_OK){
             val uri: Uri = resultData?.data ?: return false
-            openHandler.handleFileOpened(uri)
+            openHandler.handleFileOpened(uri,what)
             return true
         } else return false
     }
@@ -54,8 +66,11 @@ class FileActions (val activity: Activity, val createHandler: FileCreateHandler,
 
     fun handleFileAction(requestCode: Int ,resultCode: Int,resultData: Intent?): Boolean =
         when(requestCode){
-            OPEN_REQUEST -> {
-                systemGetUserOpenedFile(resultCode,resultData)
+            DB_FILE_REPLACE_REQUEST -> {
+                systemGetUserOpenedFile(resultCode,resultData,"replace")
+            }
+            DB_FILE_MERGE_REQUEST -> {
+                systemGetUserOpenedFile(resultCode,resultData,"merge")
             }
             CREATE_REQUEST -> {
                 systemGetUserCreatedFile(resultCode,resultData)
@@ -68,7 +83,7 @@ class FileActions (val activity: Activity, val createHandler: FileCreateHandler,
     }
 
     interface FileOpenHandler {
-        fun handleFileOpened(uri: Uri)
+        fun handleFileOpened(uri: Uri,what: String)
     }
 
     fun readTextFromUri(uri: Uri): String{
@@ -103,8 +118,9 @@ class FileActions (val activity: Activity, val createHandler: FileCreateHandler,
 
     // These can probably be any value; I chose 42 and 43 because random IIRC.
     companion object {
-        @JvmField val OPEN_REQUEST: Int = 42
-        @JvmField val CREATE_REQUEST: Int = 43
+        @JvmField val DB_FILE_REPLACE_REQUEST: Int = 42
+        @JvmField val DB_FILE_MERGE_REQUEST: Int = 43
+        @JvmField val CREATE_REQUEST: Int = 44
     }
 }
 

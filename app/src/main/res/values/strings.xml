@@ -35,4 +35,5 @@
     <string name="stat_window_header_total_bs">In Total:</string>
     <string name="stat_window_header_total_bs_30">Last 30 days:</string>
     <string name="show_graphs">Show Graphs</string>
+    <string name="action_merge_db" >merge db</string>
 </resources>

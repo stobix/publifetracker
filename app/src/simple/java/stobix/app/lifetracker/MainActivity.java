@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -361,7 +360,11 @@ public class MainActivity extends AppCompatActivity
                     return true;
 
                 case R.id.action_import_db:
-                    fa.userOpenFile();
+                    fa.userReplaceDb();
+                    return true;
+
+                case R.id.action_merge_db:
+                    fa.userMergeDb();
                     return true;
 
                 case R.id.action_export_db:
@@ -606,31 +609,50 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        public void handleFileOpened(@NotNull Uri uri) {
+        public void handleFileOpened(@NotNull Uri uri,String what) {
 
-            // TODO Add a spinning disc view or something until the db has finished reloading.
-            // TODO Merge instead of deleting the whole database!
-            MainHandler restarter = new MainHandler(this,
-                    (mainActivity, bundle) -> mainActivity.restartMe()
+                    // TODO Add a spinning disc view or something until the db has finished reloading.
+                    // TODO Merge instead of deleting the whole database!
+                    MainHandler restarter = new MainHandler(this,
+                            (mainActivity, bundle) -> mainActivity.restartMe()
                     );
-            new Thread(() -> {
-                // Gson procedure taken from http://www.vogella.com/tutorials/JavaLibrary-Gson/article.html
-                Log.i("file","opened URI: "+uri.toString());
-                String text = fa.readTextFromUri(uri);
-                Gson g = new Gson();
-                Type t = new TypeToken<List<SugarEntry>>() {}.getType();
-                Log.i("file","opened file: ");
-                List<SugarEntry> entries = g.fromJson(text,t);
-                Log.i("file",""+entries.size()+" entries");
-                Log.i("file","adding all entries to the db");
+                    new Thread(() -> {
+                        // Gson procedure taken from http://www.vogella.com/tutorials/JavaLibrary-Gson/article.html
+                        Log.i("file","opened URI: "+uri.toString());
+                        String text = fa.readTextFromUri(uri);
+                        Gson g = new Gson();
+                        Type t = new TypeToken<List<SugarEntry>>() {}.getType();
+                        Log.i("file","opened file: ");
+                        List<SugarEntry> entries = g.fromJson(text,t);
+                        Log.i("file",""+entries.size()+" entries");
+                        Log.i("file","adding all entries to the db");
 
-                Message m =restarter.obtainMessage();
-                dao.clear_sugar_entries();
-                dao.insertAll(entries);
-                nextUID=dao.getMaxUID()+1;
-                Log.i("file","db done");
-                restarter.sendMessage(m);
-            }).start();
+                        Message m =restarter.obtainMessage();
+                        switch (what) {
+                            case "replace":
+                                dao.clear_sugar_entries();
+                                dao.insertAll(entries);
+                                nextUID=dao.getMaxUID()+1;
+                                break;
+                            case "merge":
+                                // TODO This won't work unless the ID's are the same!
+                                // Solution:
+                                // Ditch the id's. Nobody wants them anyways.
+                                // Have timestamp as primary key.
+                                // If the user tries to enter a second entry with the same timestamp, increase the timestamp by 1.
+                                //
+                                // dao.updateAll(entries);
+
+
+                                // Alt solution:
+                                // Get all current SugarEntries
+                                // Sort both entrylists by timestamp
+                                // Compare items by timestamp, replacing old with new ones
+
+                        }
+                        Log.i("file","db done");
+                        restarter.sendMessage(m);
+                    }).start();
 
         }
 
@@ -647,7 +669,7 @@ public class MainActivity extends AppCompatActivity
                                      Intent resultData) {
             if(!fa.handleFileAction(requestCode,resultCode,resultData)){
                 if(fa.isFileAction(requestCode))
-                    Log.d("Activity result","activity aborted/failed: "+requestCode);
+                    Log.d("Activity result","file activity aborted/failed: "+requestCode);
                 else
                     Log.e("Activity result","unknown activity result: "+requestCode);
             }

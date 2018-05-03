@@ -46,6 +46,8 @@ public interface SugarEntryDao {
 
     @Update
     void update(SugarEntry sugarEntry);
+    @Update
+    void updateAll(List<SugarEntry> sugarEntries);
     @Insert
     void insert(SugarEntry sugarEntry);
     @Insert
