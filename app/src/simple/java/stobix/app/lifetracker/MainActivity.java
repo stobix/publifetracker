@@ -380,10 +380,7 @@ public class MainActivity extends AppCompatActivity
                     editor.putBoolean("useTheme",true);
                     editor.putInt("theme",androidResourceThemeValue);
                     editor.apply();
-                    Intent intent = getIntent();
-                    finish();
-
-                    startActivity(intent);
+                    restartMe();
         }
 
         // Show the dialog for creating a SugarEntry
@@ -608,31 +605,42 @@ public class MainActivity extends AppCompatActivity
             fa.putTextInUri(uri,json);
         }
 
-
         @Override
         public void handleFileOpened(@NotNull Uri uri) {
-            // Gson procedure taken from http://www.vogella.com/tutorials/JavaLibrary-Gson/article.html
-            Log.i("file","opened URI: "+uri.toString());
-            String text = fa.readTextFromUri(uri);
-            Gson g = new Gson();
-            Type t = new TypeToken<List<SugarEntry>>() {}.getType();
-            Log.i("file","opened text: "+text);
-            List<SugarEntry> entries = g.fromJson(text,t);
-            SugarEntryTableDataAdapter adapter = (SugarEntryTableDataAdapter) tableView.getDataAdapter();
-            /* TODO do the adapter thing in a handler after the db thread is finished. Mebbeh.
-             Or add a queue for actions to be performed.
-             Something that makes the user not be an idiot and crash the db if the request takes time.
-            */
-            adapter.getData().clear();
-            adapter.addAll(entries);
-            adapter.notifyDataSetChanged();
-            tableView.sort(0,SortingOrder.DESCENDING);
+
+            // TODO Add a spinning disc view or something until the db has finished reloading.
+            // TODO Merge instead of deleting the whole database!
+            MainHandler restarter = new MainHandler(this,
+                    (mainActivity, bundle) -> mainActivity.restartMe()
+                    );
             new Thread(() -> {
+                // Gson procedure taken from http://www.vogella.com/tutorials/JavaLibrary-Gson/article.html
+                Log.i("file","opened URI: "+uri.toString());
+                String text = fa.readTextFromUri(uri);
+                Gson g = new Gson();
+                Type t = new TypeToken<List<SugarEntry>>() {}.getType();
+                Log.i("file","opened file: ");
+                List<SugarEntry> entries = g.fromJson(text,t);
+                Log.i("file",""+entries.size()+" entries");
+                Log.i("file","adding all entries to the db");
+
+                Message m =restarter.obtainMessage();
                 dao.clear_sugar_entries();
                 dao.insertAll(entries);
                 nextUID=dao.getMaxUID()+1;
+                Log.i("file","db done");
+                restarter.sendMessage(m);
             }).start();
+
         }
+
+        public void restartMe(){
+            Intent intent = getIntent();
+            finish();
+            startActivity(intent);
+
+        }
+
 
         @Override
         public void onActivityResult(int requestCode, int resultCode,
