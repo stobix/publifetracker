@@ -635,6 +635,7 @@ public class MainActivity extends AppCompatActivity
                                 nextUID=dao.getMaxUID()+1;
                                 break;
                             case "merge":
+
                                 // TODO This won't work unless the ID's are the same!
                                 // Solution:
                                 // Ditch the id's. Nobody wants them anyways.
@@ -644,11 +645,19 @@ public class MainActivity extends AppCompatActivity
                                 // dao.updateAll(entries);
 
 
-                                // Alt solution:
-                                // Get all current SugarEntries
-                                // Sort both entrylists by timestamp
-                                // Compare items by timestamp, replacing old with new ones
+                                // Alt solution until i remove timestamps:
 
+                                nextUID=dao.getMaxUID()+1;
+
+
+                                List<SugarEntry> mergeables =
+                                        SugarEntryMerger.getMergeables(
+                                                tableView.getDataAdapter().getData(),
+                                                entries);
+                                for(SugarEntry entry:mergeables) {
+                                    entry.setUid(nextUID++);
+                                }
+                                dao.insertAll(mergeables);
                         }
                         Log.i("file","db done");
                         restarter.sendMessage(m);

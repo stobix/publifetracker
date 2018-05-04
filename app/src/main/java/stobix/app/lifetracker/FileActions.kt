@@ -11,7 +11,7 @@ import java.io.*
 // Groups together in a handy utility class all actions we need to take on a file
 
 class FileActions (
-        val activity: Activity,
+        val mainActivity: Activity,
         val createHandler: FileCreateHandler,
         val openHandler: FileOpenHandler
 ){
@@ -23,23 +23,29 @@ class FileActions (
 
 
 
+    // @doc Tells the user to open a file via a file dialog
     fun userFileOpen(requestCode: Int) {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "text/json" // Required, apparently.
-        startActivityForResult(activity, intent, requestCode, null)
+        startActivityForResult(mainActivity, intent, requestCode, null)
     }
 
+
+    // @doc Puts up an open file dialog for a file to replace the current data base
     fun userReplaceDb() = userFileOpen(DB_FILE_REPLACE_REQUEST)
+
+    // @doc Puts up an open file dialog for a file to merge with the current data base
     fun userMergeDb() = userFileOpen(DB_FILE_MERGE_REQUEST)
 
+    // @doc Tells the user to create a file via a file dialog
     fun userCreateFile() {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "text/json" // Required, apparently.
         intent.putExtra(Intent.EXTRA_TITLE,"export.json")
         //intent.putExtra(Intent.EXTRA_TEXT,"export.json")
-        startActivityForResult(activity, intent, CREATE_REQUEST, null)
+        startActivityForResult(mainActivity, intent, CREATE_REQUEST, null)
     }
 
     fun isFileAction(requestCode: Int) = when(requestCode){
@@ -87,7 +93,7 @@ class FileActions (
     }
 
     fun readTextFromUri(uri: Uri): String{
-        val inputStream = activity.contentResolver.openInputStream(uri)
+        val inputStream = mainActivity.contentResolver.openInputStream(uri)
         val reader = BufferedReader(InputStreamReader(inputStream))
         val stringBuilder = StringBuilder()
         var line: String?
@@ -104,7 +110,7 @@ class FileActions (
     }
 
     fun putTextInUri(uri: Uri,text: String){
-        val pfd: ParcelFileDescriptor? = activity.contentResolver.openFileDescriptor(uri,"w")
+        val pfd: ParcelFileDescriptor? = mainActivity.contentResolver.openFileDescriptor(uri,"w")
         if(pfd == null) {
             Error("couldn't open file!")
         } else {

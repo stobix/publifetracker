@@ -51,4 +51,15 @@ data class SugarEntry constructor(
             override fun createFromParcel(parcel: Parcel): SugarEntry = SugarEntry(parcel)
             override fun newArray(size: Int): Array<SugarEntry?> = arrayOfNulls(size)
     }
+
+    infix fun sameAs(other:Any?) = when(other){
+        is SugarEntry ->
+            this.epochTimestamp == other.epochTimestamp
+                    && this.sugarLevel == other.sugarLevel
+                    && this.extra == other.extra
+        else ->
+                false
+    }
+
+
 }
