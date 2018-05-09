@@ -23,7 +23,7 @@ import java.util.*
  */
 class FullscreenGraphActivity : Activity() {
     private var gs:List<LineGraphSeries<DataPoint>> = mutableListOf()
-    private lateinit var entries:ArrayList<SugarEntry>
+    private lateinit var entries:List<SugarEntry>
 
     private val mHideHandler = Handler()
     private val mHidePart2Runnable = Runnable {
@@ -80,6 +80,9 @@ class FullscreenGraphActivity : Activity() {
         Log.d("graph","got created")
         super.onCreate(savedInstanceState)
         entries = intent.extras.getParcelableArrayList<SugarEntry>("entries")
+                .filterNotNull()
+                .sortedBy { it.epochTimestamp }
+
         val bareSeries = LineGraphSeries<DataPoint>(
                 entries
                         .map { DataPoint(
@@ -124,6 +127,13 @@ class FullscreenGraphActivity : Activity() {
                         .toTypedArray()
 
         )
+
+        fun Calendar.between(first:Any, last: Any) = this.before(last) && this.after(first)
+
+        for ( e in entries ) {
+
+
+        }
 
         /*
         val meanPerDaySeries =LineGraphSeries<DataPoint>(
