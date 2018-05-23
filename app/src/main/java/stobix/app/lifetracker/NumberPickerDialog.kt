@@ -33,8 +33,8 @@ class NumberPickerDialog (
 
         setButton(BUTTON_POSITIVE,
                 context.getText(R.string.number_picker_ok_button),this)
-        setButton(BUTTON_NEUTRAL,
-                context.getText(R.string.number_picker_clear_button),this)
+        //setButton(BUTTON_NEUTRAL,
+        //        context.getText(R.string.number_picker_clear_button),this)
         setButton(BUTTON_NEGATIVE,
                 context.getString(R.string.number_picker_cancel_button),this)
 
@@ -69,10 +69,12 @@ class NumberPickerDialog (
                 this.dismiss()
             }
 
+            /*
             BUTTON_NEUTRAL -> {
                 listener?.onNumberClear(this)
                 this.dismiss()
             }
+            */
 
             BUTTON_NEGATIVE -> cancel()
 

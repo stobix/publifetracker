@@ -11,7 +11,7 @@
     <string name="input_extra">Övrigt</string>
     <string name="dateTimeFormat">yyyy dd/MM kk:mm</string>
     <string name="creation_dialog_button_add_close">Lägg till och stäng</string>
-    <string name="input_time">Klockslag</string>
+    <string name="input_time">Tid</string>
     <string name="creation_dialog_button_close">Stäng</string>
     <string name="creation_dialog_button_add">Lägg till</string>
     <string name="number_picker_separator_comma">,</string>
@@ -38,4 +38,5 @@
     <string name="stat_window_header_total_bs_30">Senaste 30 dagarna:</string>
     <string name="show_graphs">Visa grafer</string>
     <string name="action_merge_db">infoga fil</string>
+    <string name="sugar_entry_delete_confirmation">Är du säker på att du vill ta bort den här inmatningen?</string>
 </resources>

@@ -419,7 +419,7 @@ public class MainActivity extends AppCompatActivity
             // Taken from https://stackoverflow.com/questions/2115758/how-do-i-display-an-alert-dialog-on-android#2115770
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Delete entry")
-                    .setMessage("Are you sure you want to delete this entry?")
+                    .setMessage(R.string.sugar_entry_delete_confirmation)
                     .setPositiveButton(android.R.string.yes,
                             (dialog, which) -> sugarEntryDeleted(s))
                     .setNegativeButton(android.R.string.no,
