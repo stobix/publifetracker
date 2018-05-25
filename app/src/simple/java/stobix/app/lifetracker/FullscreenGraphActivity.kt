@@ -164,11 +164,11 @@ class FullscreenGraphActivity : Activity() {
         fun Calendar.between(first:Any, last: Any) = this.before(last) && this.after(first)
 
         bareSeries.color = Color.GREEN
+        bareSeries.thickness = 0
         meanPerFourHourSeries.color = Color.YELLOW
-        meanPerFourHourSeries.isDrawDataPoints = true
-        meanPerFourHourSeries.thickness = 0
+//        meanPerFourHourSeries.isDrawDataPoints = true
+        meanPerFourHourSeries.thickness = 2
         meanPerDaySeries.isDrawBackground=true
-        meanPerDaySeries.isDrawAsPath = true
 
         gs += bareSeries
         gs += meanPerDaySeries
