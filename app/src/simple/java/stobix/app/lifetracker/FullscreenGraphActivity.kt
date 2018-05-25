@@ -32,6 +32,8 @@ class FullscreenGraphActivity : Activity() {
 
     private val mHideHandler = Handler()
     private val mHidePart2Runnable = Runnable {
+        // TODO GestureDetector to detect double click
+
         // Delayed removal of status and navigation bar
 
         // Note that some of these constants are new as of API 16 (Jelly Bean)
@@ -77,8 +79,10 @@ class FullscreenGraphActivity : Activity() {
         // This is a horrid idea when using a graph!
         //  TODO Fix something better, like a drag-down thing
         fullscreen_graph.setOnLongClickListener {
+            true
+        }
+        fullscreen_graph.setOnClickListener {
             toggleGraphShown()
-            false
         }
 
         // Upon interacting with UI controls, delay any scheduled hide()
@@ -116,10 +120,10 @@ class FullscreenGraphActivity : Activity() {
                         //
                         .map {
                             Triple(
-                                    // For now, use the first entry in the week as timestamp.
+                                    // For now, use the last entry in the week as timestamp.
                                     // For later, it's probably best to have a timestamp
                                     // corresponding to the start of the week or so
-                                    it.value.sortedBy { it.first.epochTimestamp }.first().first.epochTimestamp
+                                    it.value.sortedBy { it.first.epochTimestamp }.last().first.epochTimestamp
                                     ,
                                     // mean value for the week
                                     it.value.sumBy {it.first.sugarLevel} .toDouble() / (it.value.size * 10.0)
@@ -189,7 +193,7 @@ class FullscreenGraphActivity : Activity() {
                 DateAsXAxisLabelFormatter(this, SimpleDateFormat.getDateInstance())
         fullscreen_graph.textAlignment = View.TEXT_ALIGNMENT_CENTER
         fullscreen_graph.gridLabelRenderer.numVerticalLabels = 4
-        fullscreen_graph.viewport.setMinX(entries.first().epochTimestamp.toDouble())
+        fullscreen_graph.viewport.setMinX((entries.last().epochTimestamp - 7*24*hour).toDouble())
         fullscreen_graph.viewport.setMaxX(entries.last().epochTimestamp.toDouble())
         fullscreen_graph.viewport.isScalable=true
 
