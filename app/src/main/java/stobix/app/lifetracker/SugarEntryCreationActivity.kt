@@ -113,7 +113,7 @@ open class SugarEntryCreationActivity
             }
         }
 
-        buttonAdd.setOnClickListener {onSubmit(extraV)}
+        buttonAdd.setOnClickListener { onSubmit(extraV) }
         buttonAddClose.setOnClickListener { onSubmitAndClose(extraV) }
         buttonClearSugar.setOnClickListener { onNumberClear() }
         buttonClearExtra.setOnClickListener { extraV.text="" }
