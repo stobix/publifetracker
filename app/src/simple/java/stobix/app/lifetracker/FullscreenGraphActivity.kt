@@ -25,6 +25,11 @@ class FullscreenGraphActivity : Activity() {
     private var gs:List<LineGraphSeries<DataPoint>> = mutableListOf()
     private lateinit var entries:List<SugarEntry>
 
+    private lateinit var bareSeries: LineGraphSeries<DataPoint>
+    private lateinit var meanPerDaySeries: LineGraphSeries<DataPoint>
+    private lateinit var meanPerFourHourSeries: LineGraphSeries<DataPoint>
+    private var showPerDay = false
+
     private val mHideHandler = Handler()
     private val mHidePart2Runnable = Runnable {
         // Delayed removal of status and navigation bar
@@ -71,7 +76,10 @@ class FullscreenGraphActivity : Activity() {
         // XXX
         // This is a horrid idea when using a graph!
         //  TODO Fix something better, like a drag-down thing
-        //fullscreen_graph.setOnClickListener { toggle() }
+        fullscreen_graph.setOnLongClickListener {
+            toggleGraphShown()
+            false
+        }
 
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
@@ -83,7 +91,7 @@ class FullscreenGraphActivity : Activity() {
                 .filterNotNull()
                 .sortedBy { it.epochTimestamp }
 
-        val bareSeries = LineGraphSeries<DataPoint>(
+        bareSeries = LineGraphSeries<DataPoint>(
                 entries
                         .map { DataPoint(
                                 DateHandler(it.epochTimestamp).dateObject,
@@ -93,7 +101,7 @@ class FullscreenGraphActivity : Activity() {
         )
 
 
-        val meanPerDaySeries = LineGraphSeries<DataPoint>(
+        meanPerDaySeries = LineGraphSeries<DataPoint>(
                 entries
                         // get the year and week of each entry
                         .map {
@@ -132,7 +140,7 @@ class FullscreenGraphActivity : Activity() {
         cal.add(Calendar.HOUR,1)
         val hour = cal.timeInMillis
 
-        val meanPerFourHourSeries = LineGraphSeries<DataPoint>(
+        meanPerFourHourSeries = LineGraphSeries<DataPoint>(
                 entries
                         .drop(1)
                         .fold( Triple(
@@ -170,7 +178,7 @@ class FullscreenGraphActivity : Activity() {
         meanPerFourHourSeries.thickness = 2
         meanPerDaySeries.isDrawBackground=true
 
-        gs += bareSeries
+        //gs += bareSeries
         gs += meanPerDaySeries
         gs += meanPerFourHourSeries
 
@@ -185,7 +193,9 @@ class FullscreenGraphActivity : Activity() {
         fullscreen_graph.viewport.setMaxX(entries.last().epochTimestamp.toDouble())
         fullscreen_graph.viewport.isScalable=true
 
-        gs.forEach { fullscreen_graph.addSeries(it) }
+        //gs.forEach { fullscreen_graph.addSeries(it) }
+        fullscreen_graph.addSeries(meanPerDaySeries)
+        toggleGraphShown()
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -213,6 +223,18 @@ class FullscreenGraphActivity : Activity() {
         } else {
             show()
         }
+    }
+
+    private fun toggleGraphShown(){
+        if (showPerDay){
+            fullscreen_graph.removeSeries(meanPerFourHourSeries)
+            fullscreen_graph.addSeries(bareSeries)
+        }
+        else {
+            fullscreen_graph.removeSeries(bareSeries)
+            fullscreen_graph.addSeries(meanPerFourHourSeries)
+        }
+        showPerDay = !showPerDay
     }
 
     private fun hide() {
