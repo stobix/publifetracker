@@ -91,7 +91,6 @@ class FullscreenGraphActivity : Activity() {
                         ) }
                         .toTypedArray()
         )
-        bareSeries.color = Color.GREEN
 
 
         val meanPerDaySeries = LineGraphSeries<DataPoint>(
@@ -128,37 +127,52 @@ class FullscreenGraphActivity : Activity() {
 
         )
 
-        fun Calendar.between(first:Any, last: Any) = this.before(last) && this.after(first)
+        val cal = Calendar.getInstance()
+        cal.timeInMillis = 0
+        cal.add(Calendar.HOUR,1)
+        val hour = cal.timeInMillis
 
-        for ( e in entries ) {
-
-
-        }
-
-        /*
-        val meanPerDaySeries =LineGraphSeries<DataPoint>(
+        val meanPerFourHourSeries = LineGraphSeries<DataPoint>(
                 entries
-                        .groupBy { DateHandler(it.epochTimestamp).date }
-                        .toSortedMap(compareBy({it.first},{it.second},{it.third}))
+                        .drop(1)
+                        .fold( Triple(
+                                        entries.first().epochTimestamp,
+                                        Pair(entries.first().sugarLevel,1),
+                                        listOf<Pair<Long,Double>>()) )
+                        {
+                            acc , current ->
+                            val (startTime: Long,meanAcc: Pair<Int, Int>,dataAcc ) = acc
+                            val (accLevels: Int,points: Int) = meanAcc
+                            if ( current.epochTimestamp - startTime >= 4*hour)
+                                Triple(current.epochTimestamp,
+                                        Pair(current.sugarLevel,1),
+                                        dataAcc+Pair(startTime,accLevels.toDouble()/(points*10)))
+                            else
+                                Triple(
+                                        startTime,
+                                        Pair(accLevels+current.sugarLevel,points+1),
+                                        dataAcc
+                                )
+                        }
+                        .third
                         .map {
-                            DataPoint(
-                                    DateHandler(it.value.first().epochTimestamp)
-                                            // place in the middle of the day
-                                            .setTime(12,0)
-                                            .dateObject
-                                    ,
-                                    it
-                                            .value
-                                            .sumBy { it.sugarLevel }
-                                            .toDouble() / (it.value.size * 10.0)
-                            ) }
+                            DataPoint(DateHandler(it.first).dateObject, it.second)
+                        }
                         .toTypedArray()
         )
-        */
+
+        fun Calendar.between(first:Any, last: Any) = this.before(last) && this.after(first)
+
+        bareSeries.color = Color.GREEN
+        meanPerFourHourSeries.color = Color.YELLOW
+        meanPerFourHourSeries.isDrawDataPoints = true
+        meanPerFourHourSeries.thickness = 0
         meanPerDaySeries.isDrawBackground=true
         meanPerDaySeries.isDrawAsPath = true
+
         gs += bareSeries
         gs += meanPerDaySeries
+        gs += meanPerFourHourSeries
 
         //graph.viewport.isYAxisBoundsManual = true
         fullscreen_graph.viewport.isXAxisBoundsManual = true
