@@ -51,6 +51,8 @@ android {
 }
 
 dependencies {
+    implementation "com.github.PhilJay:MPAndroidChart:v3.0.3"
+    implementation "com.github.lecho:hellocharts-library:1.5.8@aar"
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:support-v4:27.1.1'
     androidTestImplementation(

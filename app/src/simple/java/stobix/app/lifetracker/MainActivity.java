@@ -316,6 +316,30 @@ public class MainActivity extends AppCompatActivity
 
                     return true;
 
+                case R.id.show_new_graphs:
+                    MainHandler newGraphHandler =
+                            new MainHandler(this,(mainActivity, bundle) -> {
+                                Log.d("graph","got bundle");
+                                Intent i = new Intent(this, DependentBarLineGraphActivity.class);
+                                i.putExtras(bundle);
+                                startActivity(i);
+                            });
+
+                    new Thread(
+                            () -> {
+                                Log.d("graph","got request");
+                                Message m = newGraphHandler.obtainMessage();
+                                Bundle b = new Bundle();
+                                List<SugarEntry> entries = dao.getAllSugarPoints();
+                                Log.d("graph"," request");
+                                ArrayList<SugarEntry> entryArrayList = new ArrayList<>(entries);
+                                b.putParcelableArrayList("entries", entryArrayList);
+                                m.setData(b);
+                                Log.d("graph","sending bundle");
+                                newGraphHandler.sendMessage(m);
+                            }
+                    ).start();
+                    return true;
 
                 case R.id.action_switch_theme:
 
@@ -609,7 +633,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        public void handleFileOpened(@NotNull Uri uri,String what) {
+        public void handleFileOpened(@NotNull Uri uri,@NotNull String what) {
 
                     // TODO Add a spinning disc view or something until the db has finished reloading.
                     // TODO Merge instead of deleting the whole database!

@@ -8,10 +8,22 @@
     <!-- The primary full-screen view. This can be replaced with whatever view
          is needed to present your content, e.g. VideoView, SurfaceView,
          TextureView, etc. -->
-    <com.jjoe64.graphview.GraphView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/fullscreen_graph" />
+        android:orientation="vertical">
+
+        <com.jjoe64.graphview.GraphView
+            android:id="@+id/fullscreen_graph"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/new_fs_graph"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
 
 
     <!-- This FrameLayout insets its children based on system windows using

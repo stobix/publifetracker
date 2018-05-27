@@ -8,6 +8,7 @@ import android.view.View
 import android.support.v4.app.NavUtils
 import android.util.Log
 import android.view.MenuItem
+import com.github.mikephil.charting.data.Entry
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
@@ -95,7 +96,7 @@ class FullscreenGraphActivity : Activity() {
                 .filterNotNull()
                 .sortedBy { it.epochTimestamp }
 
-        bareSeries = LineGraphSeries<DataPoint>(
+        bareSeries = LineGraphSeries(
                 entries
                         .map { DataPoint(
                                 DateHandler(it.epochTimestamp).dateObject,
@@ -104,8 +105,7 @@ class FullscreenGraphActivity : Activity() {
                         .toTypedArray()
         )
 
-
-        meanPerDaySeries = LineGraphSeries<DataPoint>(
+        val meanPerDayData =
                 entries
                         // get the year and week of each entry
                         .map {
@@ -132,6 +132,9 @@ class FullscreenGraphActivity : Activity() {
                             ) }
                         // sort by timestamp. because somehow the data manages to get unsorted again (?)
                         .sortedBy { it.first }
+
+        meanPerDaySeries = LineGraphSeries(
+                meanPerDayData
                         // make DataPoints of the timestamp and week mean
                         .map {DataPoint(DateHandler(it.first).dateObject,it.second)}
                         // get a DataPoint array so LineGraphSeries gets happy
@@ -144,13 +147,13 @@ class FullscreenGraphActivity : Activity() {
         cal.add(Calendar.HOUR,1)
         val hour = cal.timeInMillis
 
-        meanPerFourHourSeries = LineGraphSeries<DataPoint>(
+        val meanPerFourHourData =
                 entries
                         .drop(1)
                         .fold( Triple(
-                                        entries.first().epochTimestamp,
-                                        Pair(entries.first().sugarLevel,1),
-                                        listOf<Pair<Long,Double>>()) )
+                                entries.first().epochTimestamp,
+                                Pair(entries.first().sugarLevel,1),
+                                listOf<Pair<Long,Double>>()) )
                         {
                             acc , current ->
                             val (startTime: Long,meanAcc: Pair<Int, Int>,dataAcc ) = acc
@@ -167,6 +170,9 @@ class FullscreenGraphActivity : Activity() {
                                 )
                         }
                         .third
+
+        meanPerFourHourSeries = LineGraphSeries(
+                meanPerFourHourData
                         .map {
                             DataPoint(DateHandler(it.first).dateObject, it.second)
                         }
