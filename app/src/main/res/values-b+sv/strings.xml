@@ -22,8 +22,8 @@
     <string name="number_picker_sugar_level">Blodsockernivå</string>
     <string name="action_colors">Färginställningar</string>
     <string name="action_switch_theme">Byt färgtema</string>
-    <string name="action_export_db">spara data till fil</string>
-    <string name="action_import_db">ersätt med fil</string>
+    <string name="action_export_db">Exportera data</string>
+    <string name="action_import_db">Ersätt data</string>
     <string name="edit_dialog_button_delete">Ta bort</string>
     <string name="theme_picker_dialog_title">Välj ett färgtema</string>
     <string name="number_picker_cancel_button">Avbryt</string>
@@ -37,7 +37,7 @@
     <string name="stat_window_header_total_bs">Totalt:</string>
     <string name="stat_window_header_total_bs_30">Senaste 30 dagarna:</string>
     <string name="show_graphs">Visa grafer</string>
-    <string name="action_merge_db">infoga fil</string>
+    <string name="action_merge_db">Infoga data</string>
     <string name="sugar_entry_delete_confirmation">Är du säker på att du vill ta bort den här inmatningen?</string>
     <string name="show_bar_graphs">Veckostatistik</string>
     <string name="dependent_bar_line_graph_header">Veckostatistik</string>
