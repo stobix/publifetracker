@@ -32,6 +32,11 @@ class DateHandler() {
             setDate(year, month, hour)
         }
 
+    val weekDay // Day of week, monday=0 to sunday=6
+        get() = (internal_cal.get(Calendar.DAY_OF_WEEK)-2)
+                .rem(7) // This might be negative
+                .plus(7).rem(7) // And this flips negative values to the correct positive values, like a real mod operation would.
+
     val dateObject
         get() = internal_cal.time
 
