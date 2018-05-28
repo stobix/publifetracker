@@ -10,6 +10,7 @@ import android.view.ViewGroup
 
 import lecho.lib.hellocharts.gesture.ZoomType
 import lecho.lib.hellocharts.listener.ColumnChartOnValueSelectListener
+import lecho.lib.hellocharts.listener.LineChartOnValueSelectListener
 import lecho.lib.hellocharts.model.Axis
 import lecho.lib.hellocharts.model.AxisValue
 import lecho.lib.hellocharts.model.Column
@@ -28,7 +29,7 @@ import stobix.utils.pair_extensions.to // this makes a to b to c create an (a,b,
 
 // Copied and modified from https://github.com/lecho/hellocharts-android/tree/master/hellocharts-samples/src/lecho/lib/hellocharts/samples/LineColumnDependencyActivity.java et al
 
-typealias MeanValue = Double
+typealias MeanValue = Float
 typealias StartingTimestamp = Long
 typealias Year = Int
 typealias Month = Int
@@ -74,19 +75,25 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             perWeekMean = getMeanPerWeek(entries)
 
             // Generate and set data for line chart
-            generateInitialLineData()
+            initiateTopChart()
 
             // *** BOTTOM COLUMN CHART ***
 
             chartBottom = rootView.findViewById<View>(R.id.chart_bottom) as ColumnChartView
 
-            generateColumnData(perWeekMean)
+            initiateBottomChart(perWeekMean)
 
             return rootView
         }
 
+        private fun colorBySugarLevel(level: Float) = when{
+            level > 15 -> ChartUtils.COLOR_RED
+            level > 7 -> ChartUtils.COLOR_ORANGE
+            level < 4 -> ChartUtils.COLOR_VIOLET
+            else -> ChartUtils.COLOR_GREEN
+        }
 
-        private fun generateColumnData(perWeekMean: List<Triple<StartingTimestamp, MeanValue, Map.Entry<Triple<Year, Week, Month>, List<Pair<SugarEntry, Triple<Year, Week, Month>>>>>>) {
+        private fun initiateBottomChart(perWeekMean: List<Triple<StartingTimestamp, MeanValue, Map.Entry<Triple<Year, Week, Month>, List<Pair<SugarEntry, Triple<Year, Week, Month>>>>>>) {
 
             val numSubcolumns = 4
             val numColumns = months.size
@@ -104,14 +111,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 //                    values.add(SubcolumnValue(Math.random().toFloat() * 50f + 5, ChartUtils.pickColor()))
 //                }
 
-                values.add(SubcolumnValue(currentMean.toFloat(),
-                        when{
-                            currentMean > 15 -> ChartUtils.COLOR_RED
-                            currentMean > 7 -> ChartUtils.COLOR_ORANGE
-                            currentMean < 4 -> ChartUtils.COLOR_VIOLET
-                            else -> ChartUtils.COLOR_GREEN
-                        }
-                        ))
+                values.add(SubcolumnValue(currentMean, colorBySugarLevel(currentMean)))
 
                 //axisValues.add(AxisValue(currentWeek.toFloat()).setLabel(months[currentMonth]))
                 if (currentWeek == 1)
@@ -130,7 +130,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             chartBottom.columnChartData = columnData
 
             // Set value touch listener that will trigger changes for chartTop.
-            chartBottom.onValueTouchListener = ValueTouchListener()
+            chartBottom.onValueTouchListener = BottomValueSelectedListener()
 
             // Set selection mode to keep selected month column highlighted.
             chartBottom.isValueSelectionEnabled = true
@@ -143,7 +143,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             // public void onClick(View v) {
             // SelectedValue sv = chartBottom.getSelectedValue();
             // if (!sv.isSet()) {
-            // generateInitialLineData();
+            // initiateTopChart();
             // }
             //
             // }
@@ -155,7 +155,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
          * Generates initial data for line chart. At the beginning all Y values are equals 0. That will change when user
          * will select value on column chart.
          */
-        private fun generateInitialLineData() {
+        private fun initiateTopChart() {
             val numValues = 7
 
             val axisValues = ArrayList<AxisValue>()
@@ -167,6 +167,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
             val line = Line(values)
             line.setColor(ChartUtils.COLOR_GREEN).isCubic = true
+            line.setHasLabelsOnlyForSelected(true)
 
             val lines = ArrayList<Line>()
             lines.add(line)
@@ -175,17 +176,21 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             lineData.axisXBottom = Axis(axisValues).setHasLines(true)
             lineData.axisYLeft = Axis().setHasLines(true).setMaxLabelChars(3)
 
+            chartTop.setPadding(0,0,17,40)
+
             chartTop.lineChartData = lineData
 
             // For build-up animation you have to disable viewport recalculation.
-            chartTop.isViewportCalculationEnabled = true
+            chartTop.isViewportCalculationEnabled = false
 
             // And set initial max viewport and current viewport- remember to set viewports after data.
             val v = Viewport(0f, 25f, 6f, 0f)
             chartTop.maximumViewport = v
             chartTop.currentViewport = v
 
+            chartTop.isValueSelectionEnabled = true
             chartTop.zoomType = ZoomType.HORIZONTAL
+            chartTop.onValueTouchListener = TopValueSelectedListener()
         }
 
 
@@ -205,7 +210,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             chartTop.startDataAnimation(300)
         }
 
-        private fun generateLineData(color: Int, columnIndex: Int, subcolumnIndex: Int, value: SubcolumnValue) {
+        private fun updateTopChart(color: Int, columnIndex: Int, subcolumnIndex: Int, value: SubcolumnValue) {
             Log.d("linedata","$columnIndex $value")
             // Cancel last animation if not finished.
             chartTop.cancelDataAnimation()
@@ -213,44 +218,74 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
             Log.d("linedata","$weekEntries")
 
-            // Modify data targets
+
+            // Create data points for the current week
             val newLineVals=weekEntries.mapIndexed { i,it ->
-                PointValue(i.toFloat(),it.first.sugarLevel.toFloat()/10f)
+                val sugarValue =it.first.sugarLevel.toFloat()/10f
+                PointValue(i.toFloat(),sugarValue).setLabel(sugarValue.toString())
             }
 
             val line = lineData.lines[0]// For this example there is always only one line.
             line.values = newLineVals
             line.color = color
+            line.setHasLabelsOnlyForSelected(true)
             val lines=ArrayList<Line>()
             lines+=line
             lineData.lines=lines
 
-            val maxSugar = weekEntries.maxBy { it.first.sugarLevel } !!.first.sugarLevel/10f
 
-            // Start new data animation with 300ms duration;
-            val timestamps = weekEntries.map{it.first.epochTimestamp}
+            val timestamps = weekEntries.map{it.first.epochTimestamp }
 
             val cal = Calendar.getInstance()
 
 
-            lineData.axisXBottom=Axis(timestamps.mapIndexed {
+            lineData.axisXBottom=Axis(weekEntries.mapIndexed {
                 i, it ->
-                val date = DateHandler(it)
+                val date = DateHandler(it.first.epochTimestamp)
                 val hour = date.hour
                 val minute = date.minute
-                cal.timeInMillis=it
-                val day=days[cal.get(Calendar.DAY_OF_WEEK)-1]
+                Log.d("linedata","${it.first.epochTimestamp} is a ${days[date.weekDay]}")
+                val day=days[date.weekDay]
                 AxisValue(i.toFloat()).setLabel("$day $hour:$minute")}
-            ).setHasLines(true)
-            chartTop.currentViewport = Viewport( 0f,maxSugar,weekEntries.size.toFloat()-1f,0f)
-            chartTop.startDataAnimation(300)
+            ).setHasLines(true).setHasTiltedLabels(true)
+
+            val maxSugar = weekEntries.maxBy { it.first.sugarLevel } !!.first.sugarLevel/10f
+            val newViewport = if (weekEntries.size < 2)
+                Viewport(
+                        0f,
+                        maxSugar+1,
+                        1f,
+                        0f)
+            else
+                Viewport(
+                        0f,
+                        maxSugar+1,
+                        weekEntries.size.toFloat()-1,
+                        0f)
+            chartTop.currentViewport.right = weekEntries.size.toFloat()-1
+            chartTop.currentViewport.top = maxSugar+1
+            chartTop.maximumViewport.right = weekEntries.size.toFloat()-1
+            chartTop.maximumViewport.top = maxSugar+1
+            chartTop.invalidate()
+            //chartTop.refreshDrawableState()
+            // Makes the chart update how many values to use, I think
+        }
+        private inner class TopValueSelectedListener : LineChartOnValueSelectListener {
+            override fun onValueSelected(lineIndex: Int, pointIndex: Int, value: PointValue?) {
+                Log.d("linedata","Point selected: $lineIndex, $pointIndex, $value")
+            }
+
+
+            override fun onValueDeselected() {
+                Log.d("linedata","Point deselected")
+            }
         }
 
-        private inner class ValueTouchListener : ColumnChartOnValueSelectListener {
+        private inner class BottomValueSelectedListener : ColumnChartOnValueSelectListener {
 
             override fun onValueSelected(columnIndex: Int, subcolumnIndex: Int, value: SubcolumnValue) {
 
-                generateLineData(value.color, columnIndex, subcolumnIndex, value)
+                updateTopChart(value.color, columnIndex, subcolumnIndex, value)
             }
 
             override fun onValueDeselected() {
@@ -290,7 +325,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                                     ( it.value.sortedBy { it.first.epochTimestamp }.first().first.epochTimestamp ) as StartingTimestamp
                                     ,
                                     // mean value for the week
-                                    ( it.value.sumBy {it.first.sugarLevel} .toDouble() / (it.value.size * 10.0) ) as MeanValue
+                                    ( it.value.sumBy {it.first.sugarLevel} .toFloat() / (it.value.size * 10.0f) ) as MeanValue
                                     // for
                                     , it
                             ) }
@@ -300,6 +335,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
 
         companion object {
+            // TODO internationalize these!
             val months = arrayOf("Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec")
 
             val days = arrayOf("Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön")
