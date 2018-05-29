@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import lecho.lib.hellocharts.formatter.SimpleColumnChartValueFormatter
 
 import lecho.lib.hellocharts.gesture.ZoomType
 import lecho.lib.hellocharts.listener.ColumnChartOnValueSelectListener
@@ -92,6 +93,8 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             else -> ChartUtils.COLOR_GREEN
         }
 
+
+
         private fun initiateBottomChart(perWeekMean: List<Triple<StartingTimestamp, MeanValue, Map.Entry<Triple<Year, Week, Month>, List<Pair<SugarEntry, Triple<Year, Week, Month>>>>>>) {
 
             val axisValues = ArrayList<AxisValue>()
@@ -104,7 +107,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                 val (currentYear,currentWeek ,_) = perWeekMean[i].third.key
                 val currentMean=perWeekMean[i].second
 
-                values.add(SubcolumnValue(currentMean, colorBySugarLevel(currentMean)))
+                values.add( SubcolumnValue(currentMean, colorBySugarLevel(currentMean)) )
 
                 // The year should be displayed before the first week of the year
                 if (currentWeek == 1)
@@ -112,7 +115,10 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                 else
                     axisValues.add(AxisValue(i.toFloat()).setLabel("v$currentWeek"))
 
-                columns.add(Column(values).setHasLabelsOnlyForSelected(true))
+                val c = Column(values)
+                c.formatter = SimpleColumnChartValueFormatter(1)
+                c.setHasLabelsOnlyForSelected(true)
+                columns.add(c)
             }
 
             columnData = ColumnChartData(columns)
@@ -174,12 +180,9 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
         }
 
         private fun updateTopChart(color: Int, columnIndex: Int,  value: SubcolumnValue) {
-            Log.d("linedata","$columnIndex $value")
             // Cancel last animation if not finished.
             chartTop.cancelDataAnimation()
             val weekEntries = perWeekMean[columnIndex].third.value
-
-            Log.d("linedata","$weekEntries")
 
 
             // Create data points for the current week
@@ -201,7 +204,6 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                 val date = DateHandler(it.first.epochTimestamp)
                 val hour = date.hour
                 val minute = date.minute
-                Log.d("linedata","${it.first.epochTimestamp} is a ${days[date.weekDay]}")
                 val day=days[date.weekDay]
                 AxisValue(i.toFloat()).setLabel("$day $hour:$minute")}
             ).setHasLines(true).setHasTiltedLabels(true)
@@ -220,7 +222,6 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
         private inner class BottomValueSelectedListener : ColumnChartOnValueSelectListener {
 
             override fun onValueSelected(columnIndex: Int, subcolumnIndex: Int, value: SubcolumnValue) {
-
                 updateTopChart(value.color, columnIndex, value)
             }
 
@@ -231,7 +232,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
 
         private fun getMeanPerWeek(entries: List<SugarEntry>) =
-                // The "unneccessary" casts are to make the type be descriptive instead of a long jumble of ints
+                // The "unnecessary" casts are to make the type be descriptive instead of a long jumble of ints
                 entries
                         // get the year and week of each entry
                         .map {
