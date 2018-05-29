@@ -141,6 +141,9 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
             chartBottom.zoomType = ZoomType.HORIZONTAL
 
+            chartBottom.currentViewport.right=perWeekMean.size.toFloat()-0.5f
+            chartBottom.currentViewport.left=perWeekMean.size.toFloat()-15.5f
+
         }
 
         /**
@@ -210,7 +213,8 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                 val hour = date.hour
                 val minute = date.minute
                 val day=days[date.weekDay]
-                AxisValue(i.toFloat()).setLabel("$day $hour:$minute")}
+                AxisValue(i.toFloat())
+                        .setLabel("$day ${"%02d".format(hour)}:${"%02d".format(minute)}")}
             ).setHasLines(true).setHasTiltedLabels(true)
 
             val maxSugar = weekEntries.maxBy { it.first.sugarLevel } !!.first.sugarLevel/10f
