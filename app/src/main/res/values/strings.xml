@@ -34,7 +34,7 @@
     <string name="stat_window_no_bs">No sugar levels!</string>
     <string name="stat_window_header_total_bs">In Total:</string>
     <string name="stat_window_header_total_bs_30">Last 30 days:</string>
-    <string name="show_graphs">Show Graphs</string>
+    <string name="show_graphs">History Graph</string>
     <string name="action_merge_db" >Merge db</string>
     <string name="sugar_entry_delete_confirmation">Are you sure you want to delete this entry?</string>
     <string name="show_bar_graphs">Show week summary</string>

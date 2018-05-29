@@ -36,9 +36,9 @@
     <string name="stat_window_no_bs">Inga blodsockermätningar gjorda!</string>
     <string name="stat_window_header_total_bs">Totalt:</string>
     <string name="stat_window_header_total_bs_30">Senaste 30 dagarna:</string>
-    <string name="show_graphs">Visa grafer</string>
+    <string name="show_graphs">Historikgraf</string>
     <string name="action_merge_db">Infoga data</string>
     <string name="sugar_entry_delete_confirmation">Är du säker på att du vill ta bort den här inmatningen?</string>
-    <string name="show_bar_graphs">Veckostatistik</string>
-    <string name="dependent_bar_line_graph_header">Veckostatistik</string>
+    <string name="show_bar_graphs">Veckografer</string>
+    <string name="dependent_bar_line_graph_header">Veckografer</string>
 </resources>
