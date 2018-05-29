@@ -35,6 +35,10 @@ typealias Year = Int
 typealias Month = Int
 typealias Week = Int
 
+typealias DateInfo = Pair<Year,Week>
+
+typealias WeekPerMeanStructure = List<Pair<MeanValue, Map.Entry<DateInfo, List<Pair<SugarEntry, DateInfo>>>>>
+
 class DependentBarLineGraphActivity : AppCompatActivity() {
 
 
@@ -58,7 +62,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
         lateinit var lineData: LineChartData
         private var columnData: ColumnChartData? = null
         lateinit var entries: List<SugarEntry>
-        lateinit var perWeekMean: List<Triple<StartingTimestamp, MeanValue, Map.Entry<Triple<Year, Week, Month>, List<Pair<SugarEntry, Triple<Year, Week, Month>>>>>>
+        lateinit var perWeekMean: WeekPerMeanStructure
 
         lateinit var chartTop: LineChartView
         lateinit var chartBottom: ColumnChartView
@@ -95,7 +99,8 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
 
 
-        private fun initiateBottomChart(perWeekMean: List<Triple<StartingTimestamp, MeanValue, Map.Entry<Triple<Year, Week, Month>, List<Pair<SugarEntry, Triple<Year, Week, Month>>>>>>) {
+        private fun initiateBottomChart(
+                perWeekMean: WeekPerMeanStructure) {
 
             val axisValues = ArrayList<AxisValue>()
             val columns = ArrayList<Column>()
@@ -104,8 +109,8 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             for (i in perWeekMean.indices) {
 
                 values = ArrayList()
-                val (currentYear,currentWeek ,_) = perWeekMean[i].third.key
-                val currentMean=perWeekMean[i].second
+                val (currentYear,currentWeek ) = perWeekMean[i].second.key
+                val currentMean=perWeekMean[i].first
 
                 values.add( SubcolumnValue(currentMean, colorBySugarLevel(currentMean)) )
 
@@ -182,7 +187,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
         private fun updateTopChart(color: Int, columnIndex: Int,  value: SubcolumnValue) {
             // Cancel last animation if not finished.
             chartTop.cancelDataAnimation()
-            val weekEntries = perWeekMean[columnIndex].third.value
+            val weekEntries = perWeekMean[columnIndex].second.value
 
 
             // Create data points for the current week
@@ -231,7 +236,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
 
 
-        private fun getMeanPerWeek(entries: List<SugarEntry>) =
+        private fun getMeanPerWeek(entries: List<SugarEntry>): WeekPerMeanStructure =
                 // The "unnecessary" casts are to make the type be descriptive instead of a long jumble of ints
                 entries
                         // get the year and week of each entry
@@ -242,30 +247,17 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                                     cal.get(Calendar.YEAR) as Year
                                     to
                                     cal.get(Calendar.WEEK_OF_YEAR) as Week
-                                    to
-                                    cal.get(Calendar.MONTH) as Month
                             )
                         }
-                        // sort the entries by year & week
-                        // FIXME Shouldn't be necessary, right?
-                        .sortedWith(compareBy({it.second.first},{it.second.second}))
                         // group by year & week
                         .groupBy( { it.second } )
                         //
                         .map {
-                            Triple(
-                                    // FIXME Do I need to sort this again?
-                                    // corresponding to the start of the week or so
-                                    ( it.value.sortedBy { it.first.epochTimestamp }.first().first.epochTimestamp ) as StartingTimestamp
-                                    ,
-                                    // mean value for the week
-                                    ( it.value.sumBy {it.first.sugarLevel} .toFloat() / (it.value.size * 10.0f) ) as MeanValue
-                                    // for
-                                    , it
-                            ) }
-                        // FIXME fix this
-                        // sort by timestamp. because somehow the data manages to get unsorted again (?)
-                        .sortedBy { it.first }
+                            // mean value for the week
+                            (( it.value.sumBy {it.first.sugarLevel} .toFloat() / (it.value.size * 10.0f) ) as MeanValue
+                            to
+                            it)
+                        }
 
 
         companion object {
