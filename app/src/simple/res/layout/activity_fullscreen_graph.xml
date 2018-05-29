@@ -16,12 +16,9 @@
         <com.jjoe64.graphview.GraphView
             android:id="@+id/fullscreen_graph"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/new_fs_graph"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:background="@color/black_overlay"
+            />
 
     </LinearLayout>
 

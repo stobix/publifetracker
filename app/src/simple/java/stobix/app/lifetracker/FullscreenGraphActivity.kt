@@ -17,6 +17,7 @@ import stobix.utils.DateHandler
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import stobix.utils.pair_extensions.to // this makes a to b to c create (a,b,c) instead of ((a,b),c)
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -29,7 +30,7 @@ class FullscreenGraphActivity : Activity() {
     private lateinit var bareSeries: LineGraphSeries<DataPoint>
     private lateinit var meanPerDaySeries: LineGraphSeries<DataPoint>
     private lateinit var meanPerFourHourSeries: LineGraphSeries<DataPoint>
-    private var showPerDay = false
+    private var showPerDay = 0
 
     private val mHideHandler = Handler()
     private val mHidePart2Runnable = Runnable {
@@ -150,22 +151,32 @@ class FullscreenGraphActivity : Activity() {
         val meanPerFourHourData =
                 entries
                         .drop(1)
-                        .fold( Triple(
-                                entries.first().epochTimestamp,
-                                Pair(entries.first().sugarLevel,1),
-                                listOf<Pair<Long,Double>>()) )
+                        .fold(
+                                entries.first().epochTimestamp
+                                        to
+                                        (entries.first().sugarLevel to 1)
+                                        to
+                                        listOf<Pair<Long,Double>>() )
                         {
                             acc , current ->
                             val (startTime: Long,meanAcc: Pair<Int, Int>,dataAcc ) = acc
                             val (accLevels: Int,points: Int) = meanAcc
-                            if ( current.epochTimestamp - startTime >= 4*hour)
-                                Triple(current.epochTimestamp,
-                                        Pair(current.sugarLevel,1),
-                                        dataAcc+Pair(startTime,accLevels.toDouble()/(points*10)))
+                            if ( current.epochTimestamp - startTime >= 4*hour) {
+                                val fourHourMean = accLevels.toDouble() / (points * 10)
+                                (current.epochTimestamp
+                                        to
+                                        Pair(current.sugarLevel, 1)
+                                        to
+                                        dataAcc
+                                                .plus(Pair(startTime, fourHourMean))
+                                                .plus(Pair(startTime + 4 * hour, fourHourMean))
+                                        )
+                            }
                             else
-                                Triple(
-                                        startTime,
-                                        Pair(accLevels+current.sugarLevel,points+1),
+                                ( startTime
+                                        to
+                                        Pair(accLevels+current.sugarLevel,points+1)
+                                        to
                                         dataAcc
                                 )
                         }
@@ -188,7 +199,7 @@ class FullscreenGraphActivity : Activity() {
         meanPerFourHourSeries.thickness = 3
         meanPerDaySeries.isDrawBackground=true
 
-        //gs += bareSeries
+        gs += bareSeries
         gs += meanPerDaySeries
         gs += meanPerFourHourSeries
 
@@ -203,9 +214,9 @@ class FullscreenGraphActivity : Activity() {
         fullscreen_graph.viewport.setMaxX(entries.last().epochTimestamp.toDouble())
         fullscreen_graph.viewport.isScalable=true
 
-        //gs.forEach { fullscreen_graph.addSeries(it) }
-        fullscreen_graph.addSeries(meanPerDaySeries)
-        toggleGraphShown()
+        gs.forEach { fullscreen_graph.addSeries(it) }
+        //fullscreen_graph.addSeries(meanPerDaySeries)
+        //toggleGraphShown()
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -236,15 +247,19 @@ class FullscreenGraphActivity : Activity() {
     }
 
     private fun toggleGraphShown(){
-        if (showPerDay){
-            fullscreen_graph.removeSeries(meanPerFourHourSeries)
-            fullscreen_graph.addSeries(bareSeries)
+        when (showPerDay) {
+            0 ->
+                fullscreen_graph.removeSeries(meanPerFourHourSeries)
+            1 -> {
+                fullscreen_graph.removeSeries(bareSeries)
+                fullscreen_graph.addSeries(meanPerFourHourSeries)
+            }
+            2 -> {
+                fullscreen_graph.addSeries(bareSeries)
+            }
+
         }
-        else {
-            fullscreen_graph.removeSeries(bareSeries)
-            fullscreen_graph.addSeries(meanPerFourHourSeries)
-        }
-        showPerDay = !showPerDay
+        showPerDay = (showPerDay+1) % 3
     }
 
     private fun hide() {
