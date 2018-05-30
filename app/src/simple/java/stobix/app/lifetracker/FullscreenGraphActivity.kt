@@ -8,16 +8,14 @@ import android.view.View
 import android.support.v4.app.NavUtils
 import android.util.Log
 import android.view.MenuItem
-import com.github.mikephil.charting.data.Entry
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
 import kotlinx.android.synthetic.simple.activity_fullscreen_graph.*
 import stobix.utils.DateHandler
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import stobix.utils.pair_extensions.to // this makes a to b to c create (a,b,c) instead of ((a,b),c)
+import stobix.utils.kotlinExtensions.to // this makes a to b to c create (a,b,c) instead of ((a,b),c)
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
