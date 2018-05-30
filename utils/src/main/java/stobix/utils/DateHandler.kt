@@ -9,6 +9,9 @@ import java.util.Calendar
 class DateHandler() {
 
     private val calendar: Calendar = Calendar.getInstance() // TODO Localize!
+    init {
+        calendar.firstDayOfWeek = Calendar.MONDAY
+    }
 
     constructor(timestamp: Long) : this() {
         calendar.timeInMillis=timestamp
@@ -32,10 +35,22 @@ class DateHandler() {
             setDate(year, month, hour)
         }
 
-    val weekDay // Day of week, monday=0 to sunday=6
-        get() = (calendar.get(Calendar.DAY_OF_WEEK)-2)
-                .rem(7) // This might be negative
-                .plus(7).rem(7) // And this flips negative values to the correct positive values, like a real mod operation would.
+    var weekStartsWith
+        get() = (calendar.firstDayOfWeek+5) % 7
+        set(weekDay) {
+            calendar.firstDayOfWeek=(weekDay+2) % 7
+        }
+
+    var weekDay // Day of week, monday=0 to sunday=6
+        get() = calendar.get(Calendar.DAY_OF_WEEK)
+                .minus(2) // The week does not begin with a saturday, but a monday
+                .plus(7) // Ensure the values are positive, since rem is broken
+                .rem(7) // Assign each week day a sensible, zero-indexed, value
+        set(value) {
+           calendar.set(Calendar.DAY_OF_WEEK,
+                   (value+2)%7
+           )
+        }
 
     val dateObject
         get() = calendar.time
