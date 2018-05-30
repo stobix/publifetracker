@@ -347,13 +347,7 @@ public class MainActivity extends AppCompatActivity
                     //
                     // TODO Put more color themes here, extract this to a build variant common file.
                     //
-                    c.add(new ThemeListItem( "Zimmik", R.style.Theme_Zimmik_NoActionBar,
-                            this,
-                            R.color.zimPrimary,
-                            R.color.zimAccent,
-                            R.color.zimPrimaryDark,
-                            R.color.zimtextColorPrimary,
-                            R.color.zimWindowBackground ));
+                    c.add(new ThemeListItem( "Zimmik", R.style.Theme_Zimmik_NoActionBar));
                     c.add(new ThemeListItem( "Joel", R.style.Joel_NoActionBar));
                     c.add(new ThemeListItem("Mad!",R.style.Theme_Mad_NoActionBar));
                     c.add(new ThemeListItem("Cold",R.style.Theme_Cold_NoActionBar));
@@ -363,21 +357,8 @@ public class MainActivity extends AppCompatActivity
                     c.add(new ThemeListItem("Strong",R.style.Theme_Strong_NoActionBar));
                     c.add(new ThemeListItem("Fuel",R.style.Theme_Fuel_NoActionBar));
                     c.add(new ThemeListItem("Neonight",R.style.Theme_Neonight_NoActionBar));
-                    /*
-                    XXX This theme crashes the theme list on older phones!! Maybe due to some of our own
-                    theme attributes being undefined.
-                    c.add(new ThemeListItem("default",R.style.AppTheme_NoActionBar,
-                            this,
-                            R.color.colorPrimary,
-                            R.color.colorAccent,
-                            R.color.colorPrimaryDark,
-                            R.color.zimtextColorPrimary,
-                            R.color.zimWindowBackground
-                            ));
-                            */
                     c.add(new ThemeListItem("Hope",R.style.Hope_NoActionBar));
                     c.add(new ThemeListItem("Hjul",R.style.Hjul_NoActionBar));
-
 
                     new ThemePickerDialog(this, c).show();
 

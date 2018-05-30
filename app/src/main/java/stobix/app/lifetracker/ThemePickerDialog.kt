@@ -40,7 +40,9 @@ class ThemeArrayAdapter(ctx: Context,  items: ArrayList<ThemeListItem>)
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val theme = getItem(position)
+
         val view = convertView ?: LayoutInflater.from(context)!!.inflate(layout,parent,false)
+
         val color1 = view.findViewById<ImageView>(R.id.themeViewColor1)
         val color2 = view.findViewById<ImageView>(R.id.themeViewColor2)
         val color3 = view.findViewById<ImageView>(R.id.themeViewColor3)
@@ -49,6 +51,7 @@ class ThemeArrayAdapter(ctx: Context,  items: ArrayList<ThemeListItem>)
         val slantedBar1 = view.findViewById<ImageView>(R.id.themeViewSlantedBar1)
         val slantedBar2 = view.findViewById<ImageView>(R.id.themeViewSlantedBar2)
         val slantedBar3 = view.findViewById<ImageView>(R.id.themeViewSlantedBar3)
+
         val themeWrapper = ContextThemeWrapper(context,theme.themeResourceValue)
         val themeAttributes =
                 listOf(R.attr.colorPrimary,

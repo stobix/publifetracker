@@ -3,7 +3,6 @@ package stobix.app.lifetracker
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,7 +24,6 @@ import lecho.lib.hellocharts.view.ColumnChartView
 import lecho.lib.hellocharts.view.LineChartView
 import stobix.utils.DateHandler
 import java.util.*
-import stobix.utils.pair_extensions.to // this makes a to b to c create (a,b,c) instead of ((a,b),c)
 
 // Copied and modified from https://github.com/lecho/hellocharts-android/tree/master/hellocharts-samples/src/lecho/lib/hellocharts/samples/LineColumnDependencyActivity.java et al
 
@@ -59,13 +57,13 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
     class PlaceholderFragment : Fragment() {
 
 
-        lateinit var lineData: LineChartData
+        private lateinit var lineData: LineChartData
         private var columnData: ColumnChartData? = null
         lateinit var entries: List<SugarEntry>
-        lateinit var perWeekMean: WeekPerMeanStructure
+        private lateinit var perWeekMean: WeekPerMeanStructure
 
-        lateinit var chartTop: LineChartView
-        lateinit var chartBottom: ColumnChartView
+        private lateinit var chartTop: LineChartView
+        private lateinit var chartBottom: ColumnChartView
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             entries = arguments!!.getParcelableArrayList<SugarEntry>("entries")
@@ -187,7 +185,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             chartTop.zoomType = ZoomType.HORIZONTAL
         }
 
-        private fun updateTopChart(color: Int, columnIndex: Int,  value: SubcolumnValue) {
+        private fun updateTopChart(color: Int, columnIndex: Int, @Suppress("UNUSED_PARAMETER") value: SubcolumnValue) {
             // Cancel last animation if not finished.
             chartTop.cancelDataAnimation()
             val weekEntries = perWeekMean[columnIndex].second.value
@@ -240,6 +238,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
 
 
+        @Suppress("USELESS_CAST")
         private fun getMeanPerWeek(entries: List<SugarEntry>): WeekPerMeanStructure =
                 // The "unnecessary" casts are to make the type be descriptive instead of a long jumble of ints
                 entries
