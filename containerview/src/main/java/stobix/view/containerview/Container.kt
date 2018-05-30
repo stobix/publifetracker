@@ -105,6 +105,7 @@ class IntContent @JvmOverloads constructor(
 
 }
 
+@Suppress("EqualsOrHashCode")
 @Entity(tableName="string_content")
 class StringContent(
         @PrimaryKey(autoGenerate = true) var id: Int?=null,
@@ -150,6 +151,7 @@ class ContainerContent(
 
     override fun hashCode() = super.hashCode()
 }
+@Suppress("UNCHECKED_CAST")
 class ContainerAdapterFactory : TypeAdapterFactory {
     override fun <T : Any?> create(gson: Gson?, type: TypeToken<T>?): TypeAdapter<T>? {
         fun unlessNextNull(reader: JsonReader,f: () -> Unit){
