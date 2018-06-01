@@ -53,6 +53,7 @@ public class SortableSugarEntryTableView extends SortableTableView<SugarEntry> {
                 ContextCompat.getColor(context, R.color.colorAccent)
         );
 
+        themeSettings.recycle();
 
         Resources res = getResources();
 
