@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SortableSugarEntryTableView">
+
+        <attr name="table_data_row_even" format="color"/>
+        <attr name="table_data_row_odd" format="color"/>
+        <attr name="table_data_text" format="color"/>
+        <attr name="table_data_text_even" format="color"/>
+        <attr name="table_data_text_odd" format="color"/>
+        <attr name="table_header_text" format="color"/>
+
+    </declare-styleable>
+
+    <declare-styleable name="add_button">
+        <attr name="button_plus_color" format="color"/>
+        <attr name="button_plus_background" format="color"/>
+    </declare-styleable>
+
+    <declare-styleable name="sugar_entry_dialog_details">
+        <attr name="entry_labels_color" format="color"/>
+        <attr name="entry_text_color" format="color"/>
+    </declare-styleable>
+</resources>

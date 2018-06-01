@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.support.v4.app.NavUtils
+import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.MenuItem
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter
@@ -68,6 +69,30 @@ class FullscreenGraphActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+
+        val themeSettings = applicationContext.theme.obtainStyledAttributes(
+                R.styleable.FullscreenGraph)
+
+        infix fun Int.orElse(c2: Int)=
+                themeSettings.getColor(this,ContextCompat.getColor(applicationContext,c2))
+
+        val bareSeriesColor =
+                R.styleable.FullscreenGraph_allEntriesLineColor orElse
+                        android.R.color.primary_text_dark
+
+        val fourHourMeanSeriesColor =
+                R.styleable.FullscreenGraph_fourHourMeanLineColor orElse
+                        android.R.color.secondary_text_dark
+
+        val chartBackgroundColor =
+                R.styleable.FullscreenGraph_chartAreaColor orElse
+                        android.R.color.background_dark
+
+        val weekMeanSeriesColor =
+                R.styleable.FullscreenGraph_weekMeanBackColor orElse
+                        android.R.color.tertiary_text_dark
 
         setContentView(R.layout.activity_fullscreen_graph)
         actionBar?.setDisplayHomeAsUpEnabled(true)
@@ -190,11 +215,12 @@ class FullscreenGraphActivity : Activity() {
 
         fun Calendar.between(first:Any, last: Any) = this.before(last) && this.after(first)
 
-        bareSeries.color = Color.GREEN
+        bareSeries.color = bareSeriesColor
         bareSeries.thickness = 3
-        meanPerFourHourSeries.color = Color.YELLOW
+        meanPerFourHourSeries.color = fourHourMeanSeriesColor
 //        meanPerFourHourSeries.isDrawDataPoints = true
         meanPerFourHourSeries.thickness = 3
+        meanPerDaySeries.color=weekMeanSeriesColor
         meanPerDaySeries.isDrawBackground=true
 
         gs += bareSeries
@@ -206,6 +232,7 @@ class FullscreenGraphActivity : Activity() {
         fullscreen_graph.gridLabelRenderer.isHumanRounding = true
         fullscreen_graph.gridLabelRenderer.labelFormatter =
                 DateAsXAxisLabelFormatter(this, SimpleDateFormat.getDateInstance())
+        //fullscreen_graph.background=chartBackgroundColor
         fullscreen_graph.textAlignment = View.TEXT_ALIGNMENT_CENTER
         fullscreen_graph.gridLabelRenderer.numVerticalLabels = 4
         fullscreen_graph.viewport.setMinX((entries.last().epochTimestamp - 7*24*hour).toDouble())

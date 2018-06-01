@@ -9,4 +9,11 @@
         <attr name="metaButtonBarButtonStyle" format="reference" />
     </declare-styleable>
 
+    <declare-styleable name="FullscreenGraph">
+        <attr name="fourHourMeanLineColor" format="color"/>
+        <attr name="allEntriesLineColor" format="color"/>
+        <attr name="chartAreaColor" format="color"/>
+        <attr name="weekMeanBackColor" format="color"/>
+    </declare-styleable>
+
 </resources>
