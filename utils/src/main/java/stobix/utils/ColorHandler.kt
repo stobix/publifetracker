@@ -12,6 +12,7 @@ class ColorHandler(val ctx: Context) {
     var themeRes: Int? = null
     var missingColor = Color.MAGENTA
 
+
     val theme: Resources.Theme
         get()  {
             val t = themeRes
@@ -29,7 +30,7 @@ class ColorHandler(val ctx: Context) {
 
     }
 
-    fun withColors(colorList:List<Int>, f: (Map<Int,Int>) -> Unit) {
+    fun withColorMap(colorList:List<Int>, f: (Map<Int,Int>) -> Unit) {
         val sortedColors = colorList.sorted().toIntArray()
         theme.obtainStyledAttributes(sortedColors).also {
             val colorMap = colorList.map { colorRes ->
@@ -45,6 +46,28 @@ class ColorHandler(val ctx: Context) {
             f(colorMap)
         }.recycle()
     }
+
+    fun withColorFun(colorList:List<Int>, f: ((Int) -> Int) -> Unit) {
+        var functionValid = true
+        val sortedColors = colorList.sorted().toIntArray()
+        theme.obtainStyledAttributes(sortedColors)
+                .also {
+                    fun getColor(color: Int): Int{
+                        if(!functionValid)
+                            error("function called outside its withColorFun loop")
+                        return it.getColor(
+                                it.getIndex(
+                                        sortedColors.indexOf(color)),
+                                missingColor)
+                    }
+                    f(::getColor)
+                }
+                .also{
+                    functionValid = false
+                }.recycle()
+    }
+
+
     fun withThemeColors(theme: Int ){
     }
 

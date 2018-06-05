@@ -66,9 +66,10 @@ class ThemeArrayAdapter(ctx: Context,  items: ArrayList<ThemeListItem>)
                         R.attr.table_data_row_odd,
                         R.attr.button_plus_color
                 )
-        c.withColors(colorList) {
-            colors ->
-            fun getCol(attr:Int) = colors.getValue(attr)
+        c.withColorFun(colorList) {
+            getColor ->
+
+            fun getCol(attr:Int) = getColor(attr)
 
             fun ImageView.setCol(attr:Int) = this.setColorFilter(getCol(attr),PorterDuff.Mode.SRC)
             fun TextView.setCol(attr:Int) = this.setTextColor(getCol(attr))
