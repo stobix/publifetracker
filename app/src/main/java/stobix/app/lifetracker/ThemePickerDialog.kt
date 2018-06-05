@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import stobix.utils.ColorHandler
 
 class ThemePickerDialog
     (private val ctx: Context, private val themes: ArrayList<ThemeListItem>) : Dialog(ctx)
@@ -37,6 +38,7 @@ class ThemeArrayAdapter(ctx: Context,  items: ArrayList<ThemeListItem>)
         ArrayAdapter<ThemeListItem>(ctx,R.layout.theme_picker_item_view,items)
 {
     val layout = R.layout.theme_picker_item_view
+    val c = ColorHandler(context)
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val theme = getItem(position)
@@ -52,8 +54,8 @@ class ThemeArrayAdapter(ctx: Context,  items: ArrayList<ThemeListItem>)
         val slantedBar2 = view.findViewById<ImageView>(R.id.themeViewSlantedBar2)
         val slantedBar3 = view.findViewById<ImageView>(R.id.themeViewSlantedBar3)
 
-        val themeWrapper = ContextThemeWrapper(context,theme.themeResourceValue)
-        val themeAttributes =
+        c.themeRes = theme.themeResourceValue
+        val colorList =
                 listOf(R.attr.colorPrimary,
                         R.attr.colorAccent,
                         android.R.attr.textColorPrimary,
@@ -63,14 +65,11 @@ class ThemeArrayAdapter(ctx: Context,  items: ArrayList<ThemeListItem>)
                         R.attr.table_header_text,
                         R.attr.table_data_row_odd,
                         R.attr.button_plus_color
-                ).sorted().toIntArray()
-        themeWrapper.theme.obtainStyledAttributes( themeAttributes ).also {
-            fun getCol(attr:Int) = it.getColor(
-                    it.getIndex(
-                            themeAttributes.indexOf(attr)
-                    ),
-                    Color.MAGENTA
-            )
+                )
+        c.withColors(colorList) {
+            colors ->
+            fun getCol(attr:Int) = colors.getValue(attr)
+
             fun ImageView.setCol(attr:Int) = this.setColorFilter(getCol(attr),PorterDuff.Mode.SRC)
             fun TextView.setCol(attr:Int) = this.setTextColor(getCol(attr))
             fun ImageView.setColAtop(attr:Int) = this.setColorFilter(getCol(attr),PorterDuff.Mode.SRC_ATOP)
@@ -87,8 +86,7 @@ class ThemeArrayAdapter(ctx: Context,  items: ArrayList<ThemeListItem>)
             textView.setCol(android.R.attr.textColorTertiary)
             view.setBackgroundColor(getCol(R.attr.table_data_row_odd))
             slantedBarFill.setColAtop(R.attr.table_data_row_even)
-
-        }.recycle()
+        }
 
         textView.text = theme.colorThemeName
         return view

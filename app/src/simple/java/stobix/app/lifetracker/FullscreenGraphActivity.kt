@@ -13,6 +13,7 @@ import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
 import kotlinx.android.synthetic.simple.activity_fullscreen_graph.*
+import stobix.utils.ColorHandler
 import stobix.utils.DateHandler
 import java.text.SimpleDateFormat
 import java.util.*
@@ -70,6 +71,7 @@ class FullscreenGraphActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val c = ColorHandler(applicationContext)
 
 
         val themeSettings = applicationContext.theme.obtainStyledAttributes(
