@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -20,40 +19,30 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import de.codecrafters.tableview.SortingOrder;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
-import stobix.compat.functions.Consumer;
-import stobix.compat.functions.BiConsumer;
-
-//import com.flask.colorpicker.ColorPickerView;
-//import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
 
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 
+import de.codecrafters.tableview.SortingOrder;
 import de.codecrafters.tableview.TableDataAdapter;
 import kotlin.Pair;
-import stobix.compat.functions.Function;
+import stobix.compat.functions.BiConsumer;
+import stobix.compat.functions.Consumer;
 import stobix.utils.ColorHandler;
 import stobix.utils.DateHandler;
-import stobix.utils.ListSorter;
 
 import static android.util.Log.d;
-import static android.util.Log.i;
+
+//import com.flask.colorpicker.ColorPickerView;
+//import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 public class MainActivity extends AppCompatActivity
         implements
@@ -331,26 +320,27 @@ public class MainActivity extends AppCompatActivity
                                 b.putParcelableArrayList("entries", entryArrayList);
                                 ArrayList<Integer> colorArrayList = new ArrayList<>();
                                 ColorHandler c = new ColorHandler(this);
-                                ArrayList<Integer> colors = new ArrayList<>();
-                                colors.add(android.R.attr.textColorPrimary);
-                                colors.add(android.R.attr.textColorSecondary);
-                                colors.add(android.R.attr.textColorTertiary);
-                                colors.add(R.attr.colorPrimary);
-                                colors.add(R.attr.table_data_row_odd);
-                                colors.add(R.attr.table_data_row_even);
-                                Collections.sort(colors);
+                                ArrayList<Integer> colorsIDs = new ArrayList<>();
+                                colorsIDs.add(android.R.attr.textColorPrimary);
+                                colorsIDs.add(android.R.attr.textColorSecondary);
+                                colorsIDs.add(android.R.attr.textColorTertiary);
+                                colorsIDs.add(R.attr.colorPrimary);
+                                colorsIDs.add(R.attr.table_data_row_odd);
+                                colorsIDs.add(R.attr.table_data_row_even);
+                                Collections.sort(colorsIDs);
                                 Map<Integer,Integer> colMap;
-                                c.withColorMap(colors,
+                                c.withColorMap(colorsIDs,
                                         colorMap -> {
                                             ArrayList<Integer> colorValues = new ArrayList<>();
+                                            // These are in an array instead of sending individiual
+                                            // values simply because this works and the other
+                                            // method didn't
                                             colorValues.add(0,colorMap.get(android.R.attr.textColorPrimary));
                                             colorValues.add(1,colorMap.get(android.R.attr.textColorSecondary));
                                             colorValues.add(2,colorMap.get(android.R.attr.textColorSecondary));
                                             colorValues.add(3,colorMap.get(R.attr.colorPrimary));
                                             colorValues.add(4,colorMap.get(R.attr.table_data_row_even));
                                             colorValues.add(5,colorMap.get(R.attr.table_data_row_odd));
-                                            // TODO: Transform the above to stuff like b.putInt("chartBackground",colorMap.get(R.attr.table_data_row_odd));
-
                                             b.putIntegerArrayList("colors",colorValues);
                                             return null;
                                         }

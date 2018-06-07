@@ -1,23 +1,20 @@
 package stobix.app.lifetracker
 
 import android.app.Activity
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
-import android.view.View
 import android.support.v4.app.NavUtils
-import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
 import kotlinx.android.synthetic.simple.activity_fullscreen_graph.*
-import stobix.utils.ColorHandler
 import stobix.utils.DateHandler
+import stobix.utils.kotlinExtensions.to
 import java.text.SimpleDateFormat
 import java.util.*
-import stobix.utils.kotlinExtensions.to // this makes a to b to c create (a,b,c) instead of ((a,b),c)
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -71,201 +68,167 @@ class FullscreenGraphActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val c = ColorHandler(this)
-
-        val array = listOf(R.attr.colorPrimary).sorted().toIntArray()
-        val attrs  = theme.obtainStyledAttributes(array)
-        val colIn = attrs.getIndex(array.indexOf(R.attr.colorPrimary))
-        val col = attrs.getColor(colIn,0)
-        Log.d("ferger","$array $colIn $col")
         val cols = intent.extras.getIntegerArrayList("colors")
-        Log.d("ferger","$cols")
 
+        val bareSeriesColor = cols[0]
 
-        attrs.recycle()
+        val fourHourMeanSeriesColor = cols[1]
 
-        val allColors =
-                R.styleable.FullscreenGraph.toList() + listOf(
-                        R.attr.colorPrimary,
-                        R.attr.colorAccent,
-                        R.attr.table_data_row_even,
-                        R.attr.tableView_headerColor
-                        )
+        val chartBackgroundColor = cols[4]
 
+        val weekMeanSeriesColor = cols[2]
 
-        c.withDefColorFun(allColors) { getColor ->
+        setContentView(R.layout.activity_fullscreen_graph)
+        actionBar?.setDisplayHomeAsUpEnabled(true)
 
-            infix fun Int.orElse(c2: Int) =
-                    getColor(this,c2)
+        mVisible = true
 
-            val bareSeriesColor = cols[0]
-                    //R.styleable.FullscreenGraph_allEntriesLineColor orElse
-                    //        R.attr.colorPrimary
-
-            val fourHourMeanSeriesColor = cols[1]
-                    //R.styleable.FullscreenGraph_fourHourMeanLineColor orElse
-                    //        R.attr.colorAccent
-
-            val chartBackgroundColor = cols[4]
-//                    R.styleable.FullscreenGraph_chartAreaColor orElse
-//                            R.attr.table_data_row_even
-
-            val weekMeanSeriesColor = cols[2]
-//                    R.styleable.FullscreenGraph_weekMeanBackColor orElse
-//                            R.attr.tableView_headerColor
-
-            setContentView(R.layout.activity_fullscreen_graph)
-            actionBar?.setDisplayHomeAsUpEnabled(true)
-
-            mVisible = true
-
-            // Set up the user interaction to manually show or hide the system UI.
-            // XXX
-            // This is a horrid idea when using a graph!
-            //  TODO Fix something better, like a drag-down thing
-            fullscreen_graph.setOnLongClickListener {
-                true
-            }
-            fullscreen_graph.setOnClickListener {
-                toggleGraphShown()
-            }
-
-            // Upon interacting with UI controls, delay any scheduled hide()
-            // operations to prevent the jarring behavior of controls going away
-            // while interacting with the UI.
-            dummy_button.setOnTouchListener(mDelayHideTouchListener)
-            Log.d("graph", "got created")
-            super.onCreate(savedInstanceState)
-            entries = intent.extras.getParcelableArrayList<SugarEntry>("entries")
-                    .filterNotNull()
-                    .sortedBy { it.epochTimestamp }
-
-            bareSeries = LineGraphSeries(
-                    entries
-                            .map {
-                                DataPoint(
-                                        DateHandler(it.epochTimestamp).dateObject,
-                                        it.sugarLevel.toDouble() / 10.0
-                                )
-                            }
-                            .toTypedArray()
-            )
-
-            val meanPerDayData =
-                    entries
-                            // get the year and week of each entry
-                            .map {
-                                val cal = Calendar.getInstance()
-                                cal.timeInMillis = it.epochTimestamp
-                                Pair(it, Pair(cal.get(Calendar.YEAR), cal.get(Calendar.WEEK_OF_YEAR)))
-                            }
-                            // sort the entries by year & week
-                            .sortedWith(compareBy({ it.second.first }, { it.second.second }))
-                            // group by year & week
-                            .groupBy({ it.second })
-                            //
-                            .map {
-                                Triple(
-                                        // For now, use the last entry in the week as timestamp.
-                                        // For later, it's probably best to have a timestamp
-                                        // corresponding to the start of the week or so
-                                        it.value.sortedBy { it.first.epochTimestamp }.last().first.epochTimestamp
-                                        ,
-                                        // mean value for the week
-                                        it.value.sumBy { it.first.sugarLevel }.toDouble() / (it.value.size * 10.0)
-                                        // for debugging purposes only
-                                        , it
-                                )
-                            }
-                            // sort by timestamp. because somehow the data manages to get unsorted again (?)
-                            .sortedBy { it.first }
-
-            meanPerDaySeries = LineGraphSeries(
-                    meanPerDayData
-                            // make DataPoints of the timestamp and week mean
-                            .map { DataPoint(DateHandler(it.first).dateObject, it.second) }
-                            // get a DataPoint array so LineGraphSeries gets happy
-                            .toTypedArray()
-
-            )
-
-            val cal = Calendar.getInstance()
-            cal.timeInMillis = 0
-            cal.add(Calendar.HOUR, 1)
-            val hour = cal.timeInMillis
-
-            val meanPerFourHourData =
-                    entries
-                            .drop(1)
-                            .fold(
-                                    entries.first().epochTimestamp
-                                            to
-                                            (entries.first().sugarLevel to 1)
-                                            to
-                                            listOf<Pair<Long, Double>>())
-                            { acc, current ->
-                                val (startTime: Long, meanAcc: Pair<Int, Int>, dataAcc) = acc
-                                val (accLevels: Int, points: Int) = meanAcc
-                                if (current.epochTimestamp - startTime >= 4 * hour) {
-                                    val fourHourMean = accLevels.toDouble() / (points * 10)
-                                    (current.epochTimestamp
-                                            to
-                                            Pair(current.sugarLevel, 1)
-                                            to
-                                            dataAcc
-                                                    .plus(Pair(startTime, fourHourMean))
-                                                    .plus(Pair(startTime + 4 * hour, fourHourMean))
-                                            )
-                                } else
-                                    (startTime
-                                            to
-                                            Pair(accLevels + current.sugarLevel, points + 1)
-                                            to
-                                            dataAcc
-                                            )
-                            }
-                            .third
-
-            meanPerFourHourSeries = LineGraphSeries(
-                    meanPerFourHourData
-                            .map {
-                                DataPoint(DateHandler(it.first).dateObject, it.second)
-                            }
-                            .toTypedArray()
-            )
-
-            fun Calendar.between(first: Any, last: Any) = this.before(last) && this.after(first)
-
-            bareSeries.color = bareSeriesColor
-            bareSeries.thickness = 3
-            meanPerFourHourSeries.color = fourHourMeanSeriesColor
-//        meanPerFourHourSeries.isDrawDataPoints = true
-            meanPerFourHourSeries.thickness = 3
-            meanPerDaySeries.color = weekMeanSeriesColor
-            meanPerDaySeries.isDrawBackground = true
-            meanPerDaySeries.backgroundColor = cols [5]
-
-            gs += bareSeries
-            gs += meanPerDaySeries
-            gs += meanPerFourHourSeries
-
-            //graph.viewport.isYAxisBoundsManual = true
-            fullscreen_graph.viewport.isXAxisBoundsManual = true
-            fullscreen_graph.gridLabelRenderer.isHumanRounding = true
-            fullscreen_graph.gridLabelRenderer.labelFormatter =
-                    DateAsXAxisLabelFormatter(this, SimpleDateFormat.getDateInstance())
-            //fullscreen_graph.background=chartBackgroundColor
-            fullscreen_graph.textAlignment = View.TEXT_ALIGNMENT_CENTER
-            fullscreen_graph.gridLabelRenderer.numVerticalLabels = 4
-            fullscreen_graph.viewport.setMinX((entries.last().epochTimestamp - 7 * 24 * hour).toDouble())
-            fullscreen_graph.viewport.setMaxX(entries.last().epochTimestamp.toDouble())
-            fullscreen_graph.viewport.isScalable = true
-            fullscreen_graph.setBackgroundColor(chartBackgroundColor)
-
-            gs.forEach { fullscreen_graph.addSeries(it) }
-            //fullscreen_graph.addSeries(meanPerDaySeries)
-            //toggleGraphShown()
+        // Set up the user interaction to manually show or hide the system UI.
+        // XXX
+        // This is a horrid idea when using a graph!
+        //  TODO Fix something better, like a drag-down thing
+        fullscreen_graph.setOnLongClickListener {
+            true
         }
+        fullscreen_graph.setOnClickListener {
+            toggleGraphShown()
+        }
+
+        // Upon interacting with UI controls, delay any scheduled hide()
+        // operations to prevent the jarring behavior of controls going away
+        // while interacting with the UI.
+        dummy_button.setOnTouchListener(mDelayHideTouchListener)
+        Log.d("graph", "got created")
+        super.onCreate(savedInstanceState)
+        entries = intent.extras.getParcelableArrayList<SugarEntry>("entries")
+                .filterNotNull()
+                .sortedBy { it.epochTimestamp }
+
+        bareSeries = LineGraphSeries(
+                entries
+                        .map {
+                            DataPoint(
+                                    DateHandler(it.epochTimestamp).dateObject,
+                                    it.sugarLevel.toDouble() / 10.0
+                            )
+                        }
+                        .toTypedArray()
+        )
+
+        val meanPerDayData =
+                entries
+                        // get the year and week of each entry
+                        .map {
+                            val cal = Calendar.getInstance()
+                            cal.timeInMillis = it.epochTimestamp
+                            Pair(it, Pair(cal.get(Calendar.YEAR), cal.get(Calendar.WEEK_OF_YEAR)))
+                        }
+                        // sort the entries by year & week
+                        .sortedWith(compareBy({ it.second.first }, { it.second.second }))
+                        // group by year & week
+                        .groupBy({ it.second })
+                        //
+                        .map {
+                            Triple(
+                                    // For now, use the last entry in the week as timestamp.
+                                    // For later, it's probably best to have a timestamp
+                                    // corresponding to the start of the week or so
+                                    it.value.sortedBy { it.first.epochTimestamp }.last().first.epochTimestamp
+                                    ,
+                                    // mean value for the week
+                                    it.value.sumBy { it.first.sugarLevel }.toDouble() / (it.value.size * 10.0)
+                                    // for debugging purposes only
+                                    , it
+                            )
+                        }
+                        // sort by timestamp. because somehow the data manages to get unsorted again (?)
+                        .sortedBy { it.first }
+
+        meanPerDaySeries = LineGraphSeries(
+                meanPerDayData
+                        // make DataPoints of the timestamp and week mean
+                        .map { DataPoint(DateHandler(it.first).dateObject, it.second) }
+                        // get a DataPoint array so LineGraphSeries gets happy
+                        .toTypedArray()
+
+        )
+
+        val cal = Calendar.getInstance()
+        cal.timeInMillis = 0
+        cal.add(Calendar.HOUR, 1)
+        val hour = cal.timeInMillis
+
+        val meanPerFourHourData =
+                entries
+                        .drop(1)
+                        .fold(
+                                entries.first().epochTimestamp
+                                        to
+                                        (entries.first().sugarLevel to 1)
+                                        to
+                                        listOf<Pair<Long, Double>>())
+                        { acc, current ->
+                            val (startTime: Long, meanAcc: Pair<Int, Int>, dataAcc) = acc
+                            val (accLevels: Int, points: Int) = meanAcc
+                            if (current.epochTimestamp - startTime >= 4 * hour) {
+                                val fourHourMean = accLevels.toDouble() / (points * 10)
+                                (current.epochTimestamp
+                                        to
+                                        Pair(current.sugarLevel, 1)
+                                        to
+                                        dataAcc
+                                                .plus(Pair(startTime, fourHourMean))
+                                                .plus(Pair(startTime + 4 * hour, fourHourMean))
+                                        )
+                            } else
+                                (startTime
+                                        to
+                                        Pair(accLevels + current.sugarLevel, points + 1)
+                                        to
+                                        dataAcc
+                                        )
+                        }
+                        .third
+
+        meanPerFourHourSeries = LineGraphSeries(
+                meanPerFourHourData
+                        .map {
+                            DataPoint(DateHandler(it.first).dateObject, it.second)
+                        }
+                        .toTypedArray()
+        )
+
+        fun Calendar.between(first: Any, last: Any) = this.before(last) && this.after(first)
+
+        bareSeries.color = bareSeriesColor
+        bareSeries.thickness = 3
+        meanPerFourHourSeries.color = fourHourMeanSeriesColor
+//        meanPerFourHourSeries.isDrawDataPoints = true
+        meanPerFourHourSeries.thickness = 3
+        meanPerDaySeries.color = weekMeanSeriesColor
+        meanPerDaySeries.isDrawBackground = true
+        meanPerDaySeries.backgroundColor = cols [5]
+
+        gs += bareSeries
+        gs += meanPerDaySeries
+        gs += meanPerFourHourSeries
+
+        //graph.viewport.isYAxisBoundsManual = true
+        fullscreen_graph.viewport.isXAxisBoundsManual = true
+        fullscreen_graph.gridLabelRenderer.isHumanRounding = true
+        fullscreen_graph.gridLabelRenderer.labelFormatter =
+                DateAsXAxisLabelFormatter(this, SimpleDateFormat.getDateInstance())
+        //fullscreen_graph.background=chartBackgroundColor
+        fullscreen_graph.textAlignment = View.TEXT_ALIGNMENT_CENTER
+        fullscreen_graph.gridLabelRenderer.numVerticalLabels = 4
+        fullscreen_graph.viewport.setMinX((entries.last().epochTimestamp - 7 * 24 * hour).toDouble())
+        fullscreen_graph.viewport.setMaxX(entries.last().epochTimestamp.toDouble())
+        fullscreen_graph.viewport.isScalable = true
+        fullscreen_graph.setBackgroundColor(chartBackgroundColor)
+
+        gs.forEach { fullscreen_graph.addSeries(it) }
+        //fullscreen_graph.addSeries(meanPerDaySeries)
+        //toggleGraphShown()
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
