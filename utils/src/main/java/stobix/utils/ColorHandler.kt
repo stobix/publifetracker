@@ -24,20 +24,18 @@ class ColorHandler(val ctx: Context) {
             }
         }
 
-    fun withStyleable(styleableRes: Int, f:(Map<Int,Int>)) {
-        // TODO: make this similar to withColors, but using a styleable res instead
-        // theme.obtainStyledAttributes(sortedColors).also { ...?
-
-    }
-
     fun withColorMap(colorList:List<Int>, f: (Map<Int,Int>) -> Unit) {
         val sortedColors = colorList.sorted().toIntArray()
-        theme.obtainStyledAttributes(sortedColors).also {
-            val colorMap = colorList.map { colorRes ->
+        withColorMap(sortedColors,f)
+    }
+
+    fun withColorMap(sortedColorArray: IntArray, f: (Map<Int,Int>) -> Unit) {
+        theme.obtainStyledAttributes(sortedColorArray).also {
+            val colorMap = sortedColorArray.map { colorRes ->
                 val colorVal =
                         it.getColor(
                                 it.getIndex(
-                                        sortedColors.indexOf(
+                                        sortedColorArray.indexOf(
                                                 colorRes)
                                 ),
                                 missingColor)
@@ -48,17 +46,46 @@ class ColorHandler(val ctx: Context) {
     }
 
     fun withColorFun(colorList:List<Int>, f: ((Int) -> Int) -> Unit) {
-        var functionValid = true
         val sortedColors = colorList.sorted().toIntArray()
-        theme.obtainStyledAttributes(sortedColors)
+        withColorFun(sortedColors,f)
+    }
+
+    fun withColorFun(colorList:IntArray, f: ((Int) -> Int) -> Unit) {
+        var functionValid = true
+        theme.obtainStyledAttributes(colorList)
                 .also {
                     fun getColor(color: Int): Int{
                         if(!functionValid)
                             error("function called outside its withColorFun loop")
                         return it.getColor(
                                 it.getIndex(
-                                        sortedColors.indexOf(color)),
+                                        colorList.indexOf(color)),
                                 missingColor)
+                    }
+                    f(::getColor)
+                }
+                .also{
+                    functionValid = false
+                }.recycle()
+    }
+
+    fun withDefColorFun(colorList:List<Int>, f: ((Int,Int) -> Int) -> Unit) {
+        val sortedColors = colorList.sorted().toIntArray()
+        withDefColorFun(sortedColors,f)
+    }
+
+    fun withDefColorFun(colorList:IntArray, f: ((Int,Int) -> Int) -> Unit) {
+        var functionValid = true
+        theme.obtainStyledAttributes(colorList)
+                .also {
+                    fun getColor(color: Int, defColor: Int): Int{
+                        if(!functionValid)
+                            error("function called outside its withColorFun loop")
+                        return it.getColor(
+                                it.getIndex(colorList.indexOf(color)),
+                                it.getColor(
+                                        it.getIndex(colorList.indexOf(defColor)),
+                                        missingColor))
                     }
                     f(::getColor)
                 }

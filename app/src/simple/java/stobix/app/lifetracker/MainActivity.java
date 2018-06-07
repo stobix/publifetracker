@@ -5,11 +5,13 @@ import android.app.FragmentTransaction;
 import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +21,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import de.codecrafters.tableview.SortingOrder;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 import stobix.compat.functions.Consumer;
 import stobix.compat.functions.BiConsumer;
 
@@ -32,12 +36,21 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
+import java.util.Map;
 
 import de.codecrafters.tableview.TableDataAdapter;
 import kotlin.Pair;
+import stobix.compat.functions.Function;
+import stobix.utils.ColorHandler;
 import stobix.utils.DateHandler;
+import stobix.utils.ListSorter;
 
 import static android.util.Log.d;
 import static android.util.Log.i;
@@ -167,6 +180,14 @@ public class MainActivity extends AppCompatActivity
             dbInitThread.start();
 
             BuildVairantSpecificCode.onLoad(this);
+
+            int[] array = {R.attr.colorPrimary};
+        TypedArray attrs  = getTheme().obtainStyledAttributes(array);
+        int colIn = attrs.getIndex(0);
+        int col = attrs.getColor(colIn,0);
+        Log.d("ferger","main " + " "+ col);
+        attrs.recycle();
+
         }
 
         @Override
@@ -308,6 +329,33 @@ public class MainActivity extends AppCompatActivity
                                 Log.d("graph"," request");
                                 ArrayList<SugarEntry> entryArrayList = new ArrayList<>(entries);
                                 b.putParcelableArrayList("entries", entryArrayList);
+                                ArrayList<Integer> colorArrayList = new ArrayList<>();
+                                ColorHandler c = new ColorHandler(this);
+                                ArrayList<Integer> colors = new ArrayList<>();
+                                colors.add(android.R.attr.textColorPrimary);
+                                colors.add(android.R.attr.textColorSecondary);
+                                colors.add(android.R.attr.textColorTertiary);
+                                colors.add(R.attr.colorPrimary);
+                                colors.add(R.attr.table_data_row_odd);
+                                colors.add(R.attr.table_data_row_even);
+                                Collections.sort(colors);
+                                Map<Integer,Integer> colMap;
+                                c.withColorMap(colors,
+                                        colorMap -> {
+                                            ArrayList<Integer> colorValues = new ArrayList<>();
+                                            colorValues.add(0,colorMap.get(android.R.attr.textColorPrimary));
+                                            colorValues.add(1,colorMap.get(android.R.attr.textColorSecondary));
+                                            colorValues.add(2,colorMap.get(android.R.attr.textColorSecondary));
+                                            colorValues.add(3,colorMap.get(R.attr.colorPrimary));
+                                            colorValues.add(4,colorMap.get(R.attr.table_data_row_even));
+                                            colorValues.add(5,colorMap.get(R.attr.table_data_row_odd));
+                                            // TODO: Transform the above to stuff like b.putInt("chartBackground",colorMap.get(R.attr.table_data_row_odd));
+
+                                            b.putIntegerArrayList("colors",colorValues);
+                                            return null;
+                                        }
+                                );
+
                                 m.setData(b);
                                 Log.d("graph","sending bundle");
                                 graphHandler.sendMessage(m);
