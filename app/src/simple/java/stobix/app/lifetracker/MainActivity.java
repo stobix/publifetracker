@@ -101,6 +101,7 @@ public class MainActivity extends AppCompatActivity
             setSupportActionBar(toolbar);
             tableView = findViewById(R.id.tableView);
 
+
             FloatingActionButton fab = findViewById(R.id.fab);
             Log.d("VERSION",""+Build.VERSION.SDK_INT );
             // FIXME Since API 21 seems to use activity_main.xml v19 for some reason, I use this as a quick fix, for now.
@@ -111,12 +112,7 @@ public class MainActivity extends AppCompatActivity
 
             fab.setOnClickListener(view -> showSugarEntryCreationDialog() );
 
-            SortableSugarEntryTableView tv = tableView;
-
-            tv.addDataClickListener((row, sugarEntry) -> {
-                // TODO
-                //open some dialog, maybe the entry creation dialog, to change element,
-                // and let it call sugarEntryChanged(sugarEntry);
+            tableView.addDataClickListener((row, sugarEntry) -> {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 Fragment prev = getFragmentManager().findFragmentByTag("dialog");
                 if (prev != null) {
@@ -124,9 +120,15 @@ public class MainActivity extends AppCompatActivity
                 }
                 ft.addToBackStack(null);
 
-                SugarEntryCreationActivity creationActivityFlupp = SugarEntryCreationActivity.newInstance(sugarEntry);
+                SugarEntryCreationActivity creationActivityFlupp =
+                        SugarEntryCreationActivity.newInstance(sugarEntry);
                 creationActivityFlupp.show(ft, "dialog");
 
+            });
+
+            tableView.addDataLongClickListener( (rowIndex, sugarEntry) -> {
+                onSugarEntryEntered(sugarEntry.copyToCurrentWithId(nextUID));
+                return true;
             });
 
             /*
@@ -137,7 +139,7 @@ public class MainActivity extends AppCompatActivity
             */
 
 
-            Handler db_data_handler = new DataLoadHandler(this, tv);
+            Handler db_data_handler = new DataLoadHandler(this, tableView);
 
             Runnable initiateDB = () -> {
                 SugarEntryDatabase db =

@@ -1,12 +1,12 @@
 package stobix.app.lifetracker
 
 import android.arch.persistence.room.ColumnInfo
+import android.arch.persistence.room.ColumnInfo.INTEGER
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
 import android.os.Parcel
 import android.os.Parcelable
-
-import android.arch.persistence.room.ColumnInfo.INTEGER
+import stobix.utils.DateHandler
 
 // The Room database entry class/TableView row class that acts as a glue between the two.
 
@@ -39,6 +39,10 @@ data class SugarEntry constructor(
             parcel.readInt(), // sugar
             parcel.readString() // extra
     )
+
+    fun copyToCurrentWithId(uid: Int) =
+            copy(uid=uid,epochTimestamp = DateHandler().timestamp)
+
 
     override fun writeToParcel(parcel: Parcel, i: Int) {
         parcel.writeInt(uid)
