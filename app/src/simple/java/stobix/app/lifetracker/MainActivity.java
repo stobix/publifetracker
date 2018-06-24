@@ -2,7 +2,6 @@ package stobix.app.lifetracker;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
@@ -19,12 +18,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -141,14 +136,11 @@ public class MainActivity extends AppCompatActivity
 
             Handler db_data_handler = new DataLoadHandler(this, tableView);
 
+
+
             Runnable initiateDB = () -> {
-                SugarEntryDatabase db =
-                        Room.databaseBuilder(
-                                getApplicationContext(),
-                                SugarEntryDatabase.class,
-                                "sugarApp").build();
 
-
+                SugarEntryDatabase db =DatabaseHandler.buildSugarDatabase(getApplicationContext());
 
                 dao = db.userDao();
 
@@ -646,9 +638,8 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void handleFileCreated(@NotNull Uri uri) {
             Log.i("file","created URI: "+uri.toString());
-            Gson g = new Gson();
-            Type t = new TypeToken<List<SugarEntry>>() {}.getType();
-            String json = g.toJson(tableView.getDataAdapter().getData(),t);
+            SugarEntryGsonWrapper wrapper = new SugarEntryGsonWrapper(1,tableView.getDataAdapter().getData());
+            String json = wrapper.toJSON();
             Log.i("file (json)",json);
             fa.putTextInUri(uri,json);
         }
@@ -665,10 +656,10 @@ public class MainActivity extends AppCompatActivity
                         // Gson procedure taken from http://www.vogella.com/tutorials/JavaLibrary-Gson/article.html
                         Log.i("file","opened URI: "+uri.toString());
                         String text = fa.readTextFromUri(uri);
-                        Gson g = new Gson();
-                        Type t = new TypeToken<List<SugarEntry>>() {}.getType();
                         Log.i("file","opened file: ");
-                        List<SugarEntry> entries = g.fromJson(text,t);
+                        SugarEntryGsonWrapper wrappedEntries = SugarEntryGsonWrapper.fromJSON(text);
+                        List<SugarEntry> entries = wrappedEntries.getEntries();
+                        Log.i("file","file version: "+wrappedEntries.getVersion());
                         Log.i("file",""+entries.size()+" entries");
                         Log.i("file","adding all entries to the db");
 

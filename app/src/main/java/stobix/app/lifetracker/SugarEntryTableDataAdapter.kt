@@ -5,9 +5,8 @@ import android.text.format.DateFormat
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import java.util.ArrayList
-import java.util.Date
 import de.codecrafters.tableview.TableDataAdapter
+import java.util.*
 
 /**
  * Created by stobix on 11/11/17.
@@ -36,10 +35,16 @@ class SugarEntryTableDataAdapter(
                     renderString("")
             }
 
-            2 -> renderString(currRow.extra ?: "")
+            2 -> renderString("${with(currRow.weight," kg, ","")} ${currRow.extra ?: ""}")
             else -> renderString("N/A")
         }
     }
+
+    private fun with(a: Any?, ifIs: String, ifNull: String) =
+            if (a != null)
+                "$a $ifIs"
+            else
+                ifNull
 
     private fun renderString(value: String): View {
         val textView = TextView(context)

@@ -24,7 +24,8 @@ data class SugarEntry constructor(
         @PrimaryKey var uid: Int=0, // TODO Should this even have a default value?
         @ColumnInfo(name = "timestamp", typeAffinity = INTEGER) var epochTimestamp: Long=0, // TODO Should this be a nullable in the database?
         @ColumnInfo(name = "sugar") var sugarLevel: Int=-1, // TODO Should this be a nullable in the database?
-        @ColumnInfo(name = "extra") var extra: String?=null
+        @ColumnInfo(name = "extra") var extra: String?=null,
+        @ColumnInfo(name = "weight") var weight: Int?=null
 ) : Parcelable {
 
     // The rest of this file describes how to destruct a SugarEntry into a Parcel,
@@ -37,7 +38,9 @@ data class SugarEntry constructor(
             parcel.readInt(), // uid
             parcel.readLong(), // timestamp
             parcel.readInt(), // sugar
-            parcel.readString() // extra
+            parcel.readString(), // extra
+            if(parcel.readInt()!=0) parcel.readInt() else null
+
     )
 
     fun copyToCurrentWithId(uid: Int) =
@@ -49,6 +52,13 @@ data class SugarEntry constructor(
         parcel.writeLong(epochTimestamp)
         parcel.writeInt(sugarLevel)
         parcel.writeString(extra)
+        val weight = weight
+        if (weight == null) {
+            parcel.writeInt(0)
+        } else {
+            parcel.writeInt(1)
+            parcel.writeInt(weight)
+        }
     }
 
     companion object CREATOR: Parcelable.Creator<SugarEntry> {
@@ -61,6 +71,7 @@ data class SugarEntry constructor(
             this.epochTimestamp == other.epochTimestamp
                     && this.sugarLevel == other.sugarLevel
                     && this.extra == other.extra
+                    && this.weight == other.weight
         else ->
                 false
     }
