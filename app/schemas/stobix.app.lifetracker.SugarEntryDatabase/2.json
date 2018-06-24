@@ -1,12 +1,12 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 1,
+    "version": 2,
     "identityHash": "7fde864cc03aff76a6ffb8d175472214",
     "entities": [
       {
         "tableName": "sugar_entries",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `sugar` INTEGER NOT NULL, `extra` TEXT, PRIMARY KEY(`uid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `sugar` INTEGER NOT NULL, `extra` TEXT, `weight` INTEGER, PRIMARY KEY(`uid`))",
         "fields": [
           {
             "fieldPath": "uid",
@@ -30,6 +30,12 @@
             "fieldPath": "extra",
             "columnName": "extra",
             "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "weight",
+            "columnName": "weight",
+            "affinity": "INTEGER",
             "notNull": false
           }
         ],
