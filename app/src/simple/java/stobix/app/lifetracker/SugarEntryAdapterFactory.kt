@@ -17,8 +17,14 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
             } else {
                 f()
             }
-
         }
+        fun<A> unlessNextNull(reader: JsonReader, default:A, f: () -> A) =
+            if(reader.peek() == JsonToken.NULL) {
+                reader.nextNull()
+                default
+            } else {
+                f()
+            }
 
         var version = 0
 
@@ -39,17 +45,58 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                         listAdapter.write(out,value.entries)
                     }
 
+                    fun readObjectArray(reader: JsonReader,f: (String,SugarEntry) -> Unit) : MutableList<SugarEntry> {
+                        reader.beginArray()
+                        val entries = mutableListOf<SugarEntry>()
+                        while (reader.hasNext()) {
+                            reader.beginObject()
+                            val entry = SugarEntry()
+                            while (reader.hasNext()) {
+                                f (reader.nextName(),entry)
+                            }
+                            reader.endObject()
+                            entries.add(entry)
+                        }
+                        reader.endArray()
+                        return entries
+                    }
+
                     override fun read(reader: JsonReader?): SugarEntryGsonWrapper {
                         @Suppress("NAME_SHADOWING")
                         val reader = reader ?: error("Null reader")
-                        unlessNextNull(reader){
-                            try {
-                                version = reader.nextInt()
-                            } catch (e: IllegalStateException) {
-                               Log.d("file","Unversioned JSON sugar entry file!")
-                            }
-                        }
-                        val entries = listAdapter.read(reader)
+                        val entries: List<SugarEntry> =
+                                unlessNextNull(reader,listOf()){
+                                    // If we start with a number, we have a versioned file
+                                    if (reader.peek() == JsonToken.NUMBER) {
+                                        version = reader.nextInt()
+                                        when (version) {
+                                            1 -> readObjectArray(reader){
+                                                name,entry ->
+                                                when(name) {
+                                                    "uid" -> entry.uid = reader.nextInt()
+                                                    "epochTimestamp" -> entry.epochTimestamp = reader.nextLong()
+                                                    "sugarLevel" -> entry.sugarLevel = reader.nextInt()
+                                                    "weight" -> entry.weight = reader.nextInt()
+                                                    "extra" -> entry.extra = reader.nextString()
+                                                }
+                                            }
+                                            else -> listAdapter.read(reader)
+                                        }
+                                    }
+                                    // Else, we have a pre-versions file consisting of version 0 SugarEntries
+                                    else {
+                                        Log.d("file","Unversioned JSON sugar entry file!")
+                                        readObjectArray(reader){
+                                            name,entry ->
+                                            when(name) {
+                                                "uid" -> entry.uid = reader.nextInt()
+                                                "epochTimestamp" -> entry.epochTimestamp = reader.nextLong()
+                                                "sugarLevel" -> entry.sugarLevel = reader.nextInt()
+                                                "extra" -> entry.extra = reader.nextString()
+                                            }
+                                        }
+                                    }
+                                }
                         return SugarEntryGsonWrapper(version,entries)
                     }
                 }
@@ -57,7 +104,6 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
             }
 
             /*
-            // TODO use this or something like this to create a shorter version of the SugarEntry list, using Gson's default parser iff version == 0
 
             sugarEntryListTypeToken.type -> {
                 val adapter = object : TypeAdapter<List<SugarEntry>>() {
