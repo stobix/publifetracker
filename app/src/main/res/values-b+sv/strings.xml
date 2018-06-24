@@ -41,4 +41,5 @@
     <string name="sugar_entry_delete_confirmation">Är du säker på att du vill ta bort den här inmatningen?</string>
     <string name="show_bar_graphs">Veckografer</string>
     <string name="dependent_bar_line_graph_header">Veckografer</string>
+    <string name="input_weight">Vikt</string>
 </resources>

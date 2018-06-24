@@ -27,10 +27,12 @@ open class SugarEntryCreationActivity
     private var uid: Int=0
     private var date: DateHandler = DateHandler()
     private var sugarLevel: Int? = null
+    private var weight: Int? = null
     private var alreadyDefinedEntry: Boolean = false
     lateinit private var dateView: TextView
     lateinit private var timeView: TextView
     lateinit private var sugarView: TextView
+    lateinit private var weightView: TextView
     lateinit private var entry: SugarEntry
 
 
@@ -41,6 +43,7 @@ open class SugarEntryCreationActivity
             entry=arguments.getParcelable("entry")
             uid= entry.uid
             date.timestamp= entry.epochTimestamp
+            weight = entry.weight
             sugarLevel=if (entry.sugarLevel==-1) null else entry.sugarLevel
             d( "SugarEntry create",
                     "already defined, uid:${entry.uid}, timestamp:${entry.epochTimestamp}, sugar: ${entry.sugarLevel}, extra: ${entry.epochTimestamp}"
@@ -69,12 +72,14 @@ open class SugarEntryCreationActivity
         dateView= v.findViewById(R.id.entryCreatorDate)
         timeView= v.findViewById(R.id.entryCreatorTime)
         sugarView= v.findViewById(R.id.entryCreatorSugar)
+        weightView = v.findViewById(R.id.entryCreatorWeight)
         val extraV = v.findViewById<TextView>(R.id.entryCreatorExtra)
 
         val dateText="%d-%02d-%02d".format(date.year,date.month+1,date.day)
         val timeText="%02d:%02d".format(date.hour,date.minute)
         dateView.text=dateText
         timeView.text=timeText
+        weightView.text=weight?.toFloat()?.div(10f)?.toString() ?: ""
 
         val buttonAdd: Button = v.findViewById<Button>(R.id.entryAdd)
         val buttonAddClose: Button =v.findViewById<Button>(R.id.entryAddClose)
@@ -112,6 +117,12 @@ open class SugarEntryCreationActivity
                             100)
             }
         }
+        /*
+        // Not neccessary unless I do some magic "insert kilos or lbs" view
+        weightView.setOnClickListener {
+
+        }
+        */
 
         buttonAdd.setOnClickListener { onSubmit(extraV) }
         buttonAddClose.setOnClickListener { onSubmitAndClose(extraV) }
@@ -156,18 +167,13 @@ open class SugarEntryCreationActivity
     private fun handleSubmission(extraView: TextView){
         entry.epochTimestamp=date.timestamp
         entry.sugarLevel = sugarLevel ?: -1
+        entry.weight = weightView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt()
         entry.extra = extraView.text?.toString() ?: "N/A"
         if(alreadyDefinedEntry) {
-            d("SugarEntry update", "" + entry.uid
-                    + " " + entry.epochTimestamp
-                    + " " + entry.sugarLevel
-                    + " " + entry.extra)
+            d("SugarEntry update", "${entry.uid} ${entry.epochTimestamp} ${entry.sugarLevel} ${entry.weight} ${entry.extra}")
             (activity as OnSugarEntryChangedHandler).onSugarEntryChanged(entry)
         } else {
-            d("SugarEntry submit", "" + entry.uid
-                    + " " + entry.epochTimestamp
-                    + " " + entry.sugarLevel
-                    + " " + entry.extra)
+            d("SugarEntry submit", "${entry.uid} ${entry.epochTimestamp} ${entry.sugarLevel} ${entry.weight} ${entry.extra}")
             (activity as OnSugarEntryEnteredHandler).onSugarEntryEntered(entry)
         }
     }

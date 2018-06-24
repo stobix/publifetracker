@@ -35,16 +35,30 @@ class SugarEntryTableDataAdapter(
                     renderString("")
             }
 
-            2 -> renderString("${with(currRow.weight," kg, ","")} ${currRow.extra ?: ""}")
+            2 -> renderString(with(currRow.weight?.toFloat()?.div(10f)," kg").between(", ")(currRow.extra) ?: "")
             else -> renderString("N/A")
         }
     }
 
-    private fun with(a: Any?, ifIs: String, ifNull: String) =
+    private fun with(a: Any?, ifIs: String, ifNull: String?=null) =
             if (a != null)
-                "$a $ifIs"
+                "$a$ifIs"
             else
                 ifNull
+
+    fun String?.between(s: String) : (String?) -> String? =
+        if (this == null)
+            { a -> a}
+        else
+            { a ->
+                if (a == null || a == "")
+                    this
+                else
+                    this + s + a
+            }
+
+
+
 
     private fun renderString(value: String): View {
         val textView = TextView(context)
