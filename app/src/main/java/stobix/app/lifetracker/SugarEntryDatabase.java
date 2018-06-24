@@ -6,7 +6,7 @@ import android.arch.persistence.room.RoomDatabase;
 @Database(
         entities={SugarEntry.class},
         version=1,
-        exportSchema = false // Since I don't know where to put it or why
+        exportSchema = true
 )
 public abstract class SugarEntryDatabase extends RoomDatabase{
     public abstract SugarEntryDao userDao();

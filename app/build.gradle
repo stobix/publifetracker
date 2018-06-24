@@ -17,6 +17,11 @@ android {
             }
         }
         buildConfigField "boolean", "containers", "false"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
     productFlavors {
         flavorDimensions "variant"
@@ -48,6 +53,10 @@ android {
     }
     productFlavors {
     }
+    sourceSets {
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+    }
+
 }
 
 dependencies {
