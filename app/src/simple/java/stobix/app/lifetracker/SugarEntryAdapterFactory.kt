@@ -103,22 +103,6 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                 adapter as TypeAdapter<T>
             }
 
-            /*
-
-            sugarEntryListTypeToken.type -> {
-                val adapter = object : TypeAdapter<List<SugarEntry>>() {
-                    override fun write(out: JsonWriter?, value: List<SugarEntry>?) {
-                    }
-
-                    override fun read(reader: JsonReader?): List<SugarEntry> {
-                    }
-
-                }
-                adapter as TypeAdapter<T>
-            }
-            */
-
-
             else -> null
         }
     }
