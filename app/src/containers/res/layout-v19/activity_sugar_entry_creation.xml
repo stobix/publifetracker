@@ -30,15 +30,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="0dp"
         android:layout_marginTop="8dp"
         android:focusable="false"
         android:clickable="true"
         android:inputType="none"
         android:ems="10"
         android:singleLine="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintStart_toStartOf="@+id/entryCreatorDate"
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorDate"
         tools:text="Time"
         tools:ignore="KeyboardInaccessibleWidget" />
@@ -48,7 +47,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="0dp"
         android:layout_marginTop="8dp"
         android:ems="10"
         android:focusable="false"
@@ -56,25 +55,39 @@
         android:inputType="none"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView3"
+        app:layout_constraintStart_toStartOf="@+id/entryCreatorTime"
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorTime"
         tools:text="@string/input_sugar"
         tools:ignore="KeyboardInaccessibleWidget" />
+
+    <EditText
+        android:id="@+id/entryCreatorWeight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:clickable="true"
+        android:ems="10"
+        android:inputType="numberDecimal"
+        android:selectAllOnFocus="false"
+        android:singleLine="true"
+        android:textColor="?android:textColorPrimary"
+        app:layout_constraintStart_toStartOf="@+id/entryCreatorSugar"
+        app:layout_constraintTop_toBottomOf="@+id/entryCreatorSugar"
+        tools:ignore="KeyboardInaccessibleWidget"
+        tools:text="@string/input_weight" />
 
     <EditText
         android:id="@+id/entryCreatorExtra"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="0dp"
         android:layout_marginTop="8dp"
         android:ems="10"
         android:inputType="text"
         android:selectAllOnFocus="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView4"
-        app:layout_constraintTop_toBottomOf="@+id/entryCreatorSugar"
+        app:layout_constraintStart_toStartOf="@+id/entryCreatorWeight"
+        app:layout_constraintTop_toBottomOf="@+id/entryCreatorWeight"
         tools:clickable="false"
         tools:text="@string/input_extra" />
 
@@ -138,6 +151,17 @@
         app:layout_constraintTop_toTopOf="@+id/entryCreatorSugar" />
 
     <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:labelFor="@+id/entryCreatorWeight"
+        android:text="@string/input_weight"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/entryCreatorWeight" />
+
+    <TextView
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -148,5 +172,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorExtra" />
 
+    <ImageButton
+        android:id="@+id/entryCreatorSugarDelete"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:layout_constraintTop_toTopOf="@+id/entryCreatorSugar"
+        app:layout_constraintEnd_toEndOf="@+id/entryCreatorSugar"
+        app:srcCompat="@android:drawable/ic_input_delete"
+         />
+
+    <ImageButton
+        android:id="@+id/entryCreatorExtraDelete"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:layout_constraintTop_toTopOf="@+id/entryCreatorExtra"
+        app:layout_constraintEnd_toEndOf="@+id/entryCreatorExtra"
+        app:srcCompat="@android:drawable/ic_input_delete"
+         />
 
 </android.support.constraint.ConstraintLayout>

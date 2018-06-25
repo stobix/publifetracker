@@ -3,38 +3,23 @@ package stobix.app.lifetracker;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.arch.persistence.room.Room;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.widget.ImageViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.ListView;
-import android.widget.TextView;
 
-import stobix.compat.functions.Consumer;
-import stobix.compat.functions.BiConsumer;
-
-//import com.flask.colorpicker.ColorPickerView;
-//import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
 
 import org.jetbrains.annotations.NotNull;
 
@@ -44,12 +29,16 @@ import java.util.List;
 
 import de.codecrafters.tableview.TableDataAdapter;
 import kotlin.Pair;
+import stobix.compat.functions.BiConsumer;
+import stobix.compat.functions.Consumer;
 import stobix.view.containerview.AltAltContainerDao;
 import stobix.view.containerview.AltAltDatabase;
 import stobix.view.containerview.CSubmission;
-import stobix.view.containerview.ContainerView;
 
 import static android.util.Log.d;
+
+//import com.flask.colorpicker.ColorPickerView;
+//import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 public class MainActivity extends AppCompatActivity
         implements
@@ -278,7 +267,7 @@ public class MainActivity extends AppCompatActivity
                     return true;
 
                 case R.id.action_import_db:
-                    fa.userOpenFile();
+                    fa.userReplaceDb();
                     return true;
 
                 case R.id.action_export_db:
@@ -510,7 +499,7 @@ public class MainActivity extends AppCompatActivity
 
 
         @Override
-        public void handleFileOpened(@NotNull Uri uri) {
+        public void handleFileOpened(@NotNull Uri uri,String whetherReplaceOrMergeNotUsedInContainersYet) {
             // Gson procedure taken from http://www.vogella.com/tutorials/JavaLibrary-Gson/article.html
             Log.i("file","opened URI: "+uri.toString());
             String text = fa.readTextFromUri(uri);
