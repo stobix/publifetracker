@@ -9,23 +9,6 @@
         android:id="@+id/entryCreatorDate"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:clickable="true"
-        android:ems="10"
-        android:focusable="false"
-        android:inputType="none"
-        android:singleLine="true"
-        android:text="@string/input_date"
-        app:layout_constraintEnd_toStartOf="@+id/entryCreatorTime"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="KeyboardInaccessibleWidget,TextFields" />
-
-    <EditText
-        android:id="@+id/entryCreatorTime"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
@@ -34,9 +17,26 @@
         android:focusable="false"
         android:inputType="none"
         android:singleLine="true"
+        android:text="@string/input_date"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/entryCreatorDate"
+        app:layout_constraintStart_toEndOf="@+id/textView"
         app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="KeyboardInaccessibleWidget,TextFields" />
+
+    <EditText
+        android:id="@+id/entryCreatorTime"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:clickable="true"
+        android:ems="10"
+        android:focusable="false"
+        android:inputType="none"
+        android:singleLine="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/entryCreatorDate"
+        app:layout_constraintTop_toBottomOf="@+id/entryCreatorDate"
         tools:ignore="KeyboardInaccessibleWidget"
         tools:text="Time" />
 
@@ -109,13 +109,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
         android:inputType="text"
         android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView4"
+        app:layout_constraintStart_toStartOf="@+id/entryCreatorTime"
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorWeight"
         tools:clickable="false"
         tools:text="@string/input_extra" />
@@ -147,6 +146,28 @@
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorExtra" />
 
     <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:labelFor="@id/entryCreatorDate"
+        android:text="@string/input_date"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/entryCreatorDate" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:labelFor="@+id/entryCreatorTime"
+        android:text="@string/input_time"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/entryCreatorTime" />
+
+    <TextView
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -157,7 +178,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorExtra" />
 
-    <ImageButton
+    <ImageView
         android:id="@+id/entryCreatorSugarDelete"
         android:layout_width="30dp"
         android:layout_height="30dp"
@@ -165,12 +186,13 @@
         app:layout_constraintTop_toTopOf="@+id/entryCreatorSugar"
         app:srcCompat="@android:drawable/ic_input_delete" />
 
-    <ImageButton
+    <ImageView
         android:id="@+id/entryCreatorExtraDelete"
         android:layout_width="30dp"
         android:layout_height="30dp"
         app:layout_constraintEnd_toEndOf="@+id/entryCreatorExtra"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorExtra"
         app:srcCompat="@android:drawable/ic_input_delete" />
+
 
 </android.support.constraint.ConstraintLayout>

@@ -3,7 +3,7 @@ package stobix.app.lifetracker
 import android.annotation.SuppressLint
 import android.app.DialogFragment
 import android.os.Bundle
-import android.support.v7.widget.AppCompatImageButton
+import android.support.v7.widget.AppCompatImageView
 import android.util.Log.d
 import android.util.Log.i
 import android.view.LayoutInflater
@@ -84,8 +84,8 @@ open class SugarEntryCreationActivity
         val buttonAdd: Button = v.findViewById<Button>(R.id.entryAdd)
         val buttonAddClose: Button =v.findViewById<Button>(R.id.entryAddClose)
 
-        val buttonClearSugar: AppCompatImageButton = v.findViewById(R.id.entryCreatorSugarDelete)
-        val buttonClearExtra: AppCompatImageButton = v.findViewById(R.id.entryCreatorExtraDelete)
+        val buttonClearSugar: AppCompatImageView = v.findViewById(R.id.entryCreatorSugarDelete)
+        val buttonClearExtra: AppCompatImageView = v.findViewById(R.id.entryCreatorExtraDelete)
 
         if(alreadyDefinedEntry) {
             sugarView.text=sugarLevelToString()
