@@ -25,18 +25,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import de.codecrafters.tableview.SortingOrder;
 import de.codecrafters.tableview.TableDataAdapter;
-import stobix.compat.functions.BiConsumer;
-import stobix.compat.functions.Consumer;
 import stobix.utils.ColorHandler;
 import stobix.utils.DateHandler;
 
 import static android.util.Log.d;
 
-//import com.flask.colorpicker.ColorPickerView;
-//import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 public class MainActivity extends AppCompatActivity
         implements
@@ -96,11 +94,7 @@ public class MainActivity extends AppCompatActivity
 
             FloatingActionButton fab = findViewById(R.id.fab);
             Log.d("VERSION",""+Build.VERSION.SDK_INT );
-            // FIXME Since API 21 seems to use activity_main.xml v19 for some reason, I use this as a quick fix, for now.
-            if(Build.VERSION.SDK_INT < 21)
-                fab.setImageResource(android.R.drawable.ic_input_add);
-            else
-                fab.setImageResource(R.drawable.ic_add_24dp);
+            fab.setImageResource(R.drawable.ic_add_24dp);
 
             fab.setOnClickListener(view -> showSugarEntryCreationDialog() );
 
@@ -525,7 +519,6 @@ public class MainActivity extends AppCompatActivity
             (new Thread(
                     () -> {
                         db_action.accept(s);
-
                         Message msg = table_data_handler.obtainMessage();
                         Bundle bundle = new Bundle();
                         bundle.putParcelable("entry", s);
