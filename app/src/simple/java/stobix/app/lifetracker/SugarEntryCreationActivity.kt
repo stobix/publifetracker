@@ -5,7 +5,6 @@ import android.app.DialogFragment
 import android.os.Bundle
 import android.support.v7.widget.AppCompatImageView
 import android.util.Log.d
-import android.util.Log.i
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -84,7 +83,6 @@ open class SugarEntryCreationActivity
         val buttonAdd: Button = v.findViewById<Button>(R.id.entryAdd)
         val buttonAddClose: Button =v.findViewById<Button>(R.id.entryAddClose)
 
-        val buttonClearSugar: AppCompatImageView = v.findViewById(R.id.entryCreatorSugarDelete)
         val buttonClearExtra: AppCompatImageView = v.findViewById(R.id.entryCreatorExtraDelete)
 
         if(alreadyDefinedEntry) {
@@ -99,34 +97,9 @@ open class SugarEntryCreationActivity
 
         dateView.setOnClickListener { (activity as MainActivity).showDatePicker(date.year,date.month,date.day) }
         timeView.setOnClickListener { (activity as MainActivity).showTimePicker(date.hour,date.minute) }
-        sugarView.setOnClickListener {
-            val sugarLevel = sugarLevel
-            when {
-                sugarLevel != null -> {
-                    (activity as MainActivity).showNumberPicker(
-                            sugarLevel / 10,
-                            sugarLevel % 10,
-                            0,
-                            100)
-                }
-                else ->
-                    (activity as MainActivity).showNumberPicker(
-                            4,
-                            2,
-                            0,
-                            100)
-            }
-        }
-        /*
-        // Not neccessary unless I do some magic "insert kilos or lbs" view
-        weightView.setOnClickListener {
-
-        }
-        */
 
         buttonAdd.setOnClickListener { onSubmit(extraV) }
         buttonAddClose.setOnClickListener { onSubmitAndClose(extraV) }
-        buttonClearSugar.setOnClickListener { onNumberClear() }
         buttonClearExtra.setOnClickListener { extraV.text="" }
 
         return v
@@ -166,7 +139,7 @@ open class SugarEntryCreationActivity
 
     private fun handleSubmission(extraView: TextView){
         entry.epochTimestamp=date.timestamp
-        entry.sugarLevel = sugarLevel ?: -1
+        entry.sugarLevel = sugarView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt() ?: -1 // sugarLevel ?: -1
         entry.weight = weightView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt()
         entry.extra = extraView.text?.toString() ?: "N/A"
         if(alreadyDefinedEntry) {
@@ -189,18 +162,6 @@ open class SugarEntryCreationActivity
         date.setTime(hour,minute)
         val timeText= "%02d:%02d".format(hour,minute)
         timeView.text=timeText
-    }
-
-    fun onNumberSet(values: Pair<Int,Int>) {
-        val (number,fraction)=values
-        i("SugarView","$number.$fraction")
-        sugarLevel=number*10+fraction
-        sugarView.text=sugarLevelToString()
-    }
-
-    fun onNumberClear() {
-        sugarLevel=null
-        sugarView.text=""
     }
 
     companion object Creator{

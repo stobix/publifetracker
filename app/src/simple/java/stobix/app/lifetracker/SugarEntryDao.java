@@ -36,6 +36,9 @@ public interface SugarEntryDao {
     @Query("select * from sugar_entries where sugar > -1 order by timestamp")
     List<SugarEntry> getAllSugarPoints();
 
+    @Query("select * from sugar_entries where weight > 0 order by timestamp") // For some reason, "where weight != null" returned zero results always
+    List<SugarEntry> getAllWeightPoints();
+
 
     @Update
     void update(SugarEntry sugarEntry);

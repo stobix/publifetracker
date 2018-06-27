@@ -40,4 +40,5 @@
     <string name="show_bar_graphs">Show week summary</string>
     <string name="dependent_bar_line_graph_header">Weekly stats</string>
     <string name="input_weight">Weight</string>
+    <string name="show_weight_summary">Show weight summary</string>
 </resources>

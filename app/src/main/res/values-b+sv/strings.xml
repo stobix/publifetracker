@@ -42,4 +42,5 @@
     <string name="show_bar_graphs">Veckografer</string>
     <string name="dependent_bar_line_graph_header">Veckografer</string>
     <string name="input_weight">Vikt</string>
+    <string name="show_weight_summary">Viktgrafer</string>
 </resources>

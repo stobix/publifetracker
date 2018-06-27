@@ -1,5 +1,4 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="stobix.app.lifetracker.MainActivity">
     <!--
@@ -17,8 +16,11 @@
         android:id="@+id/show_graphs"
         android:title="@string/show_graphs" />
     <item
-        android:id="@+id/show_new_graphs"
+        android:id="@+id/show_sugar_weekly"
         android:title="@string/show_bar_graphs" />
+    <item
+        android:id="@+id/show_weight_weekly"
+        android:title="@string/show_weight_summary" />
     <item
         android:id="@+id/action_import_db"
         android:title="@string/action_import_db"/>

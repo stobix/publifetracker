@@ -3,22 +3,14 @@ package stobix.app.lifetracker
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import lecho.lib.hellocharts.formatter.SimpleColumnChartValueFormatter
-
 import lecho.lib.hellocharts.gesture.ZoomType
 import lecho.lib.hellocharts.listener.ColumnChartOnValueSelectListener
-import lecho.lib.hellocharts.model.Axis
-import lecho.lib.hellocharts.model.AxisValue
-import lecho.lib.hellocharts.model.Column
-import lecho.lib.hellocharts.model.ColumnChartData
-import lecho.lib.hellocharts.model.Line
-import lecho.lib.hellocharts.model.LineChartData
-import lecho.lib.hellocharts.model.PointValue
-import lecho.lib.hellocharts.model.SubcolumnValue
-import lecho.lib.hellocharts.model.Viewport
+import lecho.lib.hellocharts.model.*
 import lecho.lib.hellocharts.util.ChartUtils
 import lecho.lib.hellocharts.view.ColumnChartView
 import lecho.lib.hellocharts.view.LineChartView
@@ -29,13 +21,17 @@ import java.util.*
 
 typealias MeanValue = Float
 typealias StartingTimestamp = Long
+typealias Timestamp = Long
+typealias Value = Int
 typealias Year = Int
 typealias Month = Int
 typealias Week = Int
 
 typealias DateInfo = Pair<Year,Week>
 
-typealias WeekPerMeanStructure = List<Pair<MeanValue, Map.Entry<DateInfo, List<Pair<SugarEntry, DateInfo>>>>>
+typealias WeekPerMeanStructure = List<Pair<MeanValue, Map.Entry<DateInfo, List<Pair<ValueEntry, DateInfo>>>>>
+
+data class ValueEntry (var timestamp: Timestamp, var value: Float, var original: Int, var converter: (Int) -> Float = {it.toFloat()/10f})
 
 class DependentBarLineGraphActivity : AppCompatActivity() {
 
@@ -57,18 +53,40 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
     class PlaceholderFragment : Fragment() {
 
 
+
         private lateinit var lineData: LineChartData
         private var columnData: ColumnChartData? = null
-        lateinit var entries: List<SugarEntry>
+        lateinit var entries: List<ValueEntry>
         private lateinit var perWeekMean: WeekPerMeanStructure
 
         private lateinit var chartTop: LineChartView
         private lateinit var chartBottom: ColumnChartView
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-            entries = arguments!!.getParcelableArrayList<SugarEntry>("entries")
-                    .filterNotNull()
-                    .sortedBy { it.epochTimestamp }
+            val arguments = arguments ?: error("no args!")
+            val entries0 = arguments.getParcelableArrayList<SugarEntry>("entries")
+                    .filterNotNull() // fixme this shouldn't be necessary
+                    .sortedBy { it.epochTimestamp } // fixme neither should this
+            val thingToPick = arguments.getString("value_type")
+
+            fun <A,B> A?.returnUnlessNull(f:(A)-> B): B? =
+                    when(this) {
+                        null -> null
+                        else -> f(this)
+                    }
+
+            val mapper = when(thingToPick){
+                "sugar" ->
+                    {entry:SugarEntry -> ValueEntry(entry.epochTimestamp,entry.sugarLevel.toFloat()/10f,entry.sugarLevel)}
+                "weight" -> {
+                    entry -> entry.weight.returnUnlessNull { ValueEntry(entry.epochTimestamp,it.toFloat()/10f,it) }
+                }
+
+                else ->
+                    {_ -> null}
+            }
+            Log.d("blah","$entries0")
+            entries = entries0.mapNotNull(mapper)
             val rootView = inflater.inflate(R.layout.fragment_line_column_dependency, container, false)
 
             // *** TOP LINE CHART ***
@@ -193,7 +211,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
             // Create data points for the current week
             val newLineVals=weekEntries.mapIndexed { i,it ->
-                val sugarValue =it.first.sugarLevel.toFloat()/10f
+                val sugarValue =it.first.value
                 PointValue(i.toFloat(),sugarValue).setLabel(sugarValue.toString())
             }
 
@@ -207,7 +225,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
             lineData.axisXBottom=Axis(weekEntries.mapIndexed {
                 i, it ->
-                val date = DateHandler(it.first.epochTimestamp)
+                val date = DateHandler(it.first.timestamp)
                 val hour = date.hour
                 val minute = date.minute
                 val day=days[date.weekDay]
@@ -215,7 +233,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                         .setLabel("$day ${"%02d".format(hour)}:${"%02d".format(minute)}")}
             ).setHasLines(true).setHasTiltedLabels(true)
 
-            val maxSugar = weekEntries.maxBy { it.first.sugarLevel } !!.first.sugarLevel/10f
+            val maxSugar = weekEntries.maxBy { it.first.original } !!.first.value
             val altRight = if (weekEntries.size < 2 ) 2f else (weekEntries.size-1).toFloat()
 
             chartTop.currentViewport.right = altRight
@@ -239,13 +257,13 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
 
         @Suppress("USELESS_CAST")
-        private fun getMeanPerWeek(entries: List<SugarEntry>): WeekPerMeanStructure =
+        private fun getMeanPerWeek(entries: List<ValueEntry>): WeekPerMeanStructure =
                 // The "unnecessary" casts are to make the type be descriptive instead of a long jumble of ints
                 entries
                         // get the year and week of each entry
                         .map {
                             val cal = Calendar.getInstance()
-                            cal.timeInMillis=it.epochTimestamp
+                            cal.timeInMillis=it.timestamp
                             it to (
                                     cal.get(Calendar.YEAR) as Year
                                     to
@@ -253,13 +271,13 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                             )
                         }
                         // group by year & week
-                        .groupBy( { it.second } )
+                        .groupBy { it.second }
                         //
                         .map {
                             // mean value for the week
-                            (( it.value.sumBy {it.first.sugarLevel} .toFloat() / (it.value.size * 10.0f) ) as MeanValue
-                            to
-                            it)
+                            (( it.value.first().first.converter(it.value.sumBy {it.first.original}) / it.value.size ) as MeanValue
+                                    to
+                                    it)
                         }
 
 

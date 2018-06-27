@@ -28,7 +28,6 @@ import java.util.Map;
 
 import de.codecrafters.tableview.SortingOrder;
 import de.codecrafters.tableview.TableDataAdapter;
-import kotlin.Pair;
 import stobix.compat.functions.BiConsumer;
 import stobix.compat.functions.Consumer;
 import stobix.utils.ColorHandler;
@@ -43,8 +42,6 @@ public class MainActivity extends AppCompatActivity
         implements
         DatePickerFragment.DatePickerHandler,
         TimePickerFragment.TimePickerHandler,
-        NumberPickerFragment.NumberPickedHandler,
-        NumberPickerFragment.NumberClearedHandler,
         SugarEntryCreationActivity.OnSugarEntryEnteredHandler,
         SugarEntryCreationActivity.OnSugarEntryChangedHandler,
         SugarEntryCreationActivity.OnSugarEntryDeletedHandler,
@@ -348,7 +345,7 @@ public class MainActivity extends AppCompatActivity
 
                     return true;
 
-                case R.id.show_new_graphs:
+                case R.id.show_sugar_weekly:
                     MainHandler newGraphHandler =
                             new MainHandler(this,(mainActivity, bundle) -> {
                                 Log.d("graph","got bundle");
@@ -366,9 +363,36 @@ public class MainActivity extends AppCompatActivity
                                 Log.d("graph"," request");
                                 ArrayList<SugarEntry> entryArrayList = new ArrayList<>(entries);
                                 b.putParcelableArrayList("entries", entryArrayList);
+                                b.putString("value_type","sugar");
                                 m.setData(b);
                                 Log.d("graph","sending bundle");
                                 newGraphHandler.sendMessage(m);
+                            }
+                    ).start();
+                    return true;
+
+                case R.id.show_weight_weekly:
+                    MainHandler weightGraphHandler =
+                            new MainHandler(this,(mainActivity, bundle) -> {
+                                Log.d("weight graph","got bundle");
+                                Intent i = new Intent(this, DependentBarLineGraphActivity.class);
+                                i.putExtras(bundle);
+                                startActivity(i);
+                            });
+
+                    new Thread(
+                            () -> {
+                                Log.d("weight graph","got request");
+                                Message m = weightGraphHandler.obtainMessage();
+                                Bundle b = new Bundle();
+                                List<SugarEntry> entries = dao.getAllWeightPoints();
+                                Log.d("weight graph"," entries: "+entries.toString());
+                                ArrayList<SugarEntry> entryArrayList = new ArrayList<>(entries);
+                                b.putParcelableArrayList("entries", entryArrayList);
+                                b.putString("value_type","weight");
+                                m.setData(b);
+                                Log.d("weight graph","sending bundle");
+                                weightGraphHandler.sendMessage(m);
                             }
                     ).start();
                     return true;
@@ -597,17 +621,6 @@ public class MainActivity extends AppCompatActivity
             t.show(getSupportFragmentManager(), "timePicker");
         }
 
-        public void showNumberPicker(int val, int frac, int min, int max){
-            NumberPickerFragment n = new NumberPickerFragment();
-            Bundle b = new Bundle();
-            b.putInt("value",val);
-            b.putInt("fraction",frac);
-            b.putInt("min",min);
-            b.putInt("max",max);
-            n.setArguments(b);
-            n.show(getSupportFragmentManager(), "numberPicker");
-        }
-
         private SugarEntryCreationActivity creationActivity(){
             return (SugarEntryCreationActivity) getFragmentManager().findFragmentByTag("dialog");
         }
@@ -620,17 +633,6 @@ public class MainActivity extends AppCompatActivity
         public void handleTime(int hour, int minute) {
             creationActivity().handleTime(hour, minute) ;
         }
-
-        @Override
-        public void handleNumber(@NotNull Pair<Integer, Integer> number) {
-            creationActivity().onNumberSet(number);
-        }
-
-        @Override
-        public void handleNumberClear() {
-            creationActivity().onNumberClear();
-        }
-
 
         // Used to glue together all pieces of code that handles import/export of the database to/from a JSON file
         private FileActions fa = new FileActions(this);
