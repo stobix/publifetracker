@@ -2,9 +2,7 @@ package stobix.app.lifetracker
 
 import android.app.Dialog
 import android.content.Context
-import android.graphics.Color
 import android.graphics.PorterDuff
-import android.support.v7.view.ContextThemeWrapper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -75,13 +73,13 @@ class ThemeArrayAdapter(ctx: Context,  items: ArrayList<ThemeListItem>)
             fun TextView.setCol(attr:Int) = this.setTextColor(getCol(attr))
             fun ImageView.setColAtop(attr:Int) = this.setColorFilter(getCol(attr),PorterDuff.Mode.SRC_ATOP)
 
-            color1.setCol(R.attr.table_header_text)
+            color1.setColAtop(R.attr.table_header_text)
             slantedBar1.setColAtop(R.attr.tableView_headerColor)
 
-            color2.setCol(android.R.attr.textColorPrimary)
+            color2.setColAtop(android.R.attr.textColorPrimary)
             slantedBar2.setColAtop(R.attr.colorPrimary)
 
-            color3.setCol(R.attr.button_plus_color)
+            color3.setColAtop(R.attr.button_plus_color)
             slantedBar3.setColAtop(R.attr.colorAccent)
 
             textView.setCol(android.R.attr.textColorTertiary)
