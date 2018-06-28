@@ -2,13 +2,30 @@ package stobix.app.lifetracker
 
 import org.junit.Assert.*
 import org.junit.Test
-import stobix.compat.monads.Option.Some
-import stobix.compat.monads.Option.None
 
 class SugarEntryMergerTest {
     //inline infix fun <A> Option<out A>.asEq (a: Option<out A>) = assertEquals(this,a)
     private infix fun <A> A.asEq(a: A) = assertEquals(this,a)
 
+    @Test
+    fun zeroRecipient() {
+        val l1 = listOf(
+                SugarEntry(1,1,0,"first"),
+                SugarEntry(2,2,0,"second")
+        )
+        val l2 = listOf<SugarEntry>()
+        l1.getMergeables(l2) asEq listOf()
+    }
+    @Test
+    fun zeroMergeList() {
+        val l1 = listOf<SugarEntry>()
+        val l2 = listOf(
+                SugarEntry(1,1,0,"first"),
+                SugarEntry(2,2,0,"second")
+        )
+        l1.getMergeables(l2) asEq l2
+
+    }
     @Test
     fun mergeablesToShorter() {
         val l1 = listOf(

@@ -680,15 +680,21 @@ public class MainActivity extends AppCompatActivity
 
                                 nextUID=dao.getMaxUID()+1;
 
-
-                                List<SugarEntry> mergeables =
-                                        SugarEntryMerger.getMergeables(
-                                                tableView.getDataAdapter().getData(),
-                                                entries);
-                                for(SugarEntry entry:mergeables) {
-                                    entry.setUid(nextUID++);
+                                List<SugarEntry> currentEntries=tableView.getDataAdapter().getData();
+                                if(currentEntries.isEmpty()) {
+                                    // Nothing to merge into, just insert.
+                                    dao.insertAll(entries);
+                                    nextUID=dao.getMaxUID()+1;
+                                } else {
+                                    List<SugarEntry> mergeables =
+                                            SugarEntryMerger.getMergeables(
+                                                    currentEntries,
+                                                    entries);
+                                    for (SugarEntry entry : mergeables) {
+                                        entry.setUid(nextUID++);
+                                    }
+                                    dao.insertAll(mergeables);
                                 }
-                                dao.insertAll(mergeables);
                         }
                         Log.i("file","db done");
                         restarter.sendMessage(m);

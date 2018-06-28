@@ -1,6 +1,11 @@
 package stobix.app.lifetracker
 
 fun List<SugarEntry>.getMergeables(candidates:List<SugarEntry>) : List<SugarEntry>{
+    if(this.isEmpty())
+        return candidates
+    else if(candidates.isEmpty())
+        return candidates
+
     val selfList = this.sortedBy { it.epochTimestamp }
     val mergeList = candidates.distinctBy { it.epochTimestamp }.sortedBy { it.epochTimestamp }
 
