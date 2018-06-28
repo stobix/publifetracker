@@ -58,7 +58,7 @@
         android:layout_weight="1"
         app:layout_constraintEnd_toStartOf="@+id/themeViewColor2"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@mipmap/date_picker_icon" />
+        app:srcCompat="@drawable/the_round_color_black" />
 
     <ImageView
         android:id="@+id/themeViewColor2"
@@ -70,7 +70,7 @@
         android:layout_weight="1"
         app:layout_constraintEnd_toStartOf="@+id/themeViewColor3"
         app:layout_constraintStart_toEndOf="@id/themeViewColor1"
-        app:srcCompat="@mipmap/date_picker_icon" />
+        app:srcCompat="@drawable/the_round_color_black" />
 
     <ImageView
         android:id="@+id/themeViewColor3"
@@ -82,7 +82,7 @@
         android:layout_weight="1"
         app:layout_constraintEnd_toStartOf="@+id/themeViewText"
         app:layout_constraintStart_toEndOf="@id/themeViewColor2"
-        app:srcCompat="@mipmap/date_picker_icon" />
+        app:srcCompat="@drawable/the_round_color_black" />
 
     <ImageView
         android:id="@+id/themeViewSlantedBarFill"
