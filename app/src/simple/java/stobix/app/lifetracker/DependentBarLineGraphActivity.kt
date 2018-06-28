@@ -233,13 +233,15 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                         .setLabel("$day ${"%02d".format(hour)}:${"%02d".format(minute)}")}
             ).setHasLines(true).setHasTiltedLabels(true)
 
-            val maxSugar = weekEntries.maxBy { it.first.original } !!.first.value
+            val maxValue = weekEntries.maxBy { it.first.original } !!.first.value
+            val minValue = weekEntries.minBy { it.first.original } !!.first.value
             val altRight = if (weekEntries.size < 2 ) 2f else (weekEntries.size-1).toFloat()
 
             chartTop.currentViewport.right = altRight
-            chartTop.currentViewport.top = maxSugar+1
+            chartTop.currentViewport.top = maxValue+1
+            chartTop.currentViewport.bottom = minValue-1 // TODO include a button to toggle this between min and 0!
             chartTop.maximumViewport.right = altRight
-            chartTop.maximumViewport.top = maxSugar+1
+            chartTop.maximumViewport.top = maxValue+1
             // Redraw the chart with the new line and viewport
             chartTop.invalidate()
         }
