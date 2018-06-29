@@ -57,7 +57,7 @@ public class SortableSugarEntryTableView extends SortableTableView<SugarEntry> {
 
         Resources res = getResources();
 
-        String[] hdrs = res.getStringArray(R.array.headers);
+        String[] hdrs = {res.getStringArray(R.array.headers)[0],""};
         final SimpleTableHeaderAdapter simpleTableHeaderAdapter =
                 new SimpleTableHeaderAdapter(context,hdrs);
 
@@ -68,24 +68,20 @@ public class SortableSugarEntryTableView extends SortableTableView<SugarEntry> {
         setDataRowBackgroundProvider(TableDataRowBackgroundProviders.alternatingRowColors(rowColorEven, rowColorOdd));
         setHeaderSortStateViewProvider(SortStateViewProviders.brightArrows());
 
-        final TableColumnWeightModel tableColumnWeightModel =
-                // TODO Maybe change this to something not dependant on the amount of headers in the current language, but the actual number of fields to be shown.
-                new TableColumnWeightModel(hdrs.length);
+        final TableColumnWeightModel tableColumnWeightModel = new TableColumnWeightModel(hdrs.length);
 
         tableColumnWeightModel.setColumnWeight(0, 2);
-        tableColumnWeightModel.setColumnWeight(1, 1);
-        tableColumnWeightModel.setColumnWeight(2, 3);
+        tableColumnWeightModel.setColumnWeight(1, 5);
         setColumnModel(tableColumnWeightModel);
 
         setColumnComparator(0, (a,b) -> {
             long x= a.getEpochTimestamp() - b.getEpochTimestamp();
-            return (x>0)?1:(x<0)?-1:0;
+            return (x>0)?1:(x<0)?-1:0; // since we can't be sure the difference isn't bigger than an int
         });
-        setColumnComparator(1, (a,b) -> a.getSugarLevel() - b.getSugarLevel());
-        setColumnComparator(2, (a,b) -> {
-                    if(a.getExtra()== null) return 1;
-                    else if(b.getExtra() == null) return -1;
-                    else return a.getExtra().compareTo(b.getExtra());
+        setColumnComparator(1, (a,b) -> {
+                    if (a.compareSugar(b) != 0) return a.compareSugar(b);
+                    else if (a.compareWeight(b) != 0) return a.compareWeight(b);
+                    else return a.compareExtra(b);
                 }
         );
     }

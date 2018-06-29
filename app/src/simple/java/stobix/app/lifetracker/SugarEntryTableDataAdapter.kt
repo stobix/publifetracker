@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import de.codecrafters.tableview.TableDataAdapter
+import stobix.utils.kotlin.strings.comma
 import java.util.*
 
 /**
@@ -27,42 +28,31 @@ class SugarEntryTableDataAdapter(
                 val myDateString = DateFormat.format(formatString, myDate).toString()
                 renderString(myDateString)
             }
-            1 -> {
-                if(currRow.sugarLevel > 0)
-                    // TODO set locale somewhere in the app so this displays a decimal comma in countries that use it
-                    renderString(String.format("%.1f", currRow.sugarLevel / 10f))
-                else
-                    renderString("")
-            }
 
-            2 -> renderString(with(currRow.weight?.toFloat()?.div(10f)," kg").between(", ")(currRow.extra) ?: "")
-            else -> renderString("N/A")
+            1 -> renderString(
+                    currRow.sugarVal()?.let { "$it mmol/l"}
+                    comma
+                    currRow.weightVal()?.let { "$it kg" }
+                    comma
+                    currRow.extra
+            )
+            else -> renderString(null)
         }
     }
 
-    private fun with(a: Any?, ifIs: String, ifNull: String?=null) =
-            if (a != null)
-                "$a$ifIs"
-            else
-                ifNull
-
-    fun String?.between(s: String) : (String?) -> String? =
-        if (this == null)
-            { a -> a}
+    private fun SugarEntry.sugarVal()=
+        if(this.sugarLevel > 0)
+            // This apparently uses either a comma or a dot in the output depending on the language
+            String.format("%.1f", this.sugarLevel / 10f)
         else
-            { a ->
-                if (a == null || a == "")
-                    this
-                else
-                    this + s + a
-            }
+            null
 
+    private fun SugarEntry.weightVal() =
+            this.weight?.let { String.format("%.1f", it / 10f) }
 
-
-
-    private fun renderString(value: String): View {
+    private fun renderString(value: String?): View {
         val textView = TextView(context)
-        textView.text = value
+        textView.text = value ?: ""
         textView.setPadding(20, 10, 20, 10)
         return textView
     }

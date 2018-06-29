@@ -76,6 +76,27 @@ data class SugarEntry constructor(
                 false
     }
 
+    fun compareSugar(that: SugarEntry) =
+            when {
+                this.sugarLevel < 0 -> 1
+                that.sugarLevel < 0 -> -1
+                else -> this.sugarLevel - that.sugarLevel
+            }
+
+    fun compareWeight(that: SugarEntry) =
+            this.weight ?. let { first ->
+                that.weight ?. let { second ->
+                    first - second
+                } ?: 1
+            } ?: -1
+
+    fun compareExtra(that: SugarEntry) =
+            this.extra ?. let { first ->
+                that.extra ?. let { second ->
+                    first.compareTo(second)
+                } ?: 1
+            } ?: -1
+
 
 }
 
