@@ -62,6 +62,12 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
         private lateinit var chartTop: LineChartView
         private lateinit var chartBottom: ColumnChartView
 
+        private var low  = 4.0
+        private var mid = 7.0
+        private var high = 15.0
+
+        private var keepLowZero = true
+
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             val arguments = arguments ?: error("no args!")
             val entries0 = arguments.getParcelableArrayList<SugarEntry>("entries")
@@ -69,17 +75,17 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                     .sortedBy { it.epochTimestamp } // fixme neither should this
             val thingToPick = arguments.getString("value_type")
 
-            fun <A,B> A?.returnUnlessNull(f:(A)-> B): B? =
-                    when(this) {
-                        null -> null
-                        else -> f(this)
-                    }
+            low = arguments.getDouble("colorLowPoint",4.0)
+            mid = arguments.getDouble("colorMidPoint",7.0)
+            high = arguments.getDouble("colorHighPoint",15.0)
+
+            keepLowZero = arguments.getBoolean("keepLowZero",true)
 
             val mapper = when(thingToPick){
                 "sugar" ->
                     {entry:SugarEntry -> ValueEntry(entry.epochTimestamp,entry.sugarLevel.toFloat()/10f,entry.sugarLevel)}
                 "weight" -> {
-                    entry -> entry.weight.returnUnlessNull { ValueEntry(entry.epochTimestamp,it.toFloat()/10f,it) }
+                    entry -> entry.weight?.let { ValueEntry(entry.epochTimestamp,it.toFloat()/10f,it) }
                 }
 
                 else ->
@@ -106,14 +112,12 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             return rootView
         }
 
-        private fun colorBySugarLevel(level: Float) = when{
-            level > 15 -> ChartUtils.COLOR_RED
-            level > 7 -> ChartUtils.COLOR_ORANGE
-            level < 4 -> ChartUtils.COLOR_VIOLET
-            else -> ChartUtils.COLOR_GREEN
+        private fun colorByLevel(level: Float) = when{
+            level < low -> ChartUtils.COLOR_VIOLET
+            level < mid -> ChartUtils.COLOR_GREEN
+            level < high -> ChartUtils.COLOR_ORANGE
+            else -> ChartUtils.COLOR_RED
         }
-
-
 
         private fun initiateBottomChart(
                 perWeekMean: WeekPerMeanStructure) {
@@ -128,7 +132,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                 val (currentYear,currentWeek ) = perWeekMean[i].second.key
                 val currentMean=perWeekMean[i].first
 
-                values.add( SubcolumnValue(currentMean, colorBySugarLevel(currentMean)) )
+                values.add( SubcolumnValue(currentMean, colorByLevel(currentMean)) )
 
                 // The year should be displayed before the first week of the year
                 if (currentWeek == 1)
@@ -151,6 +155,8 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
             // Set value touch listener that will trigger changes for chartTop.
             chartBottom.onValueTouchListener = BottomValueSelectedListener()
+            // Todo: set left to the width of the max characters shown on the axis
+            chartBottom.setPadding(40,0,0,0)
 
             // Set selection mode to keep selected month column highlighted.
             chartBottom.isValueSelectionEnabled = true
@@ -159,6 +165,9 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
             chartBottom.currentViewport.right=perWeekMean.size.toFloat()-0.5f
             chartBottom.currentViewport.left=perWeekMean.size.toFloat()-15.5f
+
+            if (!keepLowZero)
+                chartBottom.currentViewport.bottom= perWeekMean.minBy { it.first } ?.first?.minus(2f) ?: 0f
 
         }
 
@@ -187,7 +196,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             lineData.axisXBottom = Axis(axisValues).setHasLines(true)
             lineData.axisYLeft = Axis().setHasLines(true).setMaxLabelChars(3)
 
-            chartTop.setPadding(0,0,17,40)
+            chartTop.setPadding(40,0,17,43)
 
             chartTop.lineChartData = lineData
 
@@ -266,20 +275,21 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                         .map {
                             val cal = Calendar.getInstance()
                             cal.timeInMillis=it.timestamp
-                            it to (
-                                    cal.get(Calendar.YEAR) as Year
-                                    to
-                                    cal.get(Calendar.WEEK_OF_YEAR) as Week
-                            )
+                            val year: Year = cal.get(Calendar.YEAR)
+                            val week: Week = cal.get(Calendar.WEEK_OF_YEAR)
+                            val dateInfo: DateInfo = year to week
+                            it to dateInfo
                         }
                         // group by year & week
                         .groupBy { it.second }
                         //
                         .map {
-                            // mean value for the week
-                            (( it.value.first().first.converter(it.value.sumBy {it.first.original}) / it.value.size ) as MeanValue
-                                    to
-                                    it)
+                            val elems = it.value
+                            val firstElem = elems.first().first
+                            val weekSum = elems.sumBy {it.first.original}
+                            val weekConverted = firstElem.converter(weekSum)
+                            val weekMean: MeanValue = weekConverted / elems.size
+                            (weekMean to it)
                         }
 
 

@@ -384,6 +384,10 @@ public class MainActivity extends AppCompatActivity
                                 ArrayList<SugarEntry> entryArrayList = new ArrayList<>(entries);
                                 b.putParcelableArrayList("entries", entryArrayList);
                                 b.putString("value_type","weight");
+                                b.putDouble("colorHighPoint",90);
+                                b.putDouble("colorMidPoint",85);
+                                b.putDouble("colorLowPoint",80);
+                                b.putBoolean("keepLowZero",false);
                                 m.setData(b);
                                 Log.d("weight graph","sending bundle");
                                 weightGraphHandler.sendMessage(m);
