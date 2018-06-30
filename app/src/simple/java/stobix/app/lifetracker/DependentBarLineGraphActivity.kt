@@ -3,7 +3,6 @@ package stobix.app.lifetracker
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,6 +29,7 @@ typealias Week = Int
 typealias DateInfo = Pair<Year,Week>
 
 typealias WeekPerMeanStructure = List<Pair<MeanValue, Map.Entry<DateInfo, List<Pair<ValueEntry, DateInfo>>>>>
+
 
 data class ValueEntry (var timestamp: Timestamp, var value: Float, var original: Int, var converter: (Int) -> Float = {it.toFloat()/10f})
 
@@ -70,9 +70,12 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             val arguments = arguments ?: error("no args!")
-            val entries0 = arguments.getParcelableArrayList<SugarEntry>("entries")
-                    .filterNotNull() // fixme this shouldn't be necessary
-                    .sortedBy { it.epochTimestamp } // fixme neither should this
+
+
+            val entries0 = arguments.getParcelableArrayList<FloatyIntBucket>("entries")
+                    // FIXME why do these make the graphs show correctly‽ I already sorted the data and made sure there were no nulls when I accessed the database
+                    .filterNotNull()
+                    .sortedBy { it.timestamp }
             val thingToPick = arguments.getString("value_type")
 
             low = arguments.getDouble("colorLowPoint",4.0)
@@ -81,18 +84,14 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
             keepLowZero = arguments.getBoolean("keepLowZero",true)
 
-            val mapper = when(thingToPick){
-                "sugar" ->
-                    {entry:SugarEntry -> ValueEntry(entry.epochTimestamp,entry.sugarLevel.toFloat()/10f,entry.sugarLevel)}
-                "weight" -> {
-                    entry -> entry.weight?.let { ValueEntry(entry.epochTimestamp,it.toFloat()/10f,it) }
-                }
-
-                else ->
-                    {_ -> null}
+            val mapper : (FloatyIntBucket) -> ValueEntry = when(thingToPick){
+                "int" -> {{ValueEntry(it.timestamp,it.value.toFloat(),it.value)}}
+                "floatyInt10" -> {{ValueEntry(it.timestamp,it.value.toFloat()/10f,it.value)}}
+                "floatyInt100" -> {{ValueEntry(it.timestamp,it.value.toFloat()/100f,it.value)}}
+                else -> {{ValueEntry(it.timestamp,it.value.toFloat(),it.value)}}
             }
-            Log.d("blah","$entries0")
-            entries = entries0.mapNotNull(mapper)
+
+            entries = entries0.map(mapper)
             val rootView = inflater.inflate(R.layout.fragment_line_column_dependency, container, false)
 
             // *** TOP LINE CHART ***
