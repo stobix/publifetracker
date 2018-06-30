@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import de.codecrafters.tableview.TableDataAdapter
-import stobix.utils.kotlin.strings.comma
+import stobix.utils.kotlin.strings.bar
 import java.util.*
 
 /**
@@ -31,9 +31,9 @@ class SugarEntryTableDataAdapter(
 
             1 -> renderString(
                     currRow.sugarVal()?.let { "$it mmol/l"}
-                    comma
+                    bar
                     currRow.weightVal()?.let { "$it kg" }
-                    comma
+                    bar
                     currRow.extra
             )
             else -> renderString(null)
