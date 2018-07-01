@@ -4,9 +4,9 @@ import android.content.Context
 import android.text.format.DateFormat
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import de.codecrafters.tableview.TableDataAdapter
-import stobix.utils.kotlin.strings.bar
 import java.util.*
 
 /**
@@ -29,13 +29,13 @@ class SugarEntryTableDataAdapter(
                 renderString(myDateString)
             }
 
-            1 -> renderString(
-                    currRow.sugarVal()?.let { "$it mmol/l"}
-                    bar
-                    currRow.weightVal()?.let { "$it kg" }
-                    bar
-                    currRow.extra
-            )
+            1 -> renderStrings(
+                        currRow.sugarVal()?.let { "$it mmol/l"}
+                        ,
+                        currRow.weightVal()?.let { "$it kg" }
+                        ,
+                        currRow.extra
+                )
             else -> renderString(null)
         }
     }
@@ -50,6 +50,11 @@ class SugarEntryTableDataAdapter(
     private fun SugarEntry.weightVal() =
             this.weight?.let { String.format("%.1f", it / 10f) }
 
+    private fun renderStrings(vararg values: String?): View{
+        val compositeView = LinearLayout(context)
+        values.filterNotNull().forEach { compositeView.addView(renderString(it)) }
+        return compositeView
+    }
     private fun renderString(value: String?): View {
         val textView = TextView(context)
         textView.text = value ?: ""
