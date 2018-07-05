@@ -13,12 +13,8 @@ import java.util.List;
 public interface SugarEntryDao {
     @Query("select * from sugar_entries")
     List<SugarEntry> getAll();
-    @Query("SELECT * FROM sugar_entries WHERE uid IN (:userIds)")
-    List<SugarEntry> loadAllByIds(int[] userIds);
     @Query("Select * from sugar_entries where timestamp between :firstDate and :secondDate")
     List<SugarEntry> getBetweenEpochs(long firstDate,long secondDate);
-    @Query("Select max(uid) from sugar_entries")
-    int getMaxUID();
 
     @Query("select sugar from sugar_entries where sugar > -1")
     List<Long> getAllSugarLevels();

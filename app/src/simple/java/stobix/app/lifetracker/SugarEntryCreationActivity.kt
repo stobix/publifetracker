@@ -23,7 +23,6 @@ open class SugarEntryCreationActivity
 ) : DialogFragment( )
 {
 
-    private var uid: Int=0
     private var date: DateHandler = DateHandler()
     private var sugarLevel: Int? = null
     private var weight: Int? = null
@@ -40,18 +39,16 @@ open class SugarEntryCreationActivity
         alreadyDefinedEntry = arguments.getBoolean("EditCurrent")
         if(alreadyDefinedEntry) {
             entry=arguments.getParcelable("entry")
-            uid= entry.uid
             date.timestamp= entry.epochTimestamp
             weight = entry.weight
             sugarLevel=if (entry.sugarLevel==-1) null else entry.sugarLevel
             d( "SugarEntry create",
-                    "already defined, uid:${entry.uid}, timestamp:${entry.epochTimestamp}, sugar: ${entry.sugarLevel}, extra: ${entry.epochTimestamp}"
+                    "already defined; timestamp:${entry.epochTimestamp}, sugar: ${entry.sugarLevel}, extra: ${entry.epochTimestamp}"
             )
         } else {
-            uid = arguments.getInt("uid")
             date.timestamp = arguments.getLong("timestamp")
-            d("SugarEntry create","creating new, uid:${uid}, timestamp:${date.timestamp}")
-            entry = SugarEntry(uid, date.timestamp)
+            d("SugarEntry create","creating new, timestamp:${date.timestamp}")
+            entry = SugarEntry(epochTimestamp= date.timestamp)
         }
     }
 
@@ -127,8 +124,8 @@ open class SugarEntryCreationActivity
             dismiss()
         } else {
             handleSubmission(extraV)
-            uid++
-            entry= SugarEntry(uid)
+            // Ensure we don't enter two entries with the same timestamp
+            entry= SugarEntry(epochTimestamp = entry.epochTimestamp+1)
         }
     }
 
@@ -143,10 +140,10 @@ open class SugarEntryCreationActivity
         entry.weight = weightView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt()
         entry.extra = extraView.text?.toString() ?: "N/A"
         if(alreadyDefinedEntry) {
-            d("SugarEntry update", "${entry.uid} ${entry.epochTimestamp} ${entry.sugarLevel} ${entry.weight} ${entry.extra}")
+            d("SugarEntry update", "${entry.epochTimestamp} ${entry.sugarLevel} ${entry.weight} ${entry.extra}")
             (activity as OnSugarEntryChangedHandler).onSugarEntryChanged(entry)
         } else {
-            d("SugarEntry submit", "${entry.uid} ${entry.epochTimestamp} ${entry.sugarLevel} ${entry.weight} ${entry.extra}")
+            d("SugarEntry submit", "${entry.epochTimestamp} ${entry.sugarLevel} ${entry.weight} ${entry.extra}")
             (activity as OnSugarEntryEnteredHandler).onSugarEntryEntered(entry)
         }
     }
@@ -165,13 +162,12 @@ open class SugarEntryCreationActivity
     }
 
     companion object Creator{
-        @JvmStatic fun newInstance(uid: Int) = newInstance(uid, DateHandler().timestamp)
-        @JvmStatic fun newInstance(uid: Int, timestamp: Long ): SugarEntryCreationActivity {
+        @JvmStatic fun newInstance() = newInstance(DateHandler().timestamp)
+        @JvmStatic fun newInstance(timestamp: Long ): SugarEntryCreationActivity {
             val s = SugarEntryCreationActivity()
             val args = Bundle()
-            d("SugarEntry creation","Called with uid:"+uid+" timestamp:"+timestamp)
+            d("SugarEntry creation","Called with timestamp:"+timestamp)
             args.putBoolean("EditCurrent",false)
-            args.putInt("uid",uid)
             args.putLong("timestamp",timestamp)
             s.arguments=args
             return s
@@ -179,7 +175,7 @@ open class SugarEntryCreationActivity
         @JvmStatic fun newInstance(sugarEntry: SugarEntry): SugarEntryCreationActivity {
             val s = SugarEntryCreationActivity()
             val args = Bundle()
-            d("SugarEntry edit","Called with uid:"+sugarEntry.uid+" timestamp:"+sugarEntry.epochTimestamp)
+            d("SugarEntry edit","Called with timestamp:"+sugarEntry.epochTimestamp)
             args.putBoolean("EditCurrent",true)
             args.putParcelable("entry",sugarEntry)
             s.arguments=args

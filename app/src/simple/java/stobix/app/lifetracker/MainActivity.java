@@ -58,13 +58,6 @@ public class MainActivity extends AppCompatActivity
         // Used for all data base related operations once initiated in onCreate
         private SugarEntryDao dao;
 
-        // Used to keep track of the next UID that a SugarEntry can have to not
-        // crash the data base on insertion.
-        private int nextUID;
-
-
-
-
         @Override
         protected void onCreate(Bundle savedInstanceState) {
 
@@ -113,7 +106,7 @@ public class MainActivity extends AppCompatActivity
             });
 
             tableView.addDataLongClickListener( (rowIndex, sugarEntry) -> {
-                onSugarEntryEntered(sugarEntry.copyToCurrentWithId(nextUID));
+                onSugarEntryEntered(sugarEntry.copyToCurrent());
                 return true;
             });
 
@@ -137,10 +130,6 @@ public class MainActivity extends AppCompatActivity
 
                 List<SugarEntry> entries = dao.getAll();
                 d("LOL","Entries "+entries.size());
-
-                nextUID=dao.getMaxUID()+1;
-
-                d("LOL","Max UID: "+nextUID);
 
                 Message msg = db_data_handler.obtainMessage();
                 Bundle bundle = new Bundle();
@@ -454,7 +443,7 @@ public class MainActivity extends AppCompatActivity
             }
             ft.addToBackStack(null);
 
-            SugarEntryCreationActivity creationActivityFlupp = SugarEntryCreationActivity.newInstance(nextUID);
+            SugarEntryCreationActivity creationActivityFlupp = SugarEntryCreationActivity.newInstance();
             creationActivityFlupp.show(ft, "dialog");
 
         }
@@ -462,7 +451,6 @@ public class MainActivity extends AppCompatActivity
         // Called from the sugar entry dialog when the user clicks 'add'
         @Override
         public void onSugarEntryEntered(@NotNull SugarEntry s) {
-            nextUID++;
             sugarEntryGeneralAction(s,
                     (sugarEntry) -> dao.insert(sugarEntry),
                     (sugarEntry,dataAdapter) -> dataAdapter.add(sugarEntry)
@@ -637,7 +625,8 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void handleFileCreated(@NotNull Uri uri) {
             Log.i("file","created URI: "+uri.toString());
-            SugarEntryGsonWrapper wrapper = new SugarEntryGsonWrapper(1,tableView.getDataAdapter().getData());
+            // FIXME get the version number set in some config file instead!!
+            SugarEntryGsonWrapper wrapper = new SugarEntryGsonWrapper(2,tableView.getDataAdapter().getData());
             String json = wrapper.toJSON();
             Log.i("file (json)",json);
             fa.putTextInUri(uri,json);
@@ -667,7 +656,6 @@ public class MainActivity extends AppCompatActivity
                             case "replace":
                                 dao.clear_sugar_entries();
                                 dao.insertAll(entries);
-                                nextUID=dao.getMaxUID()+1;
                                 break;
                             case "merge":
 
@@ -682,21 +670,19 @@ public class MainActivity extends AppCompatActivity
 
                                 // Alt solution until i remove timestamps:
 
-                                nextUID=dao.getMaxUID()+1;
 
                                 List<SugarEntry> currentEntries=tableView.getDataAdapter().getData();
                                 if(currentEntries.isEmpty()) {
                                     // Nothing to merge into, just insert.
                                     dao.insertAll(entries);
-                                    nextUID=dao.getMaxUID()+1;
                                 } else {
+                                    Log.d("entries",currentEntries.toString());
+                                    Log.d("candidates",entries.toString());
                                     List<SugarEntry> mergeables =
                                             SugarEntryMerger.getMergeables(
                                                     currentEntries,
                                                     entries);
-                                    for (SugarEntry entry : mergeables) {
-                                        entry.setUid(nextUID++);
-                                    }
+                                    Log.d("mergeables",mergeables.toString());
                                     dao.insertAll(mergeables);
                                 }
                         }

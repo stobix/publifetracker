@@ -21,9 +21,8 @@ import stobix.utils.DateHandler
     By setting a default value for all constructor parameters, I get an empty constructor for free.
     */
 data class SugarEntry constructor(
-        @PrimaryKey var uid: Int=0, // TODO Should this even have a default value?
-        @ColumnInfo(name = "timestamp", typeAffinity = INTEGER) var epochTimestamp: Long=0, // TODO Should this be a nullable in the database?
-        @ColumnInfo(name = "sugar") var sugarLevel: Int=-1, // TODO Should this be a nullable in the database?
+        @PrimaryKey @ColumnInfo(name = "timestamp", typeAffinity = INTEGER) var epochTimestamp: Long=0,
+        @ColumnInfo(name = "sugar") var sugarLevel: Int=-1, // TODO Change this to nullable, changing any -1 in the database to null
         @ColumnInfo(name = "extra") var extra: String?=null,
         @ColumnInfo(name = "weight") var weight: Int?=null
 ) : Parcelable {
@@ -35,7 +34,6 @@ data class SugarEntry constructor(
 
     // IMPORTANT: These calls need to be in the same order as in writeToParcel below!
     private constructor(parcel: Parcel) : this(
-            parcel.readInt(), // uid
             parcel.readLong(), // timestamp
             parcel.readInt(), // sugar
             parcel.readString(), // extra
@@ -43,12 +41,10 @@ data class SugarEntry constructor(
 
     )
 
-    fun copyToCurrentWithId(uid: Int) =
-            copy(uid=uid,epochTimestamp = DateHandler().timestamp)
-
+    fun copyToCurrent() =
+            copy(epochTimestamp = DateHandler().timestamp)
 
     override fun writeToParcel(parcel: Parcel, i: Int) {
-        parcel.writeInt(uid)
         parcel.writeLong(epochTimestamp)
         parcel.writeInt(sugarLevel)
         parcel.writeString(extra)
