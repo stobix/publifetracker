@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.support.annotation.NonNull;
 
 public class DatabaseHandler {
+    // 1 -> 2: Added a weight column
     final static Migration sugarMig1_2 = new Migration(1,2) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
@@ -17,12 +18,7 @@ public class DatabaseHandler {
         }
     };
 
-    static class Sugar2_3{
-        static long timestamp;
-        static int sugar;
-        static Integer weight;
-        static String extra;
-    }
+    // 2 -> 3: Removed the superfluous uid column, making timestamp the primary, distinct key
     final static Migration sugarMig2_3 = new Migration(2,3){
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
