@@ -41,14 +41,13 @@ class SugarEntryTableDataAdapter(
     }
 
     private fun SugarEntry.sugarVal()=
-        if(this.sugarLevel > 0)
-            // This apparently uses either a comma or a dot in the output depending on the language
-            String.format("%.1f", this.sugarLevel / 10f)
-        else
-            null
+            this.sugarLevel ?. let {
+                // This apparently uses either a comma or a dot in the output depending on the language
+                String.format("%.1f", it / 10f)
+            }
 
     private fun SugarEntry.weightVal() =
-            this.weight?.let { String.format("%.1f", it / 10f) }
+            this.weight ?. let { String.format("%.1f", it / 10f) }
 
     private fun renderStrings(vararg values: String?): View{
         val compositeView = LinearLayout(context)

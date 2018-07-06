@@ -8,6 +8,21 @@ import android.os.Parcel
 import android.os.Parcelable
 import stobix.utils.DateHandler
 
+private fun Parcel.writeNullableInt(i:Int?){
+    if (i != null) {
+        this.writeInt(1)
+        this.writeInt(i)
+    }
+    else
+        this.writeInt(0)
+}
+
+private fun Parcel.readNullableInt()=
+        if (this.readInt() != 0)
+            this.readInt()
+        else
+            null
+
 // The Room database entry class/TableView row class that acts as a glue between the two.
 
 @Entity(tableName = "sugar_entries")
@@ -22,7 +37,7 @@ import stobix.utils.DateHandler
     */
 data class SugarEntry constructor(
         @PrimaryKey @ColumnInfo(name = "timestamp", typeAffinity = INTEGER) var epochTimestamp: Long=0,
-        @ColumnInfo(name = "sugar") var sugarLevel: Int=-1, // TODO Change this to nullable, changing any -1 in the database to null
+        @ColumnInfo(name = "sugar") var sugarLevel: Int?=null,
         @ColumnInfo(name = "extra") var extra: String?=null,
         @ColumnInfo(name = "weight") var weight: Int?=null
 ) : Parcelable {
@@ -35,10 +50,9 @@ data class SugarEntry constructor(
     // IMPORTANT: These calls need to be in the same order as in writeToParcel below!
     private constructor(parcel: Parcel) : this(
             parcel.readLong(), // timestamp
-            parcel.readInt(), // sugar
+            parcel.readNullableInt(), // sugar
             parcel.readString(), // extra
-            if(parcel.readInt()!=0) parcel.readInt() else null
-
+            parcel.readNullableInt() // weight
     )
 
     fun copyToCurrent() =
@@ -46,15 +60,9 @@ data class SugarEntry constructor(
 
     override fun writeToParcel(parcel: Parcel, i: Int) {
         parcel.writeLong(epochTimestamp)
-        parcel.writeInt(sugarLevel)
+        parcel.writeNullableInt(sugarLevel)
         parcel.writeString(extra)
-        val weight = weight
-        if (weight == null) {
-            parcel.writeInt(0)
-        } else {
-            parcel.writeInt(1)
-            parcel.writeInt(weight)
-        }
+        parcel.writeNullableInt(weight)
     }
 
     companion object CREATOR: Parcelable.Creator<SugarEntry> {
@@ -72,27 +80,22 @@ data class SugarEntry constructor(
                 false
     }
 
+    private fun <A>compareNullables(a: A?, b: A?, comparator: (A, A) -> Int) =
+            a ?. let { first ->
+                b ?. let { second ->
+                    comparator(first,second)
+                } ?: 1
+            } ?: -1
+
+
     fun compareSugar(that: SugarEntry) =
-            when {
-                this.sugarLevel < 0 -> 1
-                that.sugarLevel < 0 -> -1
-                else -> this.sugarLevel - that.sugarLevel
-            }
+            compareNullables(this.sugarLevel,that.sugarLevel) { a, b-> a-b}
 
     fun compareWeight(that: SugarEntry) =
-            this.weight ?. let { first ->
-                that.weight ?. let { second ->
-                    first - second
-                } ?: 1
-            } ?: -1
+            compareNullables(this.weight,that.weight) { a, b-> a-b}
 
     fun compareExtra(that: SugarEntry) =
-            this.extra ?. let { first ->
-                that.extra ?. let { second ->
-                    first.compareTo(second)
-                } ?: 1
-            } ?: -1
-
+            compareNullables(this.extra,that.extra) { a, b-> a.compareTo(b)}
 
 }
 

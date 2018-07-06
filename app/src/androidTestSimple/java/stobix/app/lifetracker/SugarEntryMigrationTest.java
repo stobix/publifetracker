@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 
 import java.io.IOException;
 
+import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -176,6 +177,45 @@ public class SugarEntryMigrationTest {
         assertEquals(entryC.getInt(entryC.getColumnIndex("timestamp")),4);
         entryC.moveToNext();
         assertEquals(entryC.getInt(entryC.getColumnIndex("timestamp")),5);
+        assertTrue(entryC.isLast());
+    }
+
+    @Test
+    public void migrate3To4() throws IOException {
+        SupportSQLiteDatabase db = helper.createDatabase(TEST_DB, 3);
+
+        ContentValues v = new ContentValues();
+        v.put("timestamp", 0L);
+        v.put("sugar",-1);
+        v.putNull("extra");
+        db.insert(TEST_DB, OnConflictStrategy.FAIL,v);
+
+        v.put("timestamp", 1L);
+        v.put("sugar",1);
+        v.putNull("extra");
+        db.insert(TEST_DB, OnConflictStrategy.FAIL,v);
+
+        db.close();
+
+        db = helper.runMigrationsAndValidate(TEST_DB, 4, true, DatabaseHandler.sugarMig3_4);
+
+        Cursor entryC = db.query("select * from sugar_entries order by timestamp");
+        // MigrationTestHelper automatically verifies the schema changes,
+        // but you need to validate that the data was migrated properly.
+        while(entryC.moveToNext()){
+            Log.d("entries",
+                    showValue(entryC,"timestamp")
+                            + showValue(entryC,"sugar")
+                            + showValue(entryC,"weight")
+                            + showValue(entryC,"extra","")
+            );
+            Log.d("newline","");
+        }
+        Log.d("entries","no more entries");
+        entryC.moveToFirst();
+        assertTrue(entryC.isNull(entryC.getColumnIndex("sugar")));
+        entryC.moveToNext();
+        assertFalse(entryC.isNull(entryC.getColumnIndex("sugar")));
         assertTrue(entryC.isLast());
     }
 }

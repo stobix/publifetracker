@@ -21,8 +21,9 @@ import java.util.*
  * status bar and navigation/system bar) with user interaction.
  */
 class FullscreenGraphActivity : Activity() {
+
     private var gs:List<LineGraphSeries<DataPoint>> = mutableListOf()
-    private lateinit var entries:List<SugarEntry>
+    private lateinit var entries:List<FloatyIntBucket>
 
     private lateinit var bareSeries: LineGraphSeries<DataPoint>
     private lateinit var meanPerDaySeries: LineGraphSeries<DataPoint>
@@ -100,16 +101,16 @@ class FullscreenGraphActivity : Activity() {
         dummy_button.setOnTouchListener(mDelayHideTouchListener)
         Log.d("graph", "got created")
         super.onCreate(savedInstanceState)
-        entries = intent.extras.getParcelableArrayList<SugarEntry>("entries")
+        entries = intent.extras.getParcelableArrayList<FloatyIntBucket>("entries")
                 .filterNotNull()
-                .sortedBy { it.epochTimestamp }
+                .sortedBy { it.timestamp }
 
         bareSeries = LineGraphSeries(
                 entries
                         .map {
                             DataPoint(
-                                    DateHandler(it.epochTimestamp).dateObject,
-                                    it.sugarLevel.toDouble() / 10.0
+                                    DateHandler(it.timestamp).dateObject,
+                                    it.value.toDouble() / 10.0
                             )
                         }
                         .toTypedArray()
@@ -120,7 +121,7 @@ class FullscreenGraphActivity : Activity() {
                         // get the year and week of each entry
                         .map {
                             val cal = Calendar.getInstance()
-                            cal.timeInMillis = it.epochTimestamp
+                            cal.timeInMillis = it.timestamp
                             Pair(it, Pair(cal.get(Calendar.YEAR), cal.get(Calendar.WEEK_OF_YEAR)))
                         }
                         // sort the entries by year & week
@@ -133,10 +134,10 @@ class FullscreenGraphActivity : Activity() {
                                     // For now, use the last entry in the week as timestamp.
                                     // For later, it's probably best to have a timestamp
                                     // corresponding to the start of the week or so
-                                    it.value.sortedBy { it.first.epochTimestamp }.last().first.epochTimestamp
+                                    it.value.sortedBy { it.first.timestamp }.last().first.timestamp
                                     ,
                                     // mean value for the week
-                                    it.value.sumBy { it.first.sugarLevel }.toDouble() / (it.value.size * 10.0)
+                                    it.value.sumBy { it.first.value }.toDouble() / (it.value.size * 10.0)
                                     // for debugging purposes only
                                     , it
                             )
@@ -162,19 +163,19 @@ class FullscreenGraphActivity : Activity() {
                 entries
                         .drop(1)
                         .fold(
-                                entries.first().epochTimestamp
+                                entries.first().timestamp
                                         to
-                                        (entries.first().sugarLevel to 1)
+                                        (entries.first().value to 1)
                                         to
                                         listOf<Pair<Long, Double>>())
                         { acc, current ->
                             val (startTime: Long, meanAcc: Pair<Int, Int>, dataAcc) = acc
                             val (accLevels: Int, points: Int) = meanAcc
-                            if (current.epochTimestamp - startTime >= 4 * hour) {
+                            if (current.timestamp - startTime >= 4 * hour) {
                                 val fourHourMean = accLevels.toDouble() / (points * 10)
-                                (current.epochTimestamp
+                                (current.timestamp
                                         to
-                                        Pair(current.sugarLevel, 1)
+                                        Pair(current.value, 1)
                                         to
                                         dataAcc
                                                 .plus(Pair(startTime, fourHourMean))
@@ -183,7 +184,7 @@ class FullscreenGraphActivity : Activity() {
                             } else
                                 (startTime
                                         to
-                                        Pair(accLevels + current.sugarLevel, points + 1)
+                                        Pair(accLevels + current.value, points + 1)
                                         to
                                         dataAcc
                                         )
@@ -221,8 +222,8 @@ class FullscreenGraphActivity : Activity() {
         //fullscreen_graph.background=chartBackgroundColor
         fullscreen_graph.textAlignment = View.TEXT_ALIGNMENT_CENTER
         fullscreen_graph.gridLabelRenderer.numVerticalLabels = 4
-        fullscreen_graph.viewport.setMinX((entries.last().epochTimestamp - 7 * 24 * hour).toDouble())
-        fullscreen_graph.viewport.setMaxX(entries.last().epochTimestamp.toDouble())
+        fullscreen_graph.viewport.setMinX((entries.last().timestamp - 7 * 24 * hour).toDouble())
+        fullscreen_graph.viewport.setMaxX(entries.last().timestamp.toDouble())
         fullscreen_graph.viewport.isScalable = true
         fullscreen_graph.setBackgroundColor(chartBackgroundColor)
 

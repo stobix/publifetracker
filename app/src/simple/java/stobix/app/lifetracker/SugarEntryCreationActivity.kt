@@ -41,7 +41,7 @@ open class SugarEntryCreationActivity
             entry=arguments.getParcelable("entry")
             date.timestamp= entry.epochTimestamp
             weight = entry.weight
-            sugarLevel=if (entry.sugarLevel==-1) null else entry.sugarLevel
+            sugarLevel=entry.sugarLevel
             d( "SugarEntry create",
                     "already defined; timestamp:${entry.epochTimestamp}, sugar: ${entry.sugarLevel}, extra: ${entry.epochTimestamp}"
             )
@@ -136,7 +136,7 @@ open class SugarEntryCreationActivity
 
     private fun handleSubmission(extraView: TextView){
         entry.epochTimestamp=date.timestamp
-        entry.sugarLevel = sugarView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt() ?: -1 // sugarLevel ?: -1
+        entry.sugarLevel = sugarView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt()
         entry.weight = weightView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt()
         entry.extra = extraView.text?.toString() ?: "N/A"
         if(alreadyDefinedEntry) {

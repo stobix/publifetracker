@@ -5,7 +5,7 @@ import android.arch.persistence.room.RoomDatabase;
 
 @Database(
         entities={SugarEntry.class},
-        version=3,
+        version=4,
         exportSchema = true
 )
 public abstract class SugarEntryDatabase extends RoomDatabase{

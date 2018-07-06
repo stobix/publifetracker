@@ -288,9 +288,9 @@ public class MainActivity extends AppCompatActivity
                                 Log.d("graph","got request");
                                 Message m = graphHandler.obtainMessage();
                                 Bundle b = new Bundle();
-                                List<SugarEntry> entries = dao.getAllSugarPoints();
+                                List<FloatyIntBucket> entries = dao.getAllSugarBuckets();
                                 Log.d("graph"," request");
-                                ArrayList<SugarEntry> entryArrayList = new ArrayList<>(entries);
+                                ArrayList<FloatyIntBucket> entryArrayList = new ArrayList<>(entries);
                                 b.putParcelableArrayList("entries", entryArrayList);
                                 ArrayList<Integer> colorArrayList = new ArrayList<>();
                                 ColorHandler c = new ColorHandler(this);

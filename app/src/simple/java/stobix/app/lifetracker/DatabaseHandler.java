@@ -66,6 +66,24 @@ public class DatabaseHandler {
         }
     };
 
+    final static Migration sugarMig3_4 = new Migration(3,4) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.beginTransaction();
+            try {
+                String TABLE_NAME = "sugar_entries_new";
+                database.execSQL("create table "+TABLE_NAME+" (timestamp integer not null primary key, sugar integer, weight integer, extra text)");
+                database.execSQL("insert into "+TABLE_NAME+" select * from sugar_entries");
+                database.execSQL("update "+TABLE_NAME+" set sugar = null where sugar == -1");
+                database.execSQL("drop table sugar_entries");
+                database.execSQL("alter table "+ TABLE_NAME + " rename to sugar_entries");
+                database.setTransactionSuccessful();
+            } finally {
+                database.endTransaction();
+            }
+        }
+    };
+
     public static SugarEntryDatabase buildSugarDatabase(Context ctx){
         return Room.databaseBuilder(
                 ctx,
@@ -73,6 +91,7 @@ public class DatabaseHandler {
                 "sugarApp")
                 .addMigrations(sugarMig1_2)
                 .addMigrations(sugarMig2_3)
+                .addMigrations(sugarMig3_4)
                 .build();
     }
 }
