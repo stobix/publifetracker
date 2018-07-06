@@ -452,8 +452,18 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onSugarEntryEntered(@NotNull SugarEntry s) {
             sugarEntryGeneralAction(s,
-                    (sugarEntry) -> dao.insert(sugarEntry),
-                    (sugarEntry,dataAdapter) -> dataAdapter.add(sugarEntry)
+                    (sugarEntry) -> {
+                        while (dao.entryExists(sugarEntry.getEpochTimestamp())) {
+                            Log.d("entry", "incrementing sugar");
+                            sugarEntry.setEpochTimestamp(sugarEntry.getEpochTimestamp() + 1);
+                        }
+                        Log.d("entry", "inserting "+sugarEntry.getEpochTimestamp()+" into db");
+                        dao.insert(sugarEntry);
+                    },
+                    (sugarEntry,dataAdapter) -> {
+                        Log.d("entry", "inserting "+sugarEntry.getEpochTimestamp()+" into table");
+                        dataAdapter.add(sugarEntry);
+                    }
             );
         }
 
@@ -636,7 +646,6 @@ public class MainActivity extends AppCompatActivity
         public void handleFileOpened(@NotNull Uri uri,@NotNull String what) {
 
                     // TODO Add a spinning disc view or something until the db has finished reloading.
-                    // TODO Merge instead of deleting the whole database!
                     MainHandler restarter = new MainHandler(this,
                             (mainActivity, bundle) -> mainActivity.restartMe()
                     );
@@ -658,17 +667,6 @@ public class MainActivity extends AppCompatActivity
                                 dao.insertAll(entries);
                                 break;
                             case "merge":
-
-                                // TODO This won't work unless the ID's are the same!
-                                // Solution:
-                                // Ditch the id's. Nobody wants them anyways.
-                                // Have timestamp as primary key.
-                                // If the user tries to enter a second entry with the same timestamp, increase the timestamp by 1.
-                                //
-                                // dao.updateAll(entries);
-
-
-                                // Alt solution until i remove timestamps:
 
 
                                 List<SugarEntry> currentEntries=tableView.getDataAdapter().getData();

@@ -16,6 +16,10 @@ public interface SugarEntryDao {
     @Query("Select * from sugar_entries where timestamp between :firstDate and :secondDate")
     List<SugarEntry> getBetweenEpochs(long firstDate,long secondDate);
 
+    @Query("select count(*)==1 from sugar_entries where timestamp == :timestamp limit 1")
+    boolean entryExists(long timestamp);
+
+
     @Query("select sugar from sugar_entries where sugar > -1")
     List<Long> getAllSugarLevels();
 
