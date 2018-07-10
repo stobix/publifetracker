@@ -30,9 +30,9 @@ class SugarEntryTableDataAdapter(
             }
 
             1 -> renderStrings(
-                    currRow.sugarVal()?.let { "$it mmol/l"}
+                    currRow.sugarLevel?.let { String.format("%.1f mmol/l", it / 10f)}
                     ,
-                    currRow.weightVal()?.let { "$it kg" }
+                    currRow.weight?.let { String.format("%.1f kg", it / 10f) }
                     ,
                     currRow.food
                     ,
@@ -43,15 +43,6 @@ class SugarEntryTableDataAdapter(
             else -> renderString(null)
         }
     }
-
-    private fun SugarEntry.sugarVal()=
-            this.sugarLevel ?. let {
-                // This apparently uses either a comma or a dot in the output depending on the language
-                String.format("%.1f", it / 10f)
-            }
-
-    private fun SugarEntry.weightVal() =
-            this.weight ?. let { String.format("%.1f", it / 10f) }
 
     private fun renderStrings(vararg values: String?): View{
         val compositeView = LinearLayout(context)
