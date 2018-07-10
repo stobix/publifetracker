@@ -90,6 +90,17 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                                                     "extra" -> entry.extra = reader.nextString()
                                                 }
                                             }
+                                            3 -> readObjectArray(reader){
+                                                name,entry ->
+                                                when(name) {
+                                                    "epochTimestamp" -> entry.epochTimestamp = reader.nextLong()
+                                                    "sugarLevel" -> entry.sugarLevel = reader.nextInt()
+                                                    "weight" -> entry.weight = reader.nextInt()
+                                                    "treatment" -> entry.treatment = reader.nextString()
+                                                    "food" -> entry.food = reader.nextString()
+                                                    "extra" -> entry.extra = reader.nextString()
+                                                }
+                                            }
                                             else -> listAdapter.read(reader)
                                         }
                                     }

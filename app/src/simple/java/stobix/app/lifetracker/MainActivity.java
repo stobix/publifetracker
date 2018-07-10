@@ -636,7 +636,7 @@ public class MainActivity extends AppCompatActivity
         public void handleFileCreated(@NotNull Uri uri) {
             Log.i("file","created URI: "+uri.toString());
             // FIXME get the version number set in some config file instead!!
-            SugarEntryGsonWrapper wrapper = new SugarEntryGsonWrapper(2,tableView.getDataAdapter().getData());
+            SugarEntryGsonWrapper wrapper = new SugarEntryGsonWrapper(3,tableView.getDataAdapter().getData());
             String json = wrapper.toJSON();
             Log.i("file (json)",json);
             fa.putTextInUri(uri,json);

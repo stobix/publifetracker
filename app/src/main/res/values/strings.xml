@@ -41,4 +41,6 @@
     <string name="dependent_bar_line_graph_header">Weekly stats</string>
     <string name="input_weight">Weight</string>
     <string name="show_weight_summary">Show weight summary</string>
+    <string name="input_food">Food</string>
+    <string name="input_treatment">Treatment</string>
 </resources>

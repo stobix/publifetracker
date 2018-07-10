@@ -30,12 +30,16 @@ class SugarEntryTableDataAdapter(
             }
 
             1 -> renderStrings(
-                        currRow.sugarVal()?.let { "$it mmol/l"}
-                        ,
-                        currRow.weightVal()?.let { "$it kg" }
-                        ,
-                        currRow.extra
-                )
+                    currRow.sugarVal()?.let { "$it mmol/l"}
+                    ,
+                    currRow.weightVal()?.let { "$it kg" }
+                    ,
+                    currRow.food
+                    ,
+                    currRow.treatment
+                    ,
+                    currRow.extra
+            )
             else -> renderString(null)
         }
     }

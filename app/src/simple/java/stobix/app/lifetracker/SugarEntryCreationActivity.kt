@@ -24,14 +24,15 @@ open class SugarEntryCreationActivity
 {
 
     private var date: DateHandler = DateHandler()
-    private var sugarLevel: Int? = null
-    private var weight: Int? = null
     private var alreadyDefinedEntry: Boolean = false
-    lateinit private var dateView: TextView
-    lateinit private var timeView: TextView
-    lateinit private var sugarView: TextView
-    lateinit private var weightView: TextView
-    lateinit private var entry: SugarEntry
+    private lateinit var dateView: TextView
+    private lateinit var timeView: TextView
+    private lateinit var sugarView: TextView
+    private lateinit var weightView: TextView
+    private lateinit var entry: SugarEntry
+    private lateinit var foodView: TextView
+    private lateinit var treatmentView: TextView
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,8 +41,6 @@ open class SugarEntryCreationActivity
         if(alreadyDefinedEntry) {
             entry=arguments.getParcelable("entry")
             date.timestamp= entry.epochTimestamp
-            weight = entry.weight
-            sugarLevel=entry.sugarLevel
             d( "SugarEntry create",
                     "already defined; timestamp:${entry.epochTimestamp}, sugar: ${entry.sugarLevel}, extra: ${entry.epochTimestamp}"
             )
@@ -49,14 +48,6 @@ open class SugarEntryCreationActivity
             date.timestamp = arguments.getLong("timestamp")
             d("SugarEntry create","creating new, timestamp:${date.timestamp}")
             entry = SugarEntry(epochTimestamp= date.timestamp)
-        }
-    }
-
-    private fun sugarLevelToString(): String {
-        val sugarLevel=sugarLevel
-        when {
-            sugarLevel == null -> return ""
-            else -> return "${sugarLevel / 10}.${sugarLevel % 10}"
         }
     }
 
@@ -69,13 +60,14 @@ open class SugarEntryCreationActivity
         timeView= v.findViewById(R.id.entryCreatorTime)
         sugarView= v.findViewById(R.id.entryCreatorSugar)
         weightView = v.findViewById(R.id.entryCreatorWeight)
+        foodView = v.findViewById(R.id.entryCreatorFood)
+        treatmentView = v.findViewById(R.id.entryCreatorTreatment)
         val extraV = v.findViewById<TextView>(R.id.entryCreatorExtra)
 
         val dateText="%d-%02d-%02d".format(date.year,date.month+1,date.day)
         val timeText="%02d:%02d".format(date.hour,date.minute)
         dateView.text=dateText
         timeView.text=timeText
-        weightView.text=weight?.toFloat()?.div(10f)?.toString() ?: ""
 
         val buttonAdd: Button = v.findViewById<Button>(R.id.entryAdd)
         val buttonAddClose: Button =v.findViewById<Button>(R.id.entryAddClose)
@@ -83,8 +75,11 @@ open class SugarEntryCreationActivity
         val buttonClearExtra: AppCompatImageView = v.findViewById(R.id.entryCreatorExtraDelete)
 
         if(alreadyDefinedEntry) {
-            sugarView.text=sugarLevelToString()
-            extraV.text= entry.extra
+            sugarView.text = entry.sugarLevel?.toFloat()?.div(10f)?.toString() ?: ""
+            weightView.text = entry.weight?.toFloat()?.div(10f)?.toString() ?: ""
+            extraV.text = entry.extra
+            foodView.text = entry.food
+            treatmentView.text = entry.treatment
             buttonAddClose.text=getString(R.string.edit_dialog_button_update)
             buttonAdd.text=getString(R.string.edit_dialog_button_delete)
         } else {
@@ -138,12 +133,14 @@ open class SugarEntryCreationActivity
         entry.epochTimestamp=date.timestamp
         entry.sugarLevel = sugarView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt()
         entry.weight = weightView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt()
-        entry.extra = extraView.text?.toString() ?: "N/A"
+        entry.extra = extraView.text?.toString()
+        entry.treatment = treatmentView.text?.toString()
+        entry.food = foodView.text?.toString()
         if(alreadyDefinedEntry) {
-            d("SugarEntry update", "${entry.epochTimestamp} ${entry.sugarLevel} ${entry.weight} ${entry.extra}")
+            d("SugarEntry update", "t ${entry.epochTimestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} tr ${entry.treatment}")
             (activity as OnSugarEntryChangedHandler).onSugarEntryChanged(entry)
         } else {
-            d("SugarEntry submit", "${entry.epochTimestamp} ${entry.sugarLevel} ${entry.weight} ${entry.extra}")
+            d("SugarEntry submit", "t ${entry.epochTimestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} tr ${entry.treatment}")
             (activity as OnSugarEntryEnteredHandler).onSugarEntryEntered(entry)
         }
     }

@@ -55,6 +55,9 @@ public class SugarEntryMigrationTest {
     public void migrate1To2() throws IOException {
         SupportSQLiteDatabase db = helper.createDatabase(TEST_DB, 1);
 
+        // db has schema version 1. insert some data using SQL queries.
+        // You cannot use DAO classes because they expect the latest schema.
+
         ContentValues v = new ContentValues();
         v.put("uid",1);
         v.put("timestamp", 0L);
@@ -67,21 +70,19 @@ public class SugarEntryMigrationTest {
         // Prepare for the next version.
         db.close();
 
-        // Re-open the database with version 2 and provide
-        // MIGRATION_1_2 as the migration process.
         db = helper.runMigrationsAndValidate(TEST_DB, 2, true, DatabaseHandler.sugarMig1_2);
 
         // MigrationTestHelper automatically verifies the schema changes,
         // but you need to validate that the data was migrated properly.
-        // TODO actually verify stuff
+        Cursor entryC = db.query("select * from sugar_entries order by timestamp");
+        entryC.moveToFirst();
+        assertTrue(entryC.isNull(entryC.getColumnIndex("weight")));
     }
 
     @Test
     public void migrate2To3() throws IOException {
         SupportSQLiteDatabase db = helper.createDatabase(TEST_DB, 2);
 
-        // db has schema version 2. insert some data using SQL queries.
-        // You cannot use DAO classes because they expect the latest schema.
 
         ContentValues v1 = new ContentValues();
         v1.put("uid",1);
@@ -143,15 +144,9 @@ public class SugarEntryMigrationTest {
         }
         Log.d("entries before","no more entries");
 
-        // Prepare for the next version.
         db.close();
 
-        // Re-open the database with version 2 and provide
-        // MIGRATION_1_2 as the migration process.
         db = helper.runMigrationsAndValidate(TEST_DB, 3, true, DatabaseHandler.sugarMig2_3);
-
-        // MigrationTestHelper automatically verifies the schema changes,
-        // but you need to validate that the data was migrated properly.
 
         entryC = db.query("select * from sugar_entries order by timestamp");
 
@@ -217,5 +212,49 @@ public class SugarEntryMigrationTest {
         entryC.moveToNext();
         assertFalse(entryC.isNull(entryC.getColumnIndex("sugar")));
         assertTrue(entryC.isLast());
+    }
+
+    @Test
+    public void migrate4to5() throws IOException {
+        SupportSQLiteDatabase db = helper.createDatabase(TEST_DB, 4);
+
+        ContentValues v = new ContentValues();
+        v.put("timestamp", 0L);
+        v.putNull("sugar");
+        v.putNull("extra");
+        db.insert(TEST_DB, OnConflictStrategy.FAIL,v);
+
+        v.put("timestamp", 1L);
+        v.put("sugar",1);
+        v.putNull("extra");
+        db.insert(TEST_DB, OnConflictStrategy.FAIL,v);
+
+        db.close();
+
+        db = helper.runMigrationsAndValidate(TEST_DB, 4, true, DatabaseHandler.sugarMig4_5);
+
+        Cursor entryC = db.query("select * from sugar_entries order by timestamp");
+        // MigrationTestHelper automatically verifies the schema changes,
+        // but you need to validate that the data was migrated properly.
+        while(entryC.moveToNext()){
+            Log.d("entries",
+                    showValue(entryC,"timestamp")
+                            + showValue(entryC,"sugar")
+                            + showValue(entryC,"weight")
+                            + showValue(entryC,"treatment")
+                            + showValue(entryC,"food")
+                            + showValue(entryC,"extra","")
+            );
+            Log.d("newline","");
+        }
+        Log.d("entries","no more entries");
+        entryC.moveToFirst();
+        assertTrue(entryC.isNull(entryC.getColumnIndex("treatment")));
+        assertTrue(entryC.isNull(entryC.getColumnIndex("food")));
+        entryC.moveToNext();
+        assertTrue(entryC.isNull(entryC.getColumnIndex("treatment")));
+        assertTrue(entryC.isNull(entryC.getColumnIndex("food")));
+        assertTrue(entryC.isLast());
+
     }
 }

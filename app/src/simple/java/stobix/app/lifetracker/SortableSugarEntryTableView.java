@@ -81,6 +81,8 @@ public class SortableSugarEntryTableView extends SortableTableView<SugarEntry> {
         setColumnComparator(1, (a,b) -> {
                     if (a.compareSugar(b) != 0) return a.compareSugar(b);
                     else if (a.compareWeight(b) != 0) return a.compareWeight(b);
+                    else if (a.compareTreatment(b) != 0) return a.compareTreatment(b);
+                    else if (a.compareFood(b) != 0) return a.compareFood(b);
                     else return a.compareExtra(b);
                 }
         );

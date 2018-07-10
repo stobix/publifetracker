@@ -66,6 +66,7 @@ public class DatabaseHandler {
         }
     };
 
+    // 3->4: blood sugar is now nullable
     final static Migration sugarMig3_4 = new Migration(3,4) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
@@ -83,6 +84,21 @@ public class DatabaseHandler {
             }
         }
     };
+    // 4->5: added the columns food and treatment
+    final static Migration sugarMig4_5 = new Migration(4,5) {
+
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.beginTransaction();
+            try{
+            database.execSQL("alter table sugar_entries add column food text ");
+            database.execSQL("alter table sugar_entries add column treatment text ");
+            database.setTransactionSuccessful();
+            } finally {
+                database.endTransaction();
+            }
+        }
+    };
 
     public static SugarEntryDatabase buildSugarDatabase(Context ctx){
         return Room.databaseBuilder(
@@ -92,6 +108,7 @@ public class DatabaseHandler {
                 .addMigrations(sugarMig1_2)
                 .addMigrations(sugarMig2_3)
                 .addMigrations(sugarMig3_4)
+                .addMigrations(sugarMig4_5)
                 .build();
     }
 }

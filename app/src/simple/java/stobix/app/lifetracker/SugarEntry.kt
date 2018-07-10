@@ -39,7 +39,9 @@ data class SugarEntry constructor(
         @PrimaryKey @ColumnInfo(name = "timestamp", typeAffinity = INTEGER) var epochTimestamp: Long=0,
         @ColumnInfo(name = "sugar") var sugarLevel: Int?=null,
         @ColumnInfo(name = "extra") var extra: String?=null,
-        @ColumnInfo(name = "weight") var weight: Int?=null
+        @ColumnInfo(name = "weight") var weight: Int?=null,
+        @ColumnInfo(name = "treatment") var treatment: String?=null,
+        @ColumnInfo(name = "food") var food: String?=null
 ) : Parcelable {
 
     // The rest of this file describes how to destruct a SugarEntry into a Parcel,
@@ -97,5 +99,10 @@ data class SugarEntry constructor(
     fun compareExtra(that: SugarEntry) =
             compareNullables(this.extra,that.extra) { a, b-> a.compareTo(b)}
 
+    fun compareTreatment(that: SugarEntry) =
+            compareNullables(this.treatment,that.treatment) {a,b -> a.compareTo(b)}
+
+    fun compareFood(that: SugarEntry) =
+            compareNullables(this.food,that.food) {a,b -> a.compareTo(b)}
 }
 
