@@ -106,7 +106,8 @@
         tools:text="@string/input_weight" />
 
 
-    <EditText
+<!-- TODO make this a MultiAutoCompleteTextView with an adapter set programmatically to reflect previous entries' extra field -->
+    <AutoCompleteTextView
         android:id="@+id/entryCreatorExtra"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -189,6 +190,7 @@
         app:layout_constraintEnd_toEndOf="@+id/entryCreatorExtra"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorExtra"
         app:srcCompat="@android:drawable/ic_input_delete" />
+
 
 
 </android.support.constraint.ConstraintLayout>
