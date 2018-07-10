@@ -36,9 +36,7 @@ public interface SugarEntryDao {
     @Query("select * from sugar_entries where sugar > -1 order by timestamp")
     List<SugarEntry> getAllSugarPoints();
 
-    /* TODO Maybe make some kind of converter so that I never return whole sugar entries for the graphs
-    */
-    @Query("select timestamp, sugar as value from sugar_entries where sugar > -1 order by timestamp")
+    @Query("select timestamp, sugar as value from sugar_entries where sugar > 0 order by timestamp")
     List<FloatyIntBucket> getAllSugarBuckets();
 
     @Query("select timestamp, weight as value from sugar_entries where weight > 0 order by timestamp") // For some reason, "where weight != null" returned zero results always
