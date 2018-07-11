@@ -40,18 +40,18 @@ class SugarEntryTableDataAdapter(
                     ,
                     currRow.extra
             )
-            else -> renderString(null)
+            else -> renderString("N/A")
         }
     }
 
     private fun renderStrings(vararg values: String?): View{
         val compositeView = LinearLayout(context)
-        values.filterNotNull().forEach { compositeView.addView(renderString(it)) }
+        values.filterNotNull().forEach { if(it!="") compositeView.addView(renderString(it)) }
         return compositeView
     }
-    private fun renderString(value: String?): View {
+    private fun renderString(value: String): View {
         val textView = TextView(context)
-        textView.text = value ?: ""
+        textView.text = value
         textView.setPadding(20, 10, 20, 10)
         return textView
     }
