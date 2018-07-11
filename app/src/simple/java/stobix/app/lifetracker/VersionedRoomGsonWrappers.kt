@@ -2,7 +2,6 @@ package stobix.app.lifetracker
 
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import stobix.view.containerview.Content
 
 // Something made the type inspection system choke on a generic, IIRC. This is thus not used yet.
 data class VersionedRoomGsonWrapper<E>(
@@ -28,6 +27,6 @@ data class SugarEntryGsonWrapper(
                 .create()
         @JvmStatic fun fromJSON(string: String) =
                 gson.fromJson<SugarEntryGsonWrapper>(string,type)
-        @JvmStatic val type = object : TypeToken<Content>() {}.type
+        @JvmStatic val type = object : TypeToken<SugarEntryGsonWrapper>() {}.type
     }
 }
