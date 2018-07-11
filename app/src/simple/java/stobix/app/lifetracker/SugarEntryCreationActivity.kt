@@ -75,8 +75,8 @@ open class SugarEntryCreationActivity
         val buttonClearExtra: AppCompatImageView = v.findViewById(R.id.entryCreatorExtraDelete)
 
         if(alreadyDefinedEntry) {
-            sugarView.text = entry.sugarLevel?.toFloat()?.div(10f)?.toString() ?: ""
-            weightView.text = entry.weight?.toFloat()?.div(10f)?.toString() ?: ""
+            sugarView.text = entry.sugarLevel?.toFloat()?.div(10f)?.toString()
+            weightView.text = entry.weight?.toFloat()?.div(10f)?.toString()
             extraV.text = entry.extra
             foodView.text = entry.food
             treatmentView.text = entry.treatment
@@ -129,13 +129,15 @@ open class SugarEntryCreationActivity
         this.dismiss()
     }
 
+    private fun String?.nullIfEmpty() = if (this.isNullOrEmpty()) null else this
+
     private fun handleSubmission(extraView: TextView){
         entry.epochTimestamp=date.timestamp
         entry.sugarLevel = sugarView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt()
         entry.weight = weightView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt()
-        entry.extra = extraView.text?.toString()
-        entry.treatment = treatmentView.text?.toString()
-        entry.food = foodView.text?.toString()
+        entry.extra = extraView.text?.toString().nullIfEmpty()
+        entry.treatment = treatmentView.text?.toString().nullIfEmpty()
+        entry.food = foodView.text?.toString().nullIfEmpty()
         if(alreadyDefinedEntry) {
             d("SugarEntry update", "t ${entry.epochTimestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} tr ${entry.treatment}")
             (activity as OnSugarEntryChangedHandler).onSugarEntryChanged(entry)
