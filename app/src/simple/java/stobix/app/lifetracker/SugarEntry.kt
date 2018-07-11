@@ -44,11 +44,11 @@ data class SugarEntry constructor(
         @ColumnInfo(name = "food") var food: String?=null
 ) : Parcelable {
 
-    // The rest of this file describes how to destruct a SugarEntry into a Parcel,
-    // and how to get it back.
 
+    // Parcel function
     override fun describeContents(): Int = 0
 
+    // Parcel function
     // IMPORTANT: These calls need to be in the same order as in writeToParcel below!
     private constructor(parcel: Parcel) : this(
             parcel.readLong(), // timestamp
@@ -60,6 +60,7 @@ data class SugarEntry constructor(
     fun copyToCurrent() =
             copy(epochTimestamp = DateHandler().timestamp)
 
+    // Parcel function
     override fun writeToParcel(parcel: Parcel, i: Int) {
         parcel.writeLong(epochTimestamp)
         parcel.writeNullableInt(sugarLevel)
@@ -68,19 +69,31 @@ data class SugarEntry constructor(
     }
 
     companion object CREATOR: Parcelable.Creator<SugarEntry> {
-            override fun createFromParcel(parcel: Parcel): SugarEntry = SugarEntry(parcel)
-            override fun newArray(size: Int): Array<SugarEntry?> = arrayOfNulls(size)
+
+        // Parcel function
+        override fun createFromParcel(parcel: Parcel): SugarEntry = SugarEntry(parcel)
+        override fun newArray(size: Int): Array<SugarEntry?> = arrayOfNulls(size)
     }
 
+
+    // (obsolete) Used to check for equality between SugarEntries with different UID's, which were dropped completely from the SugarEntry model.
+    // Still keeping it, in case some other "non-equality" SugarEntry member gets added
     infix fun sameAs(other:Any?) = when(other){
         is SugarEntry ->
             this.epochTimestamp == other.epochTimestamp
-                    && this.sugarLevel == other.sugarLevel
-                    && this.extra == other.extra
-                    && this.weight == other.weight
+            && this sameValuesAs other
         else ->
                 false
     }
+
+    infix fun sameValuesAs(other:SugarEntry) =
+            this.sugarLevel == other.sugarLevel
+                    && this.extra == other.extra
+                    && this.weight == other.weight
+                    && this.treatment == other.treatment
+                    && this.food == other.food
+
+
 
     private fun <A>compareNullables(a: A?, b: A?, comparator: (A, A) -> Int) =
             a ?. let { first ->
@@ -90,6 +103,7 @@ data class SugarEntry constructor(
             } ?: -1
 
 
+    // These are for comparing in Java, since Java has no counterpart to ?.let
     fun compareSugar(that: SugarEntry) =
             compareNullables(this.sugarLevel,that.sugarLevel) { a, b-> a-b}
 
