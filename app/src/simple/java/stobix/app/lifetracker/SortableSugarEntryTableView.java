@@ -75,7 +75,7 @@ public class SortableSugarEntryTableView extends SortableTableView<SugarEntry> {
         setColumnModel(tableColumnWeightModel);
 
         setColumnComparator(0, (a,b) -> {
-            long x= a.getEpochTimestamp() - b.getEpochTimestamp();
+            long x= a.getTimestamp() - b.getTimestamp();
             return (x>0)?1:(x<0)?-1:0; // since we can't be sure the difference isn't bigger than an int
         });
         setColumnComparator(1, (a,b) -> {

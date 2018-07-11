@@ -36,7 +36,7 @@ private fun Parcel.readNullableInt()=
     By setting a default value for all constructor parameters, I get an empty constructor for free.
     */
 data class SugarEntry constructor(
-        @PrimaryKey @ColumnInfo(name = "timestamp", typeAffinity = INTEGER) var epochTimestamp: Timestamp=0,
+        @PrimaryKey @ColumnInfo(name = "timestamp", typeAffinity = INTEGER) var timestamp: Timestamp=0,
         @ColumnInfo(name = "sugar") var sugarLevel: Int?=null,
         @ColumnInfo(name = "extra") var extra: String?=null,
         @ColumnInfo(name = "weight") var weight: Int?=null,
@@ -62,11 +62,11 @@ data class SugarEntry constructor(
     )
 
     fun copyToCurrent() =
-            copy(epochTimestamp = DateHandler().timestamp)
+            copy(timestamp = DateHandler().timestamp)
 
     // Parcel function
     override fun writeToParcel(parcel: Parcel, i: Int) {
-        parcel.writeLong(epochTimestamp)
+        parcel.writeLong(timestamp)
         parcel.writeNullableInt(sugarLevel)
         parcel.writeString(extra)
         parcel.writeNullableInt(weight)
@@ -87,7 +87,7 @@ data class SugarEntry constructor(
     // Still keeping it, in case some other "non-equality" SugarEntry member gets added
     infix fun sameAs(other:Any?) = when(other){
         is SugarEntry ->
-            this.epochTimestamp == other.epochTimestamp
+            this.timestamp == other.timestamp
             && this sameValuesAs other
         else ->
                 false

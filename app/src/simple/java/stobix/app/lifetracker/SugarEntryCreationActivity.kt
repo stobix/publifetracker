@@ -41,14 +41,14 @@ open class SugarEntryCreationActivity
         alreadyDefinedEntry = arguments.getBoolean("EditCurrent")
         if(alreadyDefinedEntry) {
             entry=arguments.getParcelable("entry")
-            date.timestamp= entry.epochTimestamp
+            date.timestamp= entry.timestamp
             d( "SugarEntry create",
-                    "already defined; timestamp:${entry.epochTimestamp}, sugar: ${entry.sugarLevel}, extra: ${entry.epochTimestamp}"
+                    "already defined; timestamp:${entry.timestamp}, sugar: ${entry.sugarLevel}, extra: ${entry.timestamp}"
             )
         } else {
             date.timestamp = arguments.getLong("timestamp")
             d("SugarEntry create","creating new, timestamp:${date.timestamp}")
-            entry = SugarEntry(epochTimestamp= date.timestamp)
+            entry = SugarEntry(timestamp= date.timestamp)
         }
     }
 
@@ -123,7 +123,7 @@ open class SugarEntryCreationActivity
         } else {
             handleSubmission(extraV)
             // Ensure we don't enter two entries with the same timestamp
-            entry= SugarEntry(epochTimestamp = entry.epochTimestamp+1)
+            entry= SugarEntry(timestamp = entry.timestamp+1)
         }
     }
 
@@ -135,7 +135,7 @@ open class SugarEntryCreationActivity
     private fun String?.nullIfEmpty() = if (this.isNullOrEmpty()) null else this
 
     private fun handleSubmission(extraView: TextView){
-        entry.epochTimestamp=date.timestamp
+        entry.timestamp=date.timestamp
         entry.sugarLevel = sugarView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt()
         entry.weight = weightView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt()
         entry.extra = extraView.text?.toString().nullIfEmpty()
@@ -143,10 +143,10 @@ open class SugarEntryCreationActivity
         entry.food = foodView.text?.toString().nullIfEmpty()
         entry.drink = drinkView.text?.toString().nullIfEmpty()
         if(alreadyDefinedEntry) {
-            d("SugarEntry update", "t ${entry.epochTimestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} d ${entry.drink} tr ${entry.treatment}")
+            d("SugarEntry update", "t ${entry.timestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} d ${entry.drink} tr ${entry.treatment}")
             (activity as OnSugarEntryChangedHandler).onSugarEntryChanged(entry)
         } else {
-            d("SugarEntry submit", "t ${entry.epochTimestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} d ${entry.drink} tr ${entry.treatment}")
+            d("SugarEntry submit", "t ${entry.timestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} d ${entry.drink} tr ${entry.treatment}")
             (activity as OnSugarEntryEnteredHandler).onSugarEntryEntered(entry)
         }
     }
@@ -178,7 +178,7 @@ open class SugarEntryCreationActivity
         @JvmStatic fun newInstance(sugarEntry: SugarEntry): SugarEntryCreationActivity {
             val s = SugarEntryCreationActivity()
             val args = Bundle()
-            d("SugarEntry edit","Called with timestamp:"+sugarEntry.epochTimestamp)
+            d("SugarEntry edit","Called with timestamp:"+sugarEntry.timestamp)
             args.putBoolean("EditCurrent",true)
             args.putParcelable("entry",sugarEntry)
             s.arguments=args

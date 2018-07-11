@@ -24,7 +24,7 @@ class SugarEntryTableDataAdapter(
         return when (columnIndex) {
             0 -> {
                 val formatString = resources.getString(R.string.dateTimeFormat)
-                val myDate = Date(currRow.epochTimestamp)
+                val myDate = Date(currRow.timestamp)
                 val myDateString = DateFormat.format(formatString, myDate).toString()
                 renderString(myDateString)
             }

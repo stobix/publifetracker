@@ -8,9 +8,9 @@ fun List<SugarEntry>.getMergeables(candidates:List<SugarEntry>) : List<SugarEntr
     else if(candidates.isEmpty())
         return candidates
 
-    val `as` = this.sortedBy { it.epochTimestamp }
+    val `as` = this.sortedBy { it.timestamp }
     // Todo See if there is anything left that will break if I remove distinctBy
-    val bs = candidates.distinctBy { it.epochTimestamp }.sortedBy { it.epochTimestamp }
+    val bs = candidates.distinctBy { it.timestamp }.sortedBy { it.timestamp }
 
     var i=0
     var j=0
@@ -26,19 +26,19 @@ fun List<SugarEntry>.getMergeables(candidates:List<SugarEntry>) : List<SugarEntr
         var base = base
         check@ for (next in entries) {
             when {
-                base.epochTimestamp < next.epochTimestamp -> break@check
-                base.epochTimestamp == next.epochTimestamp -> {
-                    next.epochTimestamp++
+                base.timestamp < next.timestamp -> break@check
+                base.timestamp == next.timestamp -> {
+                    next.timestamp++
                     base = next
                 }
-                base.epochTimestamp > next.epochTimestamp -> continue@check
+                base.timestamp > next.timestamp -> continue@check
             }
         }
     }
 
     loop@while(true) {
         when {
-            a.epochTimestamp < b.epochTimestamp -> {
+            a.timestamp < b.timestamp -> {
                 i++
                 if (i >= `as`.size) {
                     if (tempIndex != null) {
@@ -77,7 +77,7 @@ fun List<SugarEntry>.getMergeables(candidates:List<SugarEntry>) : List<SugarEntr
                     continue@loop
                 }
             }
-            a.epochTimestamp == b.epochTimestamp ->
+            a.timestamp == b.timestamp ->
                 if(a sameAs b) {
                     // Discard elements that are the same in all fields
                     j++
@@ -101,10 +101,10 @@ fun List<SugarEntry>.getMergeables(candidates:List<SugarEntry>) : List<SugarEntr
                     * this is the a we start comparing the next b against.
                     */
                     tempIndex = tempIndex ?: i
-                    b.epochTimestamp++
+                    b.timestamp++
                     continue@loop
                 }
-            a.epochTimestamp > b.epochTimestamp -> {
+            a.timestamp > b.timestamp -> {
                 // Add elements with an earlier timestamp than the list
                 acc+=b
                 j++

@@ -75,7 +75,7 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                                                 when(name) {
                                                     // TODO: Make sure no two items have the same timestamp!
                                                     "uid" -> reader.nextInt()
-                                                    "epochTimestamp" -> entry.epochTimestamp = reader.nextLong()
+                                                    "epochTimestamp" -> entry.timestamp = reader.nextLong()
                                                     "sugarLevel" -> entry.sugarLevel = reader.nextInt()
                                                     "weight" -> entry.weight = reader.nextInt()
                                                     "extra" -> entry.extra = reader.nextString()
@@ -84,16 +84,28 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                                             2 -> readObjectArray(reader){
                                                 name,entry ->
                                                 when(name) {
-                                                    "epochTimestamp" -> entry.epochTimestamp = reader.nextLong()
+                                                    "epochTimestamp" -> entry.timestamp = reader.nextLong()
                                                     "sugarLevel" -> entry.sugarLevel = reader.nextInt()
                                                     "weight" -> entry.weight = reader.nextInt()
                                                     "extra" -> entry.extra = reader.nextString()
                                                 }
                                             }
-                                            3 -> readObjectArray(reader){
+                                            3 -> readObjectArray(reader) {
+                                                name, entry ->
+                                                when (name) {
+                                                    "epochTimestamp" -> entry.timestamp = reader.nextLong()
+                                                    "sugarLevel" -> entry.sugarLevel = reader.nextInt()
+                                                    "weight" -> entry.weight = reader.nextInt()
+                                                    "treatment" -> entry.treatment = reader.nextString()
+                                                    "food" -> entry.food = reader.nextString()
+                                                    "drink" -> entry.drink = reader.nextString()
+                                                    "extra" -> entry.extra = reader.nextString()
+                                                }
+                                            }
+                                            4 -> readObjectArray(reader){
                                                 name,entry ->
                                                 when(name) {
-                                                    "epochTimestamp" -> entry.epochTimestamp = reader.nextLong()
+                                                    "timestamp" -> entry.timestamp = reader.nextLong()
                                                     "sugarLevel" -> entry.sugarLevel = reader.nextInt()
                                                     "weight" -> entry.weight = reader.nextInt()
                                                     "treatment" -> entry.treatment = reader.nextString()
@@ -113,7 +125,7 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                                             when(name) {
                                                 // TODO: Make sure no two items have the same timestamp!
                                                 "uid" -> reader.nextInt()
-                                                "epochTimestamp" -> entry.epochTimestamp = reader.nextLong()
+                                                "epochTimestamp" -> entry.timestamp = reader.nextLong()
                                                 "sugarLevel" -> entry.sugarLevel = reader.nextInt()
                                                 "extra" -> entry.extra = reader.nextString()
                                             }
