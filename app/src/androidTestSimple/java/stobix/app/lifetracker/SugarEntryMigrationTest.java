@@ -215,7 +215,7 @@ public class SugarEntryMigrationTest {
     }
 
     @Test
-    public void migrate4to5() throws IOException {
+    public void migrate4To5() throws IOException {
         SupportSQLiteDatabase db = helper.createDatabase(TEST_DB, 4);
 
         ContentValues v = new ContentValues();
@@ -231,7 +231,7 @@ public class SugarEntryMigrationTest {
 
         db.close();
 
-        db = helper.runMigrationsAndValidate(TEST_DB, 4, true, DatabaseHandler.sugarMig4_5);
+        db = helper.runMigrationsAndValidate(TEST_DB, 5, true, DatabaseHandler.sugarMig4_5);
 
         Cursor entryC = db.query("select * from sugar_entries order by timestamp");
         // MigrationTestHelper automatically verifies the schema changes,
@@ -256,5 +256,47 @@ public class SugarEntryMigrationTest {
         assertTrue(entryC.isNull(entryC.getColumnIndex("food")));
         assertTrue(entryC.isLast());
 
+    }
+
+    @Test
+    public void migrate5To6() throws IOException {
+        SupportSQLiteDatabase db = helper.createDatabase(TEST_DB, 5);
+
+        ContentValues v = new ContentValues();
+        v.put("timestamp", 0L);
+        v.putNull("sugar");
+        v.putNull("extra");
+        db.insert(TEST_DB, OnConflictStrategy.FAIL,v);
+
+        v.put("timestamp", 1L);
+        v.put("sugar",1);
+        v.putNull("extra");
+        db.insert(TEST_DB, OnConflictStrategy.FAIL,v);
+
+        db.close();
+
+        db = helper.runMigrationsAndValidate(TEST_DB, 6, true, DatabaseHandler.sugarMig5_6);
+
+        Cursor entryC = db.query("select * from sugar_entries order by timestamp");
+        // MigrationTestHelper automatically verifies the schema changes,
+        // but you need to validate that the data was migrated properly.
+        while(entryC.moveToNext()){
+            Log.d("entries",
+                    showValue(entryC,"timestamp")
+                            + showValue(entryC,"sugar")
+                            + showValue(entryC,"weight")
+                            + showValue(entryC,"treatment")
+                            + showValue(entryC,"food")
+                            + showValue(entryC,"drink")
+                            + showValue(entryC,"extra","")
+            );
+            Log.d("newline","");
+        }
+        Log.d("entries","no more entries");
+        entryC.moveToFirst();
+        assertTrue(entryC.isNull(entryC.getColumnIndex("drink")));
+        entryC.moveToNext();
+        assertTrue(entryC.isNull(entryC.getColumnIndex("drink")));
+        assertTrue(entryC.isLast());
     }
 }

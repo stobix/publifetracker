@@ -83,6 +83,7 @@ public class SortableSugarEntryTableView extends SortableTableView<SugarEntry> {
                     else if (a.compareWeight(b) != 0) return a.compareWeight(b);
                     else if (a.compareTreatment(b) != 0) return a.compareTreatment(b);
                     else if (a.compareFood(b) != 0) return a.compareFood(b);
+                    else if (a.compareDrink(b) != 0) return a.compareDrink(b);
                     else return a.compareExtra(b);
                 }
         );

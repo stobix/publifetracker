@@ -36,12 +36,13 @@ private fun Parcel.readNullableInt()=
     By setting a default value for all constructor parameters, I get an empty constructor for free.
     */
 data class SugarEntry constructor(
-        @PrimaryKey @ColumnInfo(name = "timestamp", typeAffinity = INTEGER) var epochTimestamp: Long=0,
+        @PrimaryKey @ColumnInfo(name = "timestamp", typeAffinity = INTEGER) var epochTimestamp: Timestamp=0,
         @ColumnInfo(name = "sugar") var sugarLevel: Int?=null,
         @ColumnInfo(name = "extra") var extra: String?=null,
         @ColumnInfo(name = "weight") var weight: Int?=null,
         @ColumnInfo(name = "treatment") var treatment: String?=null,
-        @ColumnInfo(name = "food") var food: String?=null
+        @ColumnInfo(name = "food") var food: String?=null,
+        @ColumnInfo(name = "drink") var drink: String?=null
 ) : Parcelable {
 
 
@@ -54,7 +55,10 @@ data class SugarEntry constructor(
             parcel.readLong(), // timestamp
             parcel.readNullableInt(), // sugar
             parcel.readString(), // extra
-            parcel.readNullableInt() // weight
+            parcel.readNullableInt(), // weight
+            parcel.readString(), // treatment
+            parcel.readString(), // food
+            parcel.readString() // drink
     )
 
     fun copyToCurrent() =
@@ -66,6 +70,9 @@ data class SugarEntry constructor(
         parcel.writeNullableInt(sugarLevel)
         parcel.writeString(extra)
         parcel.writeNullableInt(weight)
+        parcel.writeString(treatment)
+        parcel.writeString(food)
+        parcel.writeString(drink)
     }
 
     companion object CREATOR: Parcelable.Creator<SugarEntry> {
@@ -92,6 +99,7 @@ data class SugarEntry constructor(
                     && this.weight == other.weight
                     && this.treatment == other.treatment
                     && this.food == other.food
+                    && this.drink == other.drink
 
 
 
@@ -118,5 +126,8 @@ data class SugarEntry constructor(
 
     fun compareFood(that: SugarEntry) =
             compareNullables(this.food,that.food) {a,b -> a.compareTo(b)}
+
+    fun compareDrink(that: SugarEntry) =
+            compareNullables(this.drink,that.drink) {a,b -> a.compareTo(b)}
 }
 

@@ -36,6 +36,8 @@ class SugarEntryTableDataAdapter(
                     ,
                     currRow.food
                     ,
+                    currRow.drink
+                    ,
                     currRow.treatment
                     ,
                     currRow.extra

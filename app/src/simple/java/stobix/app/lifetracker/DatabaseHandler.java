@@ -100,6 +100,21 @@ public class DatabaseHandler {
         }
     };
 
+    // 5->6: added a drink column
+    final static Migration sugarMig5_6 = new Migration(5,6) {
+
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.beginTransaction();
+            try{
+                database.execSQL("alter table sugar_entries add column drink text ");
+                database.setTransactionSuccessful();
+            } finally {
+                database.endTransaction();
+            }
+        }
+    };
+
     public static SugarEntryDatabase buildSugarDatabase(Context ctx){
         return Room.databaseBuilder(
                 ctx,
@@ -109,6 +124,7 @@ public class DatabaseHandler {
                 .addMigrations(sugarMig2_3)
                 .addMigrations(sugarMig3_4)
                 .addMigrations(sugarMig4_5)
+                .addMigrations(sugarMig5_6)
                 .build();
     }
 }

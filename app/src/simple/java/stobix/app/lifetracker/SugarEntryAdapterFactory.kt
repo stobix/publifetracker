@@ -98,6 +98,7 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                                                     "weight" -> entry.weight = reader.nextInt()
                                                     "treatment" -> entry.treatment = reader.nextString()
                                                     "food" -> entry.food = reader.nextString()
+                                                    "drink" -> entry.drink = reader.nextString()
                                                     "extra" -> entry.extra = reader.nextString()
                                                 }
                                             }

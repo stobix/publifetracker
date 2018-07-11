@@ -45,4 +45,5 @@
     <string name="show_weight_summary">Viktgrafer</string>
     <string name="input_food">Mat</string>
     <string name="input_treatment">Behandling</string>
+    <string name="input_drink">Dryck</string>
 </resources>

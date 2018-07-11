@@ -32,6 +32,7 @@ open class SugarEntryCreationActivity
     private lateinit var entry: SugarEntry
     private lateinit var foodView: TextView
     private lateinit var treatmentView: TextView
+    private lateinit var drinkView: TextView
 
 
 
@@ -62,6 +63,7 @@ open class SugarEntryCreationActivity
         weightView = v.findViewById(R.id.entryCreatorWeight)
         foodView = v.findViewById(R.id.entryCreatorFood)
         treatmentView = v.findViewById(R.id.entryCreatorTreatment)
+        drinkView = v.findViewById(R.id.entryCreatorDrink)
         val extraV = v.findViewById<TextView>(R.id.entryCreatorExtra)
 
         val dateText="%d-%02d-%02d".format(date.year,date.month+1,date.day)
@@ -80,6 +82,7 @@ open class SugarEntryCreationActivity
             extraV.text = entry.extra
             foodView.text = entry.food
             treatmentView.text = entry.treatment
+            drinkView.text = entry.drink
             buttonAddClose.text=getString(R.string.edit_dialog_button_update)
             buttonAdd.text=getString(R.string.edit_dialog_button_delete)
         } else {
@@ -138,11 +141,12 @@ open class SugarEntryCreationActivity
         entry.extra = extraView.text?.toString().nullIfEmpty()
         entry.treatment = treatmentView.text?.toString().nullIfEmpty()
         entry.food = foodView.text?.toString().nullIfEmpty()
+        entry.drink = drinkView.text?.toString().nullIfEmpty()
         if(alreadyDefinedEntry) {
-            d("SugarEntry update", "t ${entry.epochTimestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} tr ${entry.treatment}")
+            d("SugarEntry update", "t ${entry.epochTimestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} d ${entry.drink} tr ${entry.treatment}")
             (activity as OnSugarEntryChangedHandler).onSugarEntryChanged(entry)
         } else {
-            d("SugarEntry submit", "t ${entry.epochTimestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} tr ${entry.treatment}")
+            d("SugarEntry submit", "t ${entry.epochTimestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} d ${entry.drink} tr ${entry.treatment}")
             (activity as OnSugarEntryEnteredHandler).onSugarEntryEntered(entry)
         }
     }
