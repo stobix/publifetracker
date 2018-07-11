@@ -10,6 +10,8 @@ import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 
 class SugarEntryAdapterFactory : TypeAdapterFactory {
+
+
     override fun <T : Any?> create(gson: Gson?, type: TypeToken<T>?): TypeAdapter<T>? {
         fun unlessNextNull(reader: JsonReader, f: () -> Unit){
             if(reader.peek() == JsonToken.NULL) {
@@ -26,7 +28,8 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                 f()
             }
 
-        var version = 0
+        // Increase this each time the JSON generating algorithm gets updated.
+        val currentVersion = 5
 
         val sugarEntryListTypeToken = object: TypeToken<List<SugarEntry>>() {}
 
@@ -41,8 +44,24 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                             out.nullValue()
                             return
                         }
-                        out.value(value.version)
-                        listAdapter.write(out,value.entries)
+                        out.value(currentVersion)
+                        // Write out the SugarEntries using an appropriately short format
+                        // For now, it's even JSON compatible!
+                        out.beginArray()
+                        for(entry in value.entries){
+                            out.beginObject()
+                            with(entry){
+                                out.name("t").value(timestamp)
+                                out.name("s").value(sugarLevel)
+                                out.name("w").value(weight)
+                                out.name("tr").value(treatment)
+                                out.name("f").value(food)
+                                out.name("d").value(drink)
+                                out.name("e").value(extra)
+                            }
+                            out.endObject()
+                        }
+                        out.endArray()
                     }
 
                     fun readObjectArray(reader: JsonReader,f: (String,SugarEntry) -> Unit) : MutableList<SugarEntry> {
@@ -68,7 +87,7 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                                 unlessNextNull(reader,listOf()){
                                     // If we start with a number, we have a versioned file
                                     if (reader.peek() == JsonToken.NUMBER) {
-                                        version = reader.nextInt()
+                                        val version = reader.nextInt()
                                         when (version) {
                                             1 -> readObjectArray(reader){
                                                 name,entry ->
@@ -114,6 +133,18 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                                                     "extra" -> entry.extra = reader.nextString()
                                                 }
                                             }
+                                            5 -> readObjectArray(reader){
+                                                name,entry ->
+                                                when(name) {
+                                                    "t" -> entry.timestamp = reader.nextLong()
+                                                    "s" -> entry.sugarLevel = reader.nextInt()
+                                                    "w" -> entry.weight = reader.nextInt()
+                                                    "tr" -> entry.treatment = reader.nextString()
+                                                    "f" -> entry.food = reader.nextString()
+                                                    "d" -> entry.drink = reader.nextString()
+                                                    "e" -> entry.extra = reader.nextString()
+                                                }
+                                            }
                                             else -> listAdapter.read(reader)
                                         }
                                     }
@@ -132,7 +163,7 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                                         }
                                     }
                                 }
-                        return SugarEntryGsonWrapper(version,entries)
+                        return SugarEntryGsonWrapper(entries)
                     }
                 }
                 adapter as TypeAdapter<T>

@@ -15,7 +15,6 @@ data class VersionedRoomGsonWrapper<E>(
  * upon read.
  */
 data class SugarEntryGsonWrapper(
-        var version: Int,
         var entries: List<SugarEntry>
 ){
 
