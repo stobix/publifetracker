@@ -279,7 +279,7 @@
         android:selectAllOnFocus="false"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/entryCreatorTime"
+        app:layout_constraintStart_toEndOf="@+id/entryCreatorExtraLabel"
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorDrink"
         tools:clickable="false"
         tools:text="@string/input_extra" />
