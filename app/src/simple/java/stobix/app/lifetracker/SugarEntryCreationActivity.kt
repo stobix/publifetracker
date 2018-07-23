@@ -2,7 +2,6 @@ package stobix.app.lifetracker
 
 import android.annotation.SuppressLint
 import android.app.DialogFragment
-import android.graphics.Color
 import android.os.Bundle
 import android.os.SystemClock
 import android.support.v7.widget.AppCompatImageView
@@ -92,7 +91,7 @@ open class SugarEntryCreationActivity
             val toggleFun = {
                 val visibleValue = stateArray[first] ?: truthiness
                 // TODO this should be some theme specific colors!
-                view.setBackgroundColor(if(visibleValue) Color.BLACK else Color.WHITE)
+                //view.setBackgroundColor(if(visibleValue) Color.BLACK else Color.WHITE)
                 listener(visibleValue)
                 stateArray[this.first] = !visibleValue
             }

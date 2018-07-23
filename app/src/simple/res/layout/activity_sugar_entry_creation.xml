@@ -301,6 +301,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@drawable/circle"
+            android:backgroundTintMode="add"
             app:srcCompat="@drawable/datetime_icon" />
 
         <ImageView
@@ -308,6 +310,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@drawable/circle"
             app:srcCompat="@drawable/weight_icon" />
 
         <ImageView
@@ -315,6 +318,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@drawable/circle"
             app:srcCompat="@drawable/blood_sugar_icon" />
 
         <ImageView
@@ -322,6 +326,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@drawable/circle"
             app:srcCompat="@drawable/treatment_icon" />
 
         <ImageView
