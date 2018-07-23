@@ -85,15 +85,15 @@ open class SugarEntryCreationActivity
                     false -> View.GONE
                 }
 
-        infix fun<A> Pair<Int,A?>.togglingWithFun(listener: (Int) -> Unit) {
+        infix fun<A> Pair<Int,A?>.togglingWithFun(listener: (Boolean) -> Unit) {
             val view = v.findViewById<ImageView>( first)
             val truthiness = second != null
 
             val toggleFun = {
                 val visibleValue = stateArray[first] ?: truthiness
-                val hiddenState = vis(visibleValue)
+                // TODO this should be some theme specific colors!
                 view.setBackgroundColor(if(visibleValue) Color.BLACK else Color.WHITE)
-                listener(hiddenState)
+                listener(visibleValue)
                 stateArray[this.first] = !visibleValue
             }
 
@@ -102,63 +102,44 @@ open class SugarEntryCreationActivity
             view.setOnClickListener { toggleFun() }
         }
 
-
-
         // Toggles between showing the views in shown and hidden, giving focus to activated when shown list is shown
         // Initial state shown is given by whether the property A is defined
         infix fun<A> Pair<Int,A?>.togglingWithoutFocus(shownHidden:Pair<ShownList,HiddenList>)  {
-            val view = v.findViewById<ImageView>( first)
-            val truthiness = second != null
             val (shown,hidden) = shownHidden
 
-
-            val toggleFun = { view: View ->
-                val visibleValue = stateArray[first] ?: truthiness
-                val hiddenState = vis(visibleValue)
-                val notHiddenState = vis(!visibleValue)
+            this togglingWithFun {
+                val hiddenState = vis(it)
+                val notHiddenState = vis(!it)
                 shown.forEach { it.visibility = hiddenState }
                 hidden.forEach { it.visibility = notHiddenState }
-                view.setBackgroundColor(if (visibleValue) Color.BLACK else Color.WHITE)
-                stateArray[first] = !visibleValue
             }
-
-            toggleFun(view)
-
-            view.setOnClickListener { toggleFun(it) }
 
         }
 
         infix fun<A> Pair<Int,A?>.togglingWithoutFocus(shown:ShownList) = this togglingWithoutFocus (shown to emptyList())
 
+
+        fun View.click() {
+            this.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(),SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, 0f, 0f, 0))
+            this.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(),SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, 0f, 0f, 0))
+        }
+
         // Toggles between showing the views in shown and hidden, giving focus to activated when shown list is shown
         // Initial state shown is given by whether the property A is defined
-        infix fun<A> Pair<Int,A?>.toggling(p:Triple<ShownList,HiddenList,View?>)  {
-            val view = v.findViewById<ImageView>( first)
-            val truthiness = second != null
-            var (shown,hidden,activated) = p
+        infix fun<A> Pair<Int,A?>.toggling(shownHiddenActivated:Triple<ShownList,HiddenList,View?>)  {
+            var (shown,hidden,activated) = shownHiddenActivated
             activated = activated ?:shown.first()
 
-
-            val toggleFun = { view: View ->
-                val visibleValue = stateArray[first] ?: truthiness
-                val hiddenState = vis(visibleValue)
-                val notHiddenState = vis(!visibleValue)
+            this togglingWithFun {
+                val hiddenState = vis(it)
+                val notHiddenState = vis(!it)
                 shown.forEach { it.visibility = hiddenState }
                 hidden.forEach { it.visibility = notHiddenState }
-                if (visibleValue) {
+                if (it) {
                     activated.requestFocus()
-                    activated.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(),SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, 0f, 0f, 0))
-                    activated.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(),SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, 0f, 0f, 0))
-                    //imm.showSoftInput(view,InputMethodManager.SHOW_FORCED)
+                    activated.click()
                 }
-                view.setBackgroundColor(if (visibleValue) Color.BLACK else Color.WHITE)
-                stateArray[first] = !visibleValue
             }
-
-            toggleFun(view)
-
-            view.setOnClickListener { toggleFun(it) }
-
         }
 
         // Default to set focus to first in shown list, include a hidden list
@@ -172,7 +153,6 @@ open class SugarEntryCreationActivity
         fun viewOf(id: Int) = v.findViewById<View>(id)
 
         infix fun View.withLabel(id: Int) = listOf(this,viewOf(id))
-
 
         R.id.entryCreatorToggleDateTime to true togglingWithoutFocus (
                 (dateView withLabel R.id.entryCreatorDateLabel) + (timeView withLabel R.id.entryCreatorTimeLabel)
