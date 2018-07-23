@@ -4,20 +4,26 @@ import android.annotation.SuppressLint
 import android.app.DialogFragment
 import android.graphics.Color
 import android.os.Bundle
+import android.os.SystemClock
 import android.support.v7.widget.AppCompatImageView
 import android.util.Log.d
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import stobix.utils.DateHandler
+import stobix.utils.kotlinExtensions.to
 
 /**
  * A dialog for creating an entry to the blood sugar database
  * Created by stobix on 11/19/17.
  */
+
+typealias ShownList = List<View>
+typealias HiddenList = List<View>
 
 @Suppress("NAME_SHADOWING")
 open class SugarEntryCreationActivity
@@ -62,7 +68,6 @@ open class SugarEntryCreationActivity
 
         v ?:throw Error("could not create view")
 
-
         dateView= v.findViewById(R.id.entryCreatorDate)
         timeView= v.findViewById(R.id.entryCreatorTime)
         sugarView= v.findViewById(R.id.entryCreatorSugar)
@@ -80,91 +85,110 @@ open class SugarEntryCreationActivity
                     false -> View.GONE
                 }
 
-        infix fun<A> Pair<Int,A?>.viewListener(listener: (Int) -> Unit) {
+        infix fun<A> Pair<Int,A?>.togglingWithFun(listener: (Int) -> Unit) {
             val view = v.findViewById<ImageView>( first)
             val truthiness = second != null
-            val visibleValue = stateArray[first] ?: truthiness
-            val hiddenState = vis(visibleValue)
-            listener(hiddenState)
-            view.setBackgroundColor(if(visibleValue) Color.BLACK else Color.WHITE)
-            stateArray[this.first] = !visibleValue
 
-            view.setOnClickListener {
+            val toggleFun = {
                 val visibleValue = stateArray[first] ?: truthiness
                 val hiddenState = vis(visibleValue)
-                it.setBackgroundColor(if(visibleValue) Color.BLACK else Color.WHITE)
+                view.setBackgroundColor(if(visibleValue) Color.BLACK else Color.WHITE)
                 listener(hiddenState)
                 stateArray[this.first] = !visibleValue
             }
+
+            toggleFun()
+
+            view.setOnClickListener { toggleFun() }
         }
 
 
-        infix fun<A> Pair<Int,A?>.elemHider(p:Pair<List<View>,List<View>>)  {
+
+        // Toggles between showing the views in shown and hidden, giving focus to activated when shown list is shown
+        // Initial state shown is given by whether the property A is defined
+        infix fun<A> Pair<Int,A?>.togglingWithoutFocus(shownHidden:Pair<ShownList,HiddenList>)  {
             val view = v.findViewById<ImageView>( first)
             val truthiness = second != null
-            val visibleValue = stateArray[first] ?: truthiness
-            val hiddenState = vis(visibleValue)
-            val notHiddenState = vis(!visibleValue)
-            val (shown,hidden) = p
-            shown.forEach { it.visibility = hiddenState }
-            hidden.forEach { it.visibility = notHiddenState }
-            view.setBackgroundColor(if(visibleValue) Color.BLACK else Color.WHITE)
-            stateArray[first] = visibleValue
+            val (shown,hidden) = shownHidden
 
-            view.setOnClickListener {
+
+            val toggleFun = { view: View ->
                 val visibleValue = stateArray[first] ?: truthiness
                 val hiddenState = vis(visibleValue)
                 val notHiddenState = vis(!visibleValue)
-                it.setBackgroundColor(if(visibleValue) Color.BLACK else Color.WHITE)
-                shown.map { it.visibility = hiddenState }
-                hidden.map { it.visibility = notHiddenState }
+                shown.forEach { it.visibility = hiddenState }
+                hidden.forEach { it.visibility = notHiddenState }
+                view.setBackgroundColor(if (visibleValue) Color.BLACK else Color.WHITE)
                 stateArray[first] = !visibleValue
             }
 
+            toggleFun(view)
+
+            view.setOnClickListener { toggleFun(it) }
+
         }
 
-       R.id.entryCreatorToggleDateTime to true viewListener {
-            dateView.visibility  = it
-            timeView.visibility = it
-            v.findViewById<TextView>(R.id.entryCreatorDateLabel).visibility = it
-            v.findViewById<TextView>(R.id.entryCreatorTimeLabel).visibility = it
+        infix fun<A> Pair<Int,A?>.togglingWithoutFocus(shown:ShownList) = this togglingWithoutFocus (shown to emptyList())
+
+        // Toggles between showing the views in shown and hidden, giving focus to activated when shown list is shown
+        // Initial state shown is given by whether the property A is defined
+        infix fun<A> Pair<Int,A?>.toggling(p:Triple<ShownList,HiddenList,View?>)  {
+            val view = v.findViewById<ImageView>( first)
+            val truthiness = second != null
+            var (shown,hidden,activated) = p
+            activated = activated ?:shown.first()
+
+
+            val toggleFun = { view: View ->
+                val visibleValue = stateArray[first] ?: truthiness
+                val hiddenState = vis(visibleValue)
+                val notHiddenState = vis(!visibleValue)
+                shown.forEach { it.visibility = hiddenState }
+                hidden.forEach { it.visibility = notHiddenState }
+                if (visibleValue) {
+                    activated.requestFocus()
+                    activated.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(),SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, 0f, 0f, 0))
+                    activated.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(),SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, 0f, 0f, 0))
+                    //imm.showSoftInput(view,InputMethodManager.SHOW_FORCED)
+                }
+                view.setBackgroundColor(if (visibleValue) Color.BLACK else Color.WHITE)
+                stateArray[first] = !visibleValue
+            }
+
+            toggleFun(view)
+
+            view.setOnClickListener { toggleFun(it) }
+
         }
 
-        R.id.entryCreatorWeightToggle to entry.weight elemHider(
-                listOf( v.findViewById(R.id.entryCreatorWeightLabel), weightView)
-                        to emptyList()
+        // Default to set focus to first in shown list, include a hidden list
+        infix fun<A> Pair<Int,A?>.toggling(p:Pair<ShownList,HiddenList>) : Unit =
+                this toggling (p to null)
+
+        // Default to set focus to first in shown list, have nothing in hidden list
+        infix fun<A> Pair<Int,A?>.toggling(shown:ShownList): Unit  =
+                this toggling (shown to emptyList())
+
+        fun viewOf(id: Int) = v.findViewById<View>(id)
+
+        infix fun View.withLabel(id: Int) = listOf(this,viewOf(id))
+
+
+        R.id.entryCreatorToggleDateTime to true togglingWithoutFocus (
+                (dateView withLabel R.id.entryCreatorDateLabel) + (timeView withLabel R.id.entryCreatorTimeLabel)
                 )
 
+        R.id.entryCreatorWeightToggle to entry.weight toggling ( weightView withLabel R.id.entryCreatorWeightLabel )
 
-        R.id.entryCreatorWeightToggle to entry.weight viewListener {
-            v.findViewById<TextView>(R.id.entryCreatorWeightLabel).visibility = it
-            weightView.visibility = it
-        }
+        R.id.entryCreatorDrinkToggle to entry.drink toggling ( drinkView withLabel R.id.entryCreatorDrinkLabel )
 
-        R.id.entryCreatorDrinkToggle to entry.drink viewListener {
-            v.findViewById<TextView>(R.id.entryCreatorDrinkLabel).visibility = it
-            drinkView.visibility = it
-        }
+        R.id.entryCreatorFoodToggle to entry.food toggling ( foodView withLabel R.id.entryCreatorFoodLabel )
 
-        R.id.entryCreatorFoodToggle to entry.food viewListener {
-            v.findViewById<TextView>(R.id.entryCreatorFoodLabel).visibility = it
-            foodView.visibility = it
-        }
+        R.id.entryCreatorTreatmentToggle to entry.treatment toggling ( treatmentView withLabel R.id.entryCreatorTreatmentLabel )
 
-        R.id.entryCreatorTreatmentToggle to entry.treatment viewListener {
-            v.findViewById<TextView>(R.id.entryCreatorTreatmentLabel).visibility = it
-            treatmentView.visibility = it
-        }
+        R.id.entryCreatorSugarToggle to entry.sugarLevel toggling  ( sugarView withLabel R.id.entryCreatorSugarLabel )
 
-        R.id.entryCreatorSugarToggle to entry.sugarLevel viewListener  {
-            v.findViewById<TextView>(R.id.entryCreatorSugarLabel).visibility = it
-            sugarView.visibility = it
-        }
-
-        R.id.entryCreatorExtraToggle to entry.extra viewListener  {
-            v.findViewById<TextView>(R.id.entryCreatorExtraLabel).visibility = it
-            extraView.visibility = it
-        }
+        R.id.entryCreatorExtraToggle to entry.extra toggling  ( extraView withLabel R.id.entryCreatorExtraLabel )
 
         val dateText="%d-%02d-%02d".format(date.year,date.month+1,date.day)
         val timeText="%02d:%02d".format(date.hour,date.minute)
