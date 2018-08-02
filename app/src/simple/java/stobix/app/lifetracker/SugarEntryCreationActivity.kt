@@ -2,6 +2,7 @@ package stobix.app.lifetracker
 
 import android.annotation.SuppressLint
 import android.app.DialogFragment
+import android.graphics.Color
 import android.os.Bundle
 import android.os.SystemClock
 import android.support.v7.widget.AppCompatImageView
@@ -91,7 +92,7 @@ open class SugarEntryCreationActivity
             val toggleFun = {
                 val visibleValue = stateArray[first] ?: truthiness
                 // TODO this should be some theme specific colors!
-                //view.setBackgroundColor(if(visibleValue) Color.BLACK else Color.WHITE)
+                view.setBackgroundColor(if(visibleValue) Color.BLACK else Color.WHITE)
                 listener(visibleValue)
                 stateArray[this.first] = !visibleValue
             }
@@ -118,6 +119,7 @@ open class SugarEntryCreationActivity
         infix fun<A> Pair<Int,A?>.togglingWithoutFocus(shown:ShownList) = this togglingWithoutFocus (shown to emptyList())
 
 
+        // Simulates a quick click on a component, e.g. for giving focus to a text field.
         fun View.click() {
             this.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(),SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, 0f, 0f, 0))
             this.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(),SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, 0f, 0f, 0))
@@ -237,6 +239,7 @@ open class SugarEntryCreationActivity
 
     private fun String?.nullIfEmpty() = if (this.isNullOrEmpty()) null else this
 
+    // Handles the submission of the entered data, either creating a new SugarEntry or updating the existing one.
     private fun handleSubmission(){
         entry.timestamp=date.timestamp
         entry.sugarLevel = sugarView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt()
@@ -254,6 +257,7 @@ open class SugarEntryCreationActivity
         }
     }
 
+    // Called by the main activity when the user changes the date.
     fun handleDate(year: Int, month: Int, day: Int) {
         date.setDate(year,month,day)
         // Calendars use a 0-indexed gregorian/julian month for some reason!
@@ -261,6 +265,7 @@ open class SugarEntryCreationActivity
         dateView.text=dateText
     }
 
+    // Called by the main activity when the user changes the time.
     fun handleTime(hour: Int, minute: Int) {
         date.setTime(hour,minute)
         val timeText= "%02d:%02d".format(hour,minute)
