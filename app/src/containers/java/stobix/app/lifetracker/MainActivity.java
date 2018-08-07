@@ -37,15 +37,10 @@ import stobix.view.containerview.CSubmission;
 
 import static android.util.Log.d;
 
-//import com.flask.colorpicker.ColorPickerView;
-//import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
-
 public class MainActivity extends AppCompatActivity
         implements
         DatePickerFragment.DatePickerHandler,
         TimePickerFragment.TimePickerHandler,
-        NumberPickerFragment.NumberPickedHandler,
-        NumberPickerFragment.NumberClearedHandler,
         SugarEntryCreationActivity.OnSugarEntryEnteredHandler,
         SugarEntryCreationActivity.OnSugarEntryChangedHandler,
         SugarEntryCreationActivity.OnSugarEntryDeletedHandler,
@@ -449,17 +444,6 @@ public class MainActivity extends AppCompatActivity
             t.show(getSupportFragmentManager(), "timePicker");
         }
 
-        public void showNumberPicker(int val, int frac, int min, int max){
-            NumberPickerFragment n = new NumberPickerFragment();
-            Bundle b = new Bundle();
-            b.putInt("value",val);
-            b.putInt("fraction",frac);
-            b.putInt("min",min);
-            b.putInt("max",max);
-            n.setArguments(b);
-            n.show(getSupportFragmentManager(), "numberPicker");
-        }
-
         private SugarEntryCreationActivity creationActivity(){
             return (SugarEntryCreationActivity) getFragmentManager().findFragmentByTag("dialog");
         }
@@ -471,16 +455,6 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void handleTime(int hour, int minute) {
             creationActivity().handleTime(hour, minute) ;
-        }
-
-        @Override
-        public void handleNumber(@NotNull Pair<Integer, Integer> number) {
-            creationActivity().onNumberSet(number);
-        }
-
-        @Override
-        public void handleNumberClear() {
-            creationActivity().onNumberClear();
         }
 
 
