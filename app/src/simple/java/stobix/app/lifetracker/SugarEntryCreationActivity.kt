@@ -2,7 +2,6 @@ package stobix.app.lifetracker
 
 import android.annotation.SuppressLint
 import android.app.DialogFragment
-import android.graphics.Color
 import android.os.Bundle
 import android.os.SystemClock
 import android.support.v7.widget.AppCompatImageView
@@ -14,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import stobix.utils.ColorHandler
 import stobix.utils.DateHandler
 import stobix.utils.kotlinExtensions.to
 
@@ -79,11 +79,29 @@ open class SugarEntryCreationActivity
 
         val stateArray: MutableMap<Int,Boolean> = mutableMapOf()
 
+        val c = ColorHandler(context)
+        var _bgColor: Int? = null
+        var _bgColorToggled: Int? = null
+
+        // Why does this only work with some colors? What am I missing?
+        // I'd like to use R.attr.colorBackground for bgColorToggled
+        c.withColorMap(listOf(R.attr.colorPrimary,R.attr.colorPrimaryDark)) {
+            _bgColor = it[R.attr.colorPrimary]
+            _bgColorToggled = it[R.attr.colorPrimaryDark]
+        }
+
+        val bgColor = _bgColor ?: error("nope")
+        val bgColorToggled = _bgColorToggled ?: error("nope")
+
         fun vis(b: Boolean) =
                 when (b){
                     true -> View.VISIBLE
                     false -> View.GONE
                 }
+
+        fun View.toggleBackgroundImage(b: Boolean){
+
+        }
 
         infix fun<A> Pair<Int,A?>.togglingWithFun(listener: (Boolean) -> Unit) {
             val view = v.findViewById<ImageView>( first)
@@ -92,7 +110,9 @@ open class SugarEntryCreationActivity
             val toggleFun = {
                 val visibleValue = stateArray[first] ?: truthiness
                 // TODO this should be some theme specific colors!
-                view.setBackgroundColor(if(visibleValue) Color.BLACK else Color.WHITE)
+
+
+                view.setBackgroundColor(if(visibleValue) bgColor else bgColorToggled)
                 listener(visibleValue)
                 stateArray[this.first] = !visibleValue
             }

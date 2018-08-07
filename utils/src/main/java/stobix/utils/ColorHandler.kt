@@ -2,10 +2,7 @@ package stobix.utils
 
 import android.content.Context
 import android.content.res.Resources
-import android.content.res.TypedArray
 import android.graphics.Color
-import android.support.annotation.StyleableRes
-import android.support.v4.content.ContextCompat
 import android.view.ContextThemeWrapper
 
 class ColorHandler(val ctx: Context) {
@@ -28,6 +25,8 @@ class ColorHandler(val ctx: Context) {
         val sortedColors = colorList.sorted().toIntArray()
         withColorMap(sortedColors,f)
     }
+
+    // TODO use getColorStateList instead of getColor to get null instead of crashes when the index is not a color!
 
     fun withColorMap(sortedColorArray: IntArray, f: (Map<Int,Int>) -> Unit) {
         theme.obtainStyledAttributes(sortedColorArray).also {
