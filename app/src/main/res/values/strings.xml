@@ -44,4 +44,5 @@
     <string name="input_food">Food</string>
     <string name="input_treatment">Treatment</string>
     <string name="input_drink">Drink</string>
+    <string name="show_hide_icons">show/hide icons</string>
 </resources>

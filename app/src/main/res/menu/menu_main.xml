@@ -28,6 +28,9 @@
         android:id="@+id/action_merge_db"
         android:title="@string/action_merge_db"/>
     <item
+        android:id="@+id/action_toggle_list_icons"
+        android:title="@string/show_hide_icons"/>
+    <item
         android:id="@+id/action_export_db"
         android:title="@string/action_export_db"/>
     <!--

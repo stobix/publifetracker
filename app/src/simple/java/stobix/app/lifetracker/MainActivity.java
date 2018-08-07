@@ -14,7 +14,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -419,6 +421,11 @@ public class MainActivity extends AppCompatActivity
                     fa.userCreateFile();
                     return true;
 
+                case R.id.action_toggle_list_icons:
+                    listIconsDisplayed = !listIconsDisplayed;
+                    tableView.invalidate();
+                    return true;
+
                 default:
                     return super.onOptionsItemSelected(item);
             }
@@ -576,11 +583,11 @@ public class MainActivity extends AppCompatActivity
         // since lint complained about the anonymous class instance.
         // See https://stackoverflow.com/questions/11407943/this-handler-class-should-be-static-or-leaks-might-occur-incominghandler
         private static class DataLoadHandler extends Handler {
-            final MainActivity context;
+            final MainActivity mainActivity;
             final SortableSugarEntryTableView tableView;
 
             DataLoadHandler(MainActivity outer_context, SortableSugarEntryTableView view) {
-                context = outer_context;
+                mainActivity = outer_context;
                 tableView = view;
             }
 
@@ -589,7 +596,7 @@ public class MainActivity extends AppCompatActivity
                 Bundle b = msg.getData();
                 ArrayList<SugarEntry> arrayEntries = b.getParcelableArrayList("entries");
                 if(arrayEntries!=null) {
-                    tableView.setDataAdapter(new SugarEntryTableDataAdapter(context, arrayEntries));
+                    tableView.setDataAdapter(new SugarEntryTableDataAdapter(mainActivity, arrayEntries));
                     tableView.sort(0, SortingOrder.DESCENDING);
                 }
             }
@@ -707,5 +714,25 @@ public class MainActivity extends AppCompatActivity
                     Log.e("Activity result","unknown activity result: "+requestCode);
             }
         }
+
+
+        private static DisplayMetrics displayMetrics = null;
+
+        public synchronized DisplayMetrics getScreenMetrics(){
+            if (displayMetrics == null) {
+                displayMetrics = new DisplayMetrics();
+                Display d = getWindowManager().getDefaultDisplay();
+                d.getRealMetrics(displayMetrics);
+            }
+            return displayMetrics;
+        }
+
+        private boolean listIconsDisplayed=false;
+
+        // XXX Possible bug source: There is nary any need for a lock here, but the user MIGHT click on the menu item the exact same micro second the rows are redisplayed ...
+        public boolean displaysListIcons(){
+            return listIconsDisplayed;
+        }
+
 
     }
