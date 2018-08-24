@@ -10,7 +10,7 @@ class SugarEntryAdapterFactoryTest{
 
     @Test
     fun emptyThing() {
-        val emptySugarEntryGsonWrapper = SugarEntryGsonWrapper(1, listOf())
+        val emptySugarEntryGsonWrapper = SugarEntryGsonWrapper( listOf())
         val json1 = emptySugarEntryGsonWrapper.toJSON()
         System.out.println(json1)
         emptySugarEntryGsonWrapper asEq SugarEntryGsonWrapper.fromJSON(json1)
@@ -19,7 +19,7 @@ class SugarEntryAdapterFactoryTest{
 
     @Test
     fun oneElement() {
-        val emptySugarEntryGsonWrapper = SugarEntryGsonWrapper(1, listOf(SugarEntry()))
+        val emptySugarEntryGsonWrapper = SugarEntryGsonWrapper( listOf(SugarEntry()))
         val json1 = emptySugarEntryGsonWrapper.toJSON()
         System.out.println(json1)
         emptySugarEntryGsonWrapper asEq SugarEntryGsonWrapper.fromJSON(json1)
@@ -27,7 +27,7 @@ class SugarEntryAdapterFactoryTest{
     }
     @Test
     fun oneElementWeight() {
-        val emptySugarEntryGsonWrapper = SugarEntryGsonWrapper(1, listOf(SugarEntry(weight=2)))
+        val emptySugarEntryGsonWrapper = SugarEntryGsonWrapper( listOf(SugarEntry(weight=2)))
         val json1 = emptySugarEntryGsonWrapper.toJSON()
         System.out.println(json1)
         emptySugarEntryGsonWrapper asEq SugarEntryGsonWrapper.fromJSON(json1)
