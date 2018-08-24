@@ -503,12 +503,26 @@ public class MainActivity extends AppCompatActivity
         }
 
         // Called when the user has changed a sugar entry and pressed 'submit changes'
-        public void onSugarEntryChanged(@NotNull SugarEntry s){
+        public void onSugarEntryChanged(@NotNull SugarEntry s, long originalTimestamp){
            sugarEntryGeneralAction(s,
-                   (sugarEntry) -> dao.update(sugarEntry),
+                   (sugarEntry) ->{
+                       // turns out there was a penalty for getting rid of the sugarID: we now have to move the sugar entry manually before updating it, since otherwise we'll lose track of it.
+                       if(s.getTimestamp() != originalTimestamp) {
+                           Log.d("entry update", "timestamp changed ("+originalTimestamp+" → "+s.getTimestamp()+")");
+                            // Try to update the timestamp to the new timestamp
+                           while (dao.updateTimestamp(originalTimestamp, sugarEntry.getTimestamp()) < 1) {
+                               // If we fail to update the timestamp, the new timestamp is already occupied, and we try the next timestamp millisecond for availability
+                               Log.d("entry update", "entry " + sugarEntry.getTimestamp() + " occupied, increasing…");
+                               sugarEntry.setTimestamp(sugarEntry.getTimestamp() + 1);
+                           }
+                       }
+                       dao.update(sugarEntry);
+                   }
+                   ,
                    (sugarEntry, dataAdapter) -> dataAdapter.notifyDataSetChanged()
                    );
         }
+
 
 
         // An abstraction of all data base followed by table adapter related consumer

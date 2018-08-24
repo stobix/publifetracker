@@ -34,6 +34,7 @@ open class SugarEntryCreationActivity
 
     private var date: DateHandler = DateHandler()
     private var alreadyDefinedEntry: Boolean = false
+    private var originalTimestamp: StartingTimestamp = 0
     private lateinit var dateView: TextView
     private lateinit var timeView: TextView
     private lateinit var sugarView: TextView
@@ -52,6 +53,7 @@ open class SugarEntryCreationActivity
         if(alreadyDefinedEntry) {
             entry=arguments.getParcelable("entry")
             date.timestamp= entry.timestamp
+            originalTimestamp = entry.timestamp
             d( "SugarEntry create",
                     "already defined; timestamp:${entry.timestamp}, sugar: ${entry.sugarLevel}, extra: ${entry.timestamp}"
             )
@@ -233,7 +235,7 @@ open class SugarEntryCreationActivity
     }
 
     interface OnSugarEntryChangedHandler{
-        fun onSugarEntryChanged(s: SugarEntry)
+        fun onSugarEntryChanged(s: SugarEntry, originalTimestamp: Long)
     }
 
     interface OnSugarEntryDeletedHandler{
@@ -270,7 +272,7 @@ open class SugarEntryCreationActivity
         entry.drink = drinkView.text?.toString().nullIfEmpty()
         if(alreadyDefinedEntry) {
             d("SugarEntry update", "t ${entry.timestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} d ${entry.drink} tr ${entry.treatment}")
-            (activity as OnSugarEntryChangedHandler).onSugarEntryChanged(entry)
+            (activity as OnSugarEntryChangedHandler).onSugarEntryChanged(entry,originalTimestamp)
         } else {
             d("SugarEntry submit", "t ${entry.timestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} d ${entry.drink} tr ${entry.treatment}")
             (activity as OnSugarEntryEnteredHandler).onSugarEntryEntered(entry)
