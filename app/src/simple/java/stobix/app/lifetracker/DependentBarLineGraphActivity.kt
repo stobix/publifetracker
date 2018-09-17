@@ -1,6 +1,8 @@
 package stobix.app.lifetracker
 
 import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
@@ -33,7 +35,68 @@ typealias WeekPerMeanStructure = List<Pair<MeanValue, Map.Entry<DateInfo, List<P
 
 data class ValueEntry (var timestamp: Timestamp, var value: Float, var original: Int, var converter: (Int) -> Float = {it.toFloat()/10f})
 
+data class DataSeries (
+        var description: String,
+        var data: ArrayList<FloatyIntBucket>,
+        var iconRes:Int,
+        var valueType:String="floatyInt10",
+        var breakPoints: DoubleArray = doubleArrayOf(4.0,7.0,15.0),
+        var keepLowZero: Boolean = true
+
+): Parcelable
+{
+    constructor(parcel: Parcel) : this(
+            parcel.readString(),
+            parcel.readBundle(DataSeries::class.java.classLoader).getParcelableArrayList("data"),
+            parcel.readInt(),
+            parcel.readString(),
+            doubleArrayOf(),
+            false
+
+    ){
+        var arrayLength = parcel.readInt()
+        val dArray = DoubleArray(arrayLength)
+        parcel.readDoubleArray(dArray)
+        breakPoints=dArray
+        arrayLength = parcel.readInt()
+        val tempArray= BooleanArray(arrayLength)
+        parcel.readBooleanArray(tempArray)
+        keepLowZero = tempArray[0]
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        val b=Bundle()
+        b.putParcelableArrayList("data",data)
+        parcel.writeString(description)
+        parcel.writeBundle(b)
+        parcel.writeInt(iconRes)
+        parcel.writeString(valueType)
+        parcel.writeInt(breakPoints.size)
+        parcel.writeDoubleArray(breakPoints)
+        val flagArray =booleanArrayOf(keepLowZero)
+        parcel.writeInt(flagArray.size)
+        parcel.writeBooleanArray(flagArray)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<DataSeries> {
+        override fun createFromParcel(parcel: Parcel): DataSeries {
+            return DataSeries(parcel)
+        }
+
+        override fun newArray(size: Int): Array<DataSeries?> {
+            return arrayOfNulls(size)
+        }
+    }
+
+}
+
+
 class DependentBarLineGraphActivity : AppCompatActivity() {
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +111,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
     }
 
     /**
-     * A placeholder fragment containing a simple view.
+     * A placeholder fragment containing a simple view
      */
     class PlaceholderFragment : Fragment() {
 
@@ -72,11 +135,13 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             val arguments = arguments ?: error("no args!")
 
 
-            val entries0 = arguments.getParcelableArrayList<FloatyIntBucket>("entries")
+
+            val entryLists = arguments.getParcelableArrayList<DataSeries>("series")
+            val entries0 = entryLists[0].data
                     // FIXME why do these make the graphs show correctly‽ I already sorted the data and made sure there were no nulls when I accessed the database
                     .filterNotNull()
                     .sortedBy { it.timestamp }
-            val thingToPick = arguments.getString("value_type")
+            val thingToPick = entryLists[0].valueType
 
             low = arguments.getDouble("colorLowPoint",4.0)
             mid = arguments.getDouble("colorMidPoint",7.0)
@@ -297,6 +362,20 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             val months = arrayOf("Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec")
 
             val days = arrayOf("Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön")
+
+        }
+    }
+
+    companion object {
+        @JvmStatic
+        fun createBarLineActivityBundle(title: String, data: ArrayList<DataSeries>)=
+            appendBarLineActivityBundle(title,data,Bundle())
+        @JvmStatic
+        fun appendBarLineActivityBundle(title: String, data: ArrayList<DataSeries>,bundle:Bundle): Bundle {
+            // TODO check if there are previous values in the bundle to consider
+            bundle.putString("title",title)
+            bundle.putParcelableArrayList("series", data)
+            return bundle
         }
     }
 }

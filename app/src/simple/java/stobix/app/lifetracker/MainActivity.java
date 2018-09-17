@@ -343,12 +343,29 @@ public class MainActivity extends AppCompatActivity
                             () -> {
                                 Log.d("graph","got request");
                                 Message m = newGraphHandler.obtainMessage();
-                                Bundle b = new Bundle();
-                                List<FloatyIntBucket> entries = dao.getAllSugarBuckets();
+                                List<FloatyIntBucket> allSugarBuckets = dao.getAllSugarBuckets();
+                                List<FloatyIntBucket> allWeightBuckets = dao.getAllWeightBuckets();
                                 Log.d("graph"," request");
-                                ArrayList<FloatyIntBucket> entryArrayList = new ArrayList<>(entries);
-                                b.putParcelableArrayList("entries", entryArrayList);
-                                b.putString("value_type","floatyInt10");
+                                ArrayList<DataSeries> a = new ArrayList<>();
+                                a.add(new DataSeries(
+                                        "blodsocker",
+                                        new ArrayList<>(allSugarBuckets),
+                                        0,
+                                        "floatyInt10",
+                                        new double[]{4.0,7.0,15.0},
+                                        true
+                                ));
+                                a.add(new DataSeries(
+                                        "vikt",
+                                        new ArrayList<>(allWeightBuckets),
+                                        0,
+                                        "floatyInt10",
+                                        new double[]{80,85,90},
+                                        false
+                                ));
+                                Bundle b =
+                                        DependentBarLineGraphActivity
+                                                .createBarLineActivityBundle( "Veckografer",a);
                                 m.setData(b);
                                 Log.d("graph","sending bundle");
                                 newGraphHandler.sendMessage(m);
@@ -369,16 +386,21 @@ public class MainActivity extends AppCompatActivity
                             () -> {
                                 Log.d("weight graph","got request");
                                 Message m = weightGraphHandler.obtainMessage();
-                                Bundle b = new Bundle();
                                 List<FloatyIntBucket> entries = dao.getAllWeightBuckets();
                                 Log.d("weight graph"," entries: "+entries.toString());
-                                ArrayList<FloatyIntBucket> entryArrayList = new ArrayList<>(entries);
-                                b.putParcelableArrayList("entries", entryArrayList);
-                                b.putString("value_type","floatyInt10");
-                                b.putDouble("colorHighPoint",90);
-                                b.putDouble("colorMidPoint",85);
-                                b.putDouble("colorLowPoint",80);
-                                b.putBoolean("keepLowZero",false);
+                                List<FloatyIntBucket> allWeightBuckets = dao.getAllWeightBuckets();
+                                ArrayList<DataSeries> a = new ArrayList<>();
+                                a.add(new DataSeries(
+                                        "vikt",
+                                        new ArrayList<>(allWeightBuckets),
+                                        0,
+                                        "floatyInt10",
+                                        new double[]{80,85,90},
+                                        false
+                                ));
+                                Bundle b =
+                                        DependentBarLineGraphActivity
+                                                .createBarLineActivityBundle( "Veckografer",a);
                                 m.setData(b);
                                 Log.d("weight graph","sending bundle");
                                 weightGraphHandler.sendMessage(m);
