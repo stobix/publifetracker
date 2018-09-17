@@ -125,10 +125,6 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
         private lateinit var chartTop: LineChartView
         private lateinit var chartBottom: ColumnChartView
 
-        private var low  = 4.0
-        private var mid = 7.0
-        private var high = 15.0
-
         private var keepLowZero = true
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -143,11 +139,58 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                     .sortedBy { it.timestamp }
             val thingToPick = entryLists[0].valueType
 
-            low = arguments.getDouble("colorLowPoint",4.0)
-            mid = arguments.getDouble("colorMidPoint",7.0)
-            high = arguments.getDouble("colorHighPoint",15.0)
+            val breakPoints = entryLists[0].breakPoints
+            colorByLevel = when ( breakPoints.size ) {
+                0 -> {
+                    {
+                        ChartUtils.COLOR_GREEN
+                    }
+                }
+                1 -> {
+                    {
+                        when {
+                        it < breakPoints[0] -> ChartUtils.COLOR_GREEN
+                        else -> ChartUtils.COLOR_RED
+                        }
+                    }
 
-            keepLowZero = arguments.getBoolean("keepLowZero",true)
+                }
+                2 -> {
+                    {
+                        when{
+                            it < breakPoints[0] -> ChartUtils.COLOR_GREEN
+                            it < breakPoints[1] -> ChartUtils.COLOR_ORANGE
+                            else -> ChartUtils.COLOR_RED
+                        }
+                    }
+
+                }
+                3 -> {
+                    {
+                        when{
+                            it < breakPoints[0] -> ChartUtils.COLOR_VIOLET
+                            it < breakPoints[1] -> ChartUtils.COLOR_GREEN
+                            it < breakPoints[2] -> ChartUtils.COLOR_ORANGE
+                            else -> ChartUtils.COLOR_RED
+                        }
+                    }
+                }
+                // FIXME Any breakpoint above 4 is ignored for now. Maybe do this more dynamically?
+                else ->
+                {
+                    {
+                        when{
+                            it < breakPoints[0] -> ChartUtils.COLOR_VIOLET
+                            it < breakPoints[1] -> ChartUtils.COLOR_GREEN
+                            it < breakPoints[2] -> ChartUtils.COLOR_ORANGE
+                            it < breakPoints[3] -> ChartUtils.COLOR_RED
+                            else -> ChartUtils.COLOR_BLUE
+                        }
+                    }
+                }
+            }
+
+            keepLowZero = entryLists[0].keepLowZero
 
             val mapper : (FloatyIntBucket) -> ValueEntry = when(thingToPick){
                 "int" -> {{ValueEntry(it.timestamp,it.value.toFloat(),it.value)}}
@@ -176,12 +219,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             return rootView
         }
 
-        private fun colorByLevel(level: Float) = when{
-            level < low -> ChartUtils.COLOR_VIOLET
-            level < mid -> ChartUtils.COLOR_GREEN
-            level < high -> ChartUtils.COLOR_ORANGE
-            else -> ChartUtils.COLOR_RED
-        }
+        private var colorByLevel: (level: Float) -> Int = { ChartUtils.COLOR_VIOLET } // Dummy init fun
 
         private fun initiateBottomChart(
                 perWeekMean: WeekPerMeanStructure) {
