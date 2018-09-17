@@ -32,7 +32,6 @@ typealias DateInfo = Pair<Year,Week>
 
 typealias WeekPerMeanStructure = List<Pair<MeanValue, Map.Entry<DateInfo, List<Pair<ValueEntry, DateInfo>>>>>
 
-
 data class ValueEntry (var timestamp: Timestamp, var value: Float, var original: Int)
 
 data class DataSeries (
@@ -133,17 +132,8 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
         fun menuItemClicked(itemId: Int)
     }
 
-    /**
-     * A placeholder fragment containing a simple view
-     */
     class PlaceholderFragment : Fragment(), MenuOptionReceiver{
-        override fun menuItemClicked(itemId: Int) {
-            Log.d("menu","item click received $itemId")
-            if(itemId < series.size ) {
-                Log.d("menu","switching data sets")
-                switchToDataSet(itemId)
-            }
-        }
+
 
         private lateinit var lineData: LineChartData
         private var columnData: ColumnChartData? = null
@@ -154,7 +144,74 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
         private lateinit var chartTop: LineChartView
         private lateinit var chartBottom: ColumnChartView
 
-        private var keepLowZero = true
+
+        /******************
+         * Initiation
+         ******************/
+        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+            val arguments = arguments ?: error("no args!")
+
+            series = arguments.getParcelableArrayList<DataSeries>("series").map(::processDataSeries)
+
+            val rootView = inflater.inflate(R.layout.fragment_line_column_dependency, container, false)
+
+            // *** TOP LINE CHART ***
+            chartTop = rootView.findViewById<View>(R.id.chart_top) as LineChartView
+
+            initiateTopChart()
+
+            // *** BOTTOM COLUMN CHART ***
+
+            chartBottom = rootView.findViewById<View>(R.id.chart_bottom) as ColumnChartView
+
+            // set values for data set 0, and refresh bottom chart
+            switchToDataSet(0)
+
+            return rootView
+        }
+
+        // Initiate the top chart, and draw a 0 value for each day of the week.
+        private fun initiateTopChart() {
+            val numValues = 7
+
+            val axisValues = ArrayList<AxisValue>()
+            val values = ArrayList<PointValue>()
+            for (i in 0 until numValues) {
+                values.add(PointValue(i.toFloat(), 0f))
+                axisValues.add(AxisValue(i.toFloat()).setLabel(days[i%7]))
+            }
+
+            val line = Line(values)
+            line.setColor(ChartUtils.COLOR_GREEN).isCubic = true
+            line.setHasLabelsOnlyForSelected(true)
+
+            val lines = ArrayList<Line>()
+            lines.add(line)
+
+            lineData = LineChartData(lines)
+            lineData.axisXBottom = Axis(axisValues).setHasLines(true)
+            lineData.axisYLeft = Axis().setHasLines(true).setMaxLabelChars(3)
+
+            chartTop.setPadding(40,0,17,43)
+
+            chartTop.lineChartData = lineData
+
+            // For build-up animation you have to disable viewport recalculation.
+            chartTop.isViewportCalculationEnabled = false
+
+            // And set initial max viewport and current viewport- remember to set viewports after data.
+            val v = Viewport(0f, 25f, 6f, 0f)
+            chartTop.maximumViewport = v
+            chartTop.currentViewport = v
+
+            chartTop.isValueSelectionEnabled = true
+            chartTop.zoomType = ZoomType.HORIZONTAL
+        }
+
+
+        /******************
+         * Data processing
+         ******************/
 
         private fun processDataSeries(data:DataSeries): Triple<WeekPerMeanStructure, (level: Float) -> Int, Boolean> {
             val entries0 = data.data
@@ -199,7 +256,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                         }
                     }
                 }
-                // FIXME Any breakpoint above 4 is ignored for now. Maybe do this more dynamically?
+            // FIXME Any breakpoint above 4 is ignored for now. Maybe do this more dynamically for higher values?
                 else ->
                 {
                     {
@@ -226,45 +283,51 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             }
 
             val entries = entries0.map(mapper)
-            val weekPerMean = getMeanPerWeek(entries,convertFromInt)
+            // The "unnecessary" casts are to make the type be descriptive instead of a long jumble of ints
+            @Suppress("USELESS_CAST")
+            val weekPerMean =
+                    entries
+                            // get the year and week of each entry
+                            .map {
+                                val cal = Calendar.getInstance()
+                                cal.timeInMillis=it.timestamp
+                                val year: Year = cal.get(Calendar.YEAR)
+                                val week: Week = cal.get(Calendar.WEEK_OF_YEAR)
+                                val dateInfo: DateInfo = year to week
+                                it to dateInfo
+                            }
+                            // group by year & week
+                            .groupBy { it.second }
+                            //
+                            .map {
+                                val elems = it.value
+                                val weekSum = elems.sumBy {it.first.original}
+                                val weekConverted = convertFromInt(weekSum)
+                                val weekMean: MeanValue = weekConverted / elems.size
+                                (weekMean to it)
+                            }
             return weekPerMean to colorByLevel to data.keepLowZero
         }
 
-        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-            val arguments = arguments ?: error("no args!")
-
-            rawSeries = arguments.getParcelableArrayList<DataSeries>("series")
-            series = rawSeries.map { processDataSeries(it) }
-
-            val rootView = inflater.inflate(R.layout.fragment_line_column_dependency, container, false)
-
-            // *** TOP LINE CHART ***
-            chartTop = rootView.findViewById<View>(R.id.chart_top) as LineChartView
-
-            // Initiate the top chart, and draw some default values.
-            initiateTopChart()
-
-            // *** BOTTOM COLUMN CHART ***
-
-            chartBottom = rootView.findViewById<View>(R.id.chart_bottom) as ColumnChartView
-
-            // set values for data set 0, and refresh bottom chart
-            switchToDataSet(0)
-
-            return rootView
+        /******************
+         * Menu Click Handling / Data Switching
+         ******************/
+        override fun menuItemClicked(itemId: Int) {
+            Log.d("menu","item click received $itemId")
+            if(itemId < series.size ) {
+                Log.d("menu","switching data sets")
+                switchToDataSet(itemId)
+            }
         }
-
 
         private fun switchToDataSet(index: Int){
             perWeekMean = series[index].first
-            val colorByLevel = series[index].second
-            keepLowZero = series[index].third
             initiateTopChart()
-            refreshBottomChart(colorByLevel)
+            refreshBottomChart(series[index].second,series[index].third)
         }
 
 
-        private fun refreshBottomChart(colorByLevel: (Float) -> Int) {
+        private fun refreshBottomChart(colorByLevel: (Float) -> Int,keepLowZero: Boolean) {
 
             val axisValues = ArrayList<AxisValue>()
             val columns = ArrayList<Column>()
@@ -313,63 +376,27 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             if (!keepLowZero)
                 chartBottom.currentViewport.bottom= perWeekMean.minBy { it.first } ?.first?.minus(2f) ?: 0f
 
-
-
             // TODO switch to the same week for the new data set that we had for the old iff we had an old data set and it had data the same week!
+            // TODO When switching back and forth between data sets, put back the previously selected week when switching to a previously selected data set.
         }
 
-        /**
-         * Generates initial data for line chart. At the beginning all Y values are equals 0. That will change when user
-         * will select value on column chart.
-         */
-        private fun initiateTopChart() {
-            val numValues = 7
+        /******************
+         * Column click handling
+         ******************/
 
-            val axisValues = ArrayList<AxisValue>()
-            val values = ArrayList<PointValue>()
-            for (i in 0 until numValues) {
-                values.add(PointValue(i.toFloat(), 0f))
-                axisValues.add(AxisValue(i.toFloat()).setLabel(days[i%7]))
+        private inner class BottomValueSelectedListener : ColumnChartOnValueSelectListener {
+
+            override fun onValueSelected(columnIndex: Int, subcolumnIndex: Int, value: SubcolumnValue) {
+                updateTopChart(value.color, columnIndex)
             }
-
-            val line = Line(values)
-            line.setColor(ChartUtils.COLOR_GREEN).isCubic = true
-            line.setHasLabelsOnlyForSelected(true)
-
-            val lines = ArrayList<Line>()
-            lines.add(line)
-
-            lineData = LineChartData(lines)
-            lineData.axisXBottom = Axis(axisValues).setHasLines(true)
-            lineData.axisYLeft = Axis().setHasLines(true).setMaxLabelChars(3)
-
-            chartTop.setPadding(40,0,17,43)
-
-            chartTop.lineChartData = lineData
-
-            // For build-up animation you have to disable viewport recalculation.
-            chartTop.isViewportCalculationEnabled = false
-
-            // And set initial max viewport and current viewport- remember to set viewports after data.
-            val v = Viewport(0f, 25f, 6f, 0f)
-            chartTop.maximumViewport = v
-            chartTop.currentViewport = v
-
-            chartTop.isValueSelectionEnabled = true
-            chartTop.zoomType = ZoomType.HORIZONTAL
+            override fun onValueDeselected() {}
         }
-
-        private var topColor: Int = 0
-        private var selectedColumn: Int? = null
 
         private fun updateTopChart(color: Int, columnIndex: Int){
-            // Save these so we can refresh without knowing the index
-            topColor = color
-            selectedColumn = columnIndex
             // Cancel last animation if not finished.
             chartTop.cancelDataAnimation()
+            // FIXME this is the only place outside refreshBottomChart that references perWeekMean. Can I change this to make perWeekMean not be class global?
             val weekEntries = perWeekMean[columnIndex].second.value
-
 
             // Create data points for the current week
             val newLineVals=weekEntries.mapIndexed { i,it ->
@@ -408,49 +435,10 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             chartTop.invalidate()
         }
 
-        private inner class BottomValueSelectedListener : ColumnChartOnValueSelectListener {
-
-            override fun onValueSelected(columnIndex: Int, subcolumnIndex: Int, value: SubcolumnValue) {
-                updateTopChart(value.color, columnIndex)
-            }
-
-            override fun onValueDeselected() {}
-
-        }
-
-
-
-        @Suppress("USELESS_CAST")
-        private fun getMeanPerWeek(entries: List<ValueEntry>,convertFromInt:(Int) -> Float): WeekPerMeanStructure =
-                // The "unnecessary" casts are to make the type be descriptive instead of a long jumble of ints
-                entries
-                        // get the year and week of each entry
-                        .map {
-                            val cal = Calendar.getInstance()
-                            cal.timeInMillis=it.timestamp
-                            val year: Year = cal.get(Calendar.YEAR)
-                            val week: Week = cal.get(Calendar.WEEK_OF_YEAR)
-                            val dateInfo: DateInfo = year to week
-                            it to dateInfo
-                        }
-                        // group by year & week
-                        .groupBy { it.second }
-                        //
-                        .map {
-                            val elems = it.value
-                            val weekSum = elems.sumBy {it.first.original}
-                            val weekConverted = convertFromInt(weekSum)
-                            val weekMean: MeanValue = weekConverted / elems.size
-                            (weekMean to it)
-                        }
-
-
         companion object {
             // TODO internationalize these!
             val months = arrayOf("Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec")
-
             val days = arrayOf("Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön")
-
         }
     }
 
