@@ -33,7 +33,7 @@ typealias DateInfo = Pair<Year,Week>
 typealias WeekPerMeanStructure = List<Pair<MeanValue, Map.Entry<DateInfo, List<Pair<ValueEntry, DateInfo>>>>>
 
 
-data class ValueEntry (var timestamp: Timestamp, var value: Float, var original: Int, var converter: (Int) -> Float = {it.toFloat()/10f})
+data class ValueEntry (var timestamp: Timestamp, var value: Float, var original: Int)
 
 data class DataSeries (
         var description: String,
@@ -192,11 +192,15 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
             keepLowZero = entryLists[0].keepLowZero
 
-            val mapper : (FloatyIntBucket) -> ValueEntry = when(thingToPick){
-                "int" -> {{ValueEntry(it.timestamp,it.value.toFloat(),it.value)}}
-                "floatyInt10" -> {{ValueEntry(it.timestamp,it.value.toFloat()/10f,it.value)}}
-                "floatyInt100" -> {{ValueEntry(it.timestamp,it.value.toFloat()/100f,it.value)}}
-                else -> {{ValueEntry(it.timestamp,it.value.toFloat(),it.value)}}
+            convertFromInt  = when(thingToPick){
+                "int" -> {{it.toFloat()}}
+                "floatyInt10" -> {{it.toFloat()/10f}}
+                "floatyInt100" -> {{it.toFloat()/100f}}
+                else -> {{it.toFloat()}}
+            }
+
+            val mapper : (FloatyIntBucket) -> ValueEntry = {
+                ValueEntry(it.timestamp,convertFromInt(it.value),it.value)
             }
 
             entries = entries0.map(mapper)
@@ -220,6 +224,8 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
         }
 
         private var colorByLevel: (level: Float) -> Int = { ChartUtils.COLOR_VIOLET } // Dummy init fun
+
+        private var convertFromInt: (value: Int) -> Float = { 0f } // Dummy init fun
 
         private fun initiateBottomChart(
                 perWeekMean: WeekPerMeanStructure) {
@@ -387,9 +393,8 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                         //
                         .map {
                             val elems = it.value
-                            val firstElem = elems.first().first
                             val weekSum = elems.sumBy {it.first.original}
-                            val weekConverted = firstElem.converter(weekSum)
+                            val weekConverted = convertFromInt(weekSum)
                             val weekMean: MeanValue = weekConverted / elems.size
                             (weekMean to it)
                         }
