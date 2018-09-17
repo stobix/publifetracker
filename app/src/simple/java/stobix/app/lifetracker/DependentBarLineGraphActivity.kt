@@ -259,6 +259,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             perWeekMean = series[index].first
             val colorByLevel = series[index].second
             keepLowZero = series[index].third
+            initiateTopChart()
             refreshBottomChart(colorByLevel)
         }
 
