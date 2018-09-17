@@ -373,41 +373,6 @@ public class MainActivity extends AppCompatActivity
                     ).start();
                     return true;
 
-                case R.id.show_weight_weekly:
-                    MainHandler weightGraphHandler =
-                            new MainHandler(this,(mainActivity, bundle) -> {
-                                Log.d("weight graph","got bundle");
-                                Intent i = new Intent(this, DependentBarLineGraphActivity.class);
-                                i.putExtras(bundle);
-                                startActivity(i);
-                            });
-
-                    new Thread(
-                            () -> {
-                                Log.d("weight graph","got request");
-                                Message m = weightGraphHandler.obtainMessage();
-                                List<FloatyIntBucket> entries = dao.getAllWeightBuckets();
-                                Log.d("weight graph"," entries: "+entries.toString());
-                                List<FloatyIntBucket> allWeightBuckets = dao.getAllWeightBuckets();
-                                ArrayList<DataSeries> a = new ArrayList<>();
-                                a.add(new DataSeries(
-                                        "vikt",
-                                        new ArrayList<>(allWeightBuckets),
-                                        0,
-                                        "floatyInt10",
-                                        new double[]{80,85,90},
-                                        false
-                                ));
-                                Bundle b =
-                                        DependentBarLineGraphActivity
-                                                .createBarLineActivityBundle( "Veckografer",a);
-                                m.setData(b);
-                                Log.d("weight graph","sending bundle");
-                                weightGraphHandler.sendMessage(m);
-                            }
-                    ).start();
-                    return true;
-
                 case R.id.action_switch_theme:
 
                     ArrayList<ThemeListItem> c = new ArrayList<>();

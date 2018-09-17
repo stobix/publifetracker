@@ -5,9 +5,8 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
 import lecho.lib.hellocharts.formatter.SimpleColumnChartValueFormatter
 import lecho.lib.hellocharts.gesture.ZoomType
 import lecho.lib.hellocharts.listener.ColumnChartOnValueSelectListener
@@ -16,6 +15,7 @@ import lecho.lib.hellocharts.util.ChartUtils
 import lecho.lib.hellocharts.view.ColumnChartView
 import lecho.lib.hellocharts.view.LineChartView
 import stobix.utils.DateHandler
+import stobix.utils.kotlinExtensions.to
 import java.util.*
 
 // Copied and modified from https://github.com/lecho/hellocharts-android/tree/master/hellocharts-samples/src/lecho/lib/hellocharts/samples/LineColumnDependencyActivity.java et al
@@ -98,28 +98,57 @@ data class DataSeries (
 class DependentBarLineGraphActivity : AppCompatActivity() {
 
 
+    lateinit var menuEntries:List<String>
+    lateinit var fragment: PlaceholderFragment
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_weekly,menu)
+        menuEntries.forEachIndexed { i, s ->
+            menu?.add(0,i,0,s)
+        }
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        val id = item?.itemId ?: 0
+        Log.d("menu","item selected: $id")
+        fragment.menuItemClicked(id)
+        return super.onOptionsItemSelected(item)
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_line_column_dependency)
         if (savedInstanceState == null) {
-            val fragment = PlaceholderFragment()
+            fragment = PlaceholderFragment()
             val args = intent.extras
+            menuEntries = args.getParcelableArrayList<DataSeries>("series").map{it.description}
             fragment.arguments = args
             supportFragmentManager.beginTransaction().add(R.id.container, fragment).commit()
         }
     }
 
+    private interface MenuOptionReceiver{
+        fun menuItemClicked(itemId: Int)
+    }
+
     /**
      * A placeholder fragment containing a simple view
      */
-    class PlaceholderFragment : Fragment() {
-
-
+    class PlaceholderFragment : Fragment(), MenuOptionReceiver{
+        override fun menuItemClicked(itemId: Int) {
+            Log.d("menu","item click received $itemId")
+            if(itemId < series.size ) {
+                Log.d("menu","switching data sets")
+                switchToDataSet(itemId)
+            }
+        }
 
         private lateinit var lineData: LineChartData
         private var columnData: ColumnChartData? = null
-        lateinit var entries: List<ValueEntry>
+        private lateinit var rawSeries: ArrayList<DataSeries>
+        private lateinit var series: List<Triple<WeekPerMeanStructure,(Float)->Int,Boolean>>
         private lateinit var perWeekMean: WeekPerMeanStructure
 
         private lateinit var chartTop: LineChartView
@@ -127,20 +156,15 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
         private var keepLowZero = true
 
-        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-            val arguments = arguments ?: error("no args!")
-
-
-
-            val entryLists = arguments.getParcelableArrayList<DataSeries>("series")
-            val entries0 = entryLists[0].data
+        private fun processDataSeries(data:DataSeries): Triple<WeekPerMeanStructure, (level: Float) -> Int, Boolean> {
+            val entries0 = data.data
                     // FIXME why do these make the graphs show correctly‽ I already sorted the data and made sure there were no nulls when I accessed the database
                     .filterNotNull()
                     .sortedBy { it.timestamp }
-            val thingToPick = entryLists[0].valueType
 
-            val breakPoints = entryLists[0].breakPoints
-            colorByLevel = when ( breakPoints.size ) {
+            val thingToPick = data.valueType
+            val breakPoints = data.breakPoints
+            val colorByLevel:(Float) -> Int = when ( breakPoints.size ) {
                 0 -> {
                     {
                         ChartUtils.COLOR_GREEN
@@ -149,8 +173,8 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                 1 -> {
                     {
                         when {
-                        it < breakPoints[0] -> ChartUtils.COLOR_GREEN
-                        else -> ChartUtils.COLOR_RED
+                            it < breakPoints[0] -> ChartUtils.COLOR_GREEN
+                            else -> ChartUtils.COLOR_RED
                         }
                     }
 
@@ -190,9 +214,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                 }
             }
 
-            keepLowZero = entryLists[0].keepLowZero
-
-            convertFromInt  = when(thingToPick){
+            val convertFromInt :(Int) -> Float = when(thingToPick){
                 "int" -> {{it.toFloat()}}
                 "floatyInt10" -> {{it.toFloat()/10f}}
                 "floatyInt100" -> {{it.toFloat()/100f}}
@@ -203,32 +225,45 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                 ValueEntry(it.timestamp,convertFromInt(it.value),it.value)
             }
 
-            entries = entries0.map(mapper)
+            val entries = entries0.map(mapper)
+            val weekPerMean = getMeanPerWeek(entries,convertFromInt)
+            return weekPerMean to colorByLevel to data.keepLowZero
+        }
+
+        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+            val arguments = arguments ?: error("no args!")
+
+            rawSeries = arguments.getParcelableArrayList<DataSeries>("series")
+            series = rawSeries.map { processDataSeries(it) }
+
             val rootView = inflater.inflate(R.layout.fragment_line_column_dependency, container, false)
 
             // *** TOP LINE CHART ***
             chartTop = rootView.findViewById<View>(R.id.chart_top) as LineChartView
 
-            perWeekMean = getMeanPerWeek(entries)
-
-            // Generate and set data for line chart
+            // Initiate the top chart, and draw some default values.
             initiateTopChart()
 
             // *** BOTTOM COLUMN CHART ***
 
             chartBottom = rootView.findViewById<View>(R.id.chart_bottom) as ColumnChartView
 
-            initiateBottomChart(perWeekMean)
+            // set values for data set 0, and refresh bottom chart
+            switchToDataSet(0)
 
             return rootView
         }
 
-        private var colorByLevel: (level: Float) -> Int = { ChartUtils.COLOR_VIOLET } // Dummy init fun
 
-        private var convertFromInt: (value: Int) -> Float = { 0f } // Dummy init fun
+        private fun switchToDataSet(index: Int){
+            perWeekMean = series[index].first
+            val colorByLevel = series[index].second
+            keepLowZero = series[index].third
+            refreshBottomChart(colorByLevel)
+        }
 
-        private fun initiateBottomChart(
-                perWeekMean: WeekPerMeanStructure) {
+
+        private fun refreshBottomChart(colorByLevel: (Float) -> Int) {
 
             val axisValues = ArrayList<AxisValue>()
             val columns = ArrayList<Column>()
@@ -277,6 +312,9 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             if (!keepLowZero)
                 chartBottom.currentViewport.bottom= perWeekMean.minBy { it.first } ?.first?.minus(2f) ?: 0f
 
+
+
+            // TODO switch to the same week for the new data set that we had for the old iff we had an old data set and it had data the same week!
         }
 
         /**
@@ -320,7 +358,13 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             chartTop.zoomType = ZoomType.HORIZONTAL
         }
 
-        private fun updateTopChart(color: Int, columnIndex: Int, @Suppress("UNUSED_PARAMETER") value: SubcolumnValue) {
+        private var topColor: Int = 0
+        private var selectedColumn: Int? = null
+
+        private fun updateTopChart(color: Int, columnIndex: Int){
+            // Save these so we can refresh without knowing the index
+            topColor = color
+            selectedColumn = columnIndex
             // Cancel last animation if not finished.
             chartTop.cancelDataAnimation()
             val weekEntries = perWeekMean[columnIndex].second.value
@@ -366,7 +410,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
         private inner class BottomValueSelectedListener : ColumnChartOnValueSelectListener {
 
             override fun onValueSelected(columnIndex: Int, subcolumnIndex: Int, value: SubcolumnValue) {
-                updateTopChart(value.color, columnIndex, value)
+                updateTopChart(value.color, columnIndex)
             }
 
             override fun onValueDeselected() {}
@@ -376,7 +420,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
 
         @Suppress("USELESS_CAST")
-        private fun getMeanPerWeek(entries: List<ValueEntry>): WeekPerMeanStructure =
+        private fun getMeanPerWeek(entries: List<ValueEntry>,convertFromInt:(Int) -> Float): WeekPerMeanStructure =
                 // The "unnecessary" casts are to make the type be descriptive instead of a long jumble of ints
                 entries
                         // get the year and week of each entry

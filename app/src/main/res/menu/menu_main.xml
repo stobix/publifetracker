@@ -19,9 +19,6 @@
         android:id="@+id/show_sugar_weekly"
         android:title="@string/show_bar_graphs" />
     <item
-        android:id="@+id/show_weight_weekly"
-        android:title="@string/show_weight_summary" />
-    <item
         android:id="@+id/action_import_db"
         android:title="@string/action_import_db"/>
     <item
