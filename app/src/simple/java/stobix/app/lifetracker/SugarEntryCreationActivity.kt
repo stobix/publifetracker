@@ -2,6 +2,8 @@ package stobix.app.lifetracker
 
 import android.annotation.SuppressLint
 import android.app.DialogFragment
+import android.graphics.ColorFilter
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.os.SystemClock
 import android.support.v7.widget.AppCompatImageView
@@ -81,20 +83,6 @@ open class SugarEntryCreationActivity
 
         val stateArray: MutableMap<Int,Boolean> = mutableMapOf()
 
-        val c = ColorHandler(context)
-        var _bgColor: Int? = null
-        var _bgColorToggled: Int? = null
-
-        // Why does this only work with some colors? What am I missing?
-        // I'd like to use R.attr.colorBackground for bgColorToggled
-        c.withColorMap(listOf(R.attr.colorPrimary,R.attr.colorPrimaryDark)) {
-            _bgColor = it[R.attr.colorPrimary]
-            _bgColorToggled = it[R.attr.colorPrimaryDark]
-        }
-
-        val bgColor = _bgColor ?: error("nope")
-        val bgColorToggled = _bgColorToggled ?: error("nope")
-
         fun vis(b: Boolean) =
                 when (b){
                     true -> View.VISIBLE
@@ -102,7 +90,7 @@ open class SugarEntryCreationActivity
                 }
 
         fun View.toggleBackgroundImage(b: Boolean){
-
+            this.setBackgroundResource(if(b) R.drawable.icon_back_circle else R.drawable.icon_back_circle_inactive)
         }
 
         infix fun<A> Pair<Int,A?>.togglingWithFun(listener: (Boolean) -> Unit) {
@@ -114,7 +102,8 @@ open class SugarEntryCreationActivity
                 // TODO this should be some theme specific colors!
 
 
-                view.setBackgroundColor(if(visibleValue) bgColor else bgColorToggled)
+                view.toggleBackgroundImage(visibleValue)
+                //view.setBackgroundColor(if(visibleValue) bgColor else bgColorToggled)
                 listener(visibleValue)
                 stateArray[this.first] = !visibleValue
             }
@@ -198,8 +187,8 @@ open class SugarEntryCreationActivity
         dateView.text=dateText
         timeView.text=timeText
 
-        val buttonAdd: Button = v.findViewById(R.id.entryAdd)
-        val buttonAddClose: Button =v.findViewById(R.id.entryAddClose)
+        val buttonAdd: Button = v.findViewById(R.id.entrySubmitAction2)
+        val buttonAddClose: Button =v.findViewById(R.id.entrySubmitAction1)
 
         val buttonClearExtra: AppCompatImageView = v.findViewById(R.id.entryCreatorExtraDelete)
 

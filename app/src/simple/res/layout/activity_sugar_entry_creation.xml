@@ -300,61 +300,100 @@
             android:id="@+id/entryCreatorToggleDateTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
             android:layout_weight="1"
-            android:background="@drawable/circle"
+            android:background="@drawable/icon_back_circle"
             android:backgroundTintMode="add"
-            app:srcCompat="@drawable/datetime_icon" />
+            android:padding="3dp"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/datetime_icon"
+            tools:ignore="ContentDescription" />
 
         <ImageView
             android:id="@+id/entryCreatorWeightToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
             android:layout_weight="1"
-            android:background="@drawable/circle"
-            app:srcCompat="@drawable/weight_icon" />
+            android:background="@drawable/icon_back_circle"
+            android:padding="3dip"
+            android:paddingTop="1dip"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/weight_icon"
+            tools:ignore="ContentDescription" />
 
         <ImageView
             android:id="@+id/entryCreatorSugarToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
             android:layout_weight="1"
-            android:background="@drawable/circle"
-            app:srcCompat="@drawable/blood_sugar_icon" />
+            android:background="@drawable/icon_back_circle"
+            android:padding="3dp"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/blood_sugar_icon"
+            tools:ignore="ContentDescription" />
 
         <ImageView
             android:id="@+id/entryCreatorTreatmentToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
             android:layout_weight="1"
-            android:background="@drawable/circle"
-            app:srcCompat="@drawable/treatment_icon" />
+            android:background="@drawable/icon_back_circle"
+            android:padding="3dp"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/treatment_icon"
+            tools:ignore="ContentDescription" />
 
         <ImageView
             android:id="@+id/entryCreatorFoodToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
             android:layout_weight="1"
-            app:srcCompat="@drawable/food_icon" />
+            android:background="@drawable/icon_back_circle"
+            android:padding="3dp"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/food_icon"
+            tools:ignore="ContentDescription" />
 
         <ImageView
             android:id="@+id/entryCreatorDrinkToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
             android:layout_weight="1"
-            app:srcCompat="@drawable/drink_icon" />
+            android:background="@drawable/icon_back_circle"
+            android:padding="3dp"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/drink_icon"
+            tools:ignore="ContentDescription" />
 
         <ImageView
             android:id="@+id/entryCreatorExtraToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
             android:layout_weight="1"
-            app:srcCompat="@drawable/extra_icon" />
+            android:background="@drawable/icon_back_circle"
+            android:padding="3dp"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/extra_icon"
+            tools:ignore="ContentDescription" />
     </LinearLayout>
 
     <!-- submit buttons -->
 
     <Button
-        android:id="@+id/entryAddClose"
+        android:id="@+id/entrySubmitAction1"
         style="?android:attr/buttonBarButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -364,11 +403,11 @@
         android:text="@string/creation_dialog_button_add_close"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/entryAdd"
+        app:layout_constraintStart_toEndOf="@+id/entrySubmitAction2"
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorButtonBar" />
 
     <Button
-        android:id="@+id/entryAdd"
+        android:id="@+id/entrySubmitAction2"
         style="?android:attr/buttonBarButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -377,7 +416,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/creation_dialog_button_add"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/entryAddClose"
+        app:layout_constraintEnd_toStartOf="@+id/entrySubmitAction1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorButtonBar" />
 

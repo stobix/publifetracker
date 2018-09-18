@@ -13,6 +13,8 @@
 
     <declare-styleable name="list_icons">
         <attr name="list_icon_color" format="color"/>>
+        <attr name="list_icon_background_active" format="color"/>>
+        <attr name="list_icon_background_inactive" format="color"/>>
     </declare-styleable>
 
     <declare-styleable name="add_button">
