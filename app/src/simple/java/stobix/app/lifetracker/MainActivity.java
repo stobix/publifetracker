@@ -74,8 +74,10 @@ public class MainActivity extends AppCompatActivity
             } else
                 setTheme(R.style.Theme_Zimmik_NoActionBar);
 
+            SharedPreferences visibilityPrefs = getSharedPreferences("visibility",MODE_PRIVATE);
+            listIconsDisplayed= visibilityPrefs.getBoolean("show table icons",false);
 
-            // DOn't use savedInstanceState before setting the color theme! It can lead to a vicious
+            // Don't use savedInstanceState before setting the color theme! It can lead to a vicious
             // loop if the previously selected theme didn't work. I think. ;)
             super.onCreate(savedInstanceState);
             // TODO Add something that sets a default functioning theme if the set theme crashes the app!
@@ -159,6 +161,9 @@ public class MainActivity extends AppCompatActivity
         public boolean onCreateOptionsMenu(Menu menu) {
             // Inflate the menu; this adds items to the action bar if it is present.
             getMenuInflater().inflate(R.menu.menu_main, menu);
+            //((MenuItem)findViewById(R.id.action_toggle_list_icons)).setChecked(listIconsDisplayed);
+            MenuItem showHideIconIcon = menu.findItem(R.id.action_toggle_list_icons);
+            showHideIconIcon.setChecked(listIconsDisplayed);
             return true;
         }
 
@@ -409,8 +414,7 @@ public class MainActivity extends AppCompatActivity
                     return true;
 
                 case R.id.action_toggle_list_icons:
-                    listIconsDisplayed = !listIconsDisplayed;
-                    tableView.invalidate();
+                    doChangeIconVisibility();
                     return true;
 
                 default:
@@ -419,6 +423,14 @@ public class MainActivity extends AppCompatActivity
 
         }
 
+        public void doChangeIconVisibility(){
+            SharedPreferences preferences = getSharedPreferences("visibility",MODE_PRIVATE);
+            boolean showIcons = preferences.getBoolean("show table icons",false);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean("show table icons",!showIcons);
+            editor.apply();
+            restartMe();
+        }
 
         public void doSetTheme(int androidResourceThemeValue){
                     SharedPreferences.Editor editor = getSharedPreferences("colorsNstuff",MODE_PRIVATE).edit();

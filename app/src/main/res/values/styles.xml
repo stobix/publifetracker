@@ -16,14 +16,17 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="DefaultTheme" parent="Theme.AppCompat">
+        <item name="list_icon_color">?android:attr/colorAccent</item>
         <item name="button_plus_color">?android:attr/textColor</item>
     </style>
 
     <style name="DefaultTheme.Light" parent="Theme.AppCompat.Light">
+        <item name="list_icon_color">?android:attr/colorAccent</item>
         <item name="button_plus_color">?android:attr/colorPrimary</item>
     </style>
 
     <style name="DefaultTheme.Light.DarkActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="list_icon_color">?android:attr/colorAccent</item>
         <item name="button_plus_color">?android:attr/colorPrimary</item>
     </style>
 
@@ -48,6 +51,7 @@
         <item name="button_plus_color">@color/joeldata_button_plus</item>
         <item name="entry_labels_color">?android:colorAccent</item>
         <item name="entry_text_color">#ffcb00</item>
+        <item name="list_icon_color">@color/joeldata_button_plus</item>
     </style>
 
     <style name="Joel.NoActionBar" >

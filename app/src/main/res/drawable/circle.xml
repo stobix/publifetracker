@@ -5,6 +5,6 @@ android:height="100dp"
 android:viewportWidth="512.0"
 android:viewportHeight="512.0">
 <path
-    android:fillColor="?attr/button_plus_background"
+    android:fillColor="?attr/list_icon_color"
     android:pathData="M0,256a256,256 0 1,0 512,0a256,256 0 1,0 -512,0z" />
 </vector>
