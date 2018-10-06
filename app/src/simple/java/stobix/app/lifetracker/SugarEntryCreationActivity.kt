@@ -26,6 +26,7 @@ import stobix.utils.kotlinExtensions.to
 
 typealias ShownList = List<View>
 typealias HiddenList = List<View>
+typealias ResourceID = Int
 
 @Suppress("NAME_SHADOWING")
 open class SugarEntryCreationActivity
@@ -83,29 +84,37 @@ open class SugarEntryCreationActivity
 
         val stateArray: MutableMap<Int,Boolean> = mutableMapOf()
 
+
+        // Simulates a quick click on a component, e.g. for giving focus to a text field.
+        fun View.click() {
+            this.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(),SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, 0f, 0f, 0))
+            this.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(),SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, 0f, 0f, 0))
+        }
+
+
+
         fun vis(b: Boolean) =
                 when (b){
                     true -> View.VISIBLE
                     false -> View.GONE
                 }
 
+
         fun View.toggleBackgroundImage(b: Boolean){
             this.setBackgroundResource(if(b) R.drawable.icon_back_circle else R.drawable.icon_back_circle_inactive)
         }
 
-        infix fun<A> Pair<Int,A?>.togglingWithFun(listener: (Boolean) -> Unit) {
+
+        // Make the resource run the listener function on each click on the resource, with a boolean toggled each time.
+        infix fun<A> Pair<ResourceID,A?>.togglingWithFun(listener: (Boolean) -> Unit) {
             val view = v.findViewById<ImageView>( first)
             val truthiness = second != null
 
             val toggleFun = {
                 val visibleValue = stateArray[first] ?: truthiness
-                // TODO this should be some theme specific colors!
-
-
                 view.toggleBackgroundImage(visibleValue)
-                //view.setBackgroundColor(if(visibleValue) bgColor else bgColorToggled)
                 listener(visibleValue)
-                stateArray[this.first] = !visibleValue
+                stateArray[first] = !visibleValue
             }
 
             toggleFun()
@@ -115,7 +124,7 @@ open class SugarEntryCreationActivity
 
         // Toggles between showing the views in shown and hidden, giving focus to activated when shown list is shown
         // Initial state shown is given by whether the property A is defined
-        infix fun<A> Pair<Int,A?>.togglingWithoutFocus(shownHidden:Pair<ShownList,HiddenList>)  {
+        infix fun<A> Pair<ResourceID,A?>.togglingWithoutFocus(shownHidden:Pair<ShownList,HiddenList>)  {
             val (shown,hidden) = shownHidden
 
             this togglingWithFun {
@@ -127,18 +136,18 @@ open class SugarEntryCreationActivity
 
         }
 
-        infix fun<A> Pair<Int,A?>.togglingWithoutFocus(shown:ShownList) = this togglingWithoutFocus (shown to emptyList())
+        // Stripped down versions
+
+        infix fun<A> Pair<ResourceID,A?>.togglingWithoutFocus(shown:ShownList) = this togglingWithoutFocus (shown to emptyList())
+
+        infix fun ResourceID.togglingWithoutFocus(shownHidden:Pair<ShownList,HiddenList>) = this to true togglingWithoutFocus shownHidden
+
+        infix fun ResourceID.togglingWithoutFocus(shown:ShownList) = this to true togglingWithoutFocus shown
 
 
-        // Simulates a quick click on a component, e.g. for giving focus to a text field.
-        fun View.click() {
-            this.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(),SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, 0f, 0f, 0))
-            this.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(),SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, 0f, 0f, 0))
-        }
-
-        // Toggles between showing the views in shown and hidden, giving focus to activated when shown list is shown
+        // Toggles on a click on the Resource between showing the views in shown and hidden, giving focus to activated when shown list is shown (or first in shown list if activated is null)
         // Initial state shown is given by whether the property A is defined
-        infix fun<A> Pair<Int,A?>.toggling(shownHiddenActivated:Triple<ShownList,HiddenList,View?>)  {
+        infix fun<A> Pair<ResourceID,A?>.toggling(shownHiddenActivated:Triple<ShownList,HiddenList,View?>)  {
             var (shown,hidden,activated) = shownHiddenActivated
             activated = activated ?:shown.first()
 
@@ -155,18 +164,20 @@ open class SugarEntryCreationActivity
         }
 
         // Default to set focus to first in shown list, include a hidden list
-        infix fun<A> Pair<Int,A?>.toggling(p:Pair<ShownList,HiddenList>) : Unit =
+        infix fun<A> Pair<ResourceID,A?>.toggling(p:Pair<ShownList,HiddenList>) : Unit =
                 this toggling (p to null)
 
         // Default to set focus to first in shown list, have nothing in hidden list
-        infix fun<A> Pair<Int,A?>.toggling(shown:ShownList): Unit  =
+        infix fun<A> Pair<ResourceID,A?>.toggling(shown:ShownList): Unit  =
                 this toggling (shown to emptyList())
 
-        fun viewOf(id: Int) = v.findViewById<View>(id)
+        // Just declarative syntax sugar, kinda like => in perl.
+        infix fun View.withLabel(id: ResourceID) = listOf(this,v.findViewById<View>(id))
 
-        infix fun View.withLabel(id: Int) = listOf(this,viewOf(id))
 
-        R.id.entryCreatorToggleDateTime to true togglingWithoutFocus (
+
+
+        R.id.entryCreatorToggleDateTime togglingWithoutFocus (
                 (dateView withLabel R.id.entryCreatorDateLabel) + (timeView withLabel R.id.entryCreatorTimeLabel)
                 )
 
