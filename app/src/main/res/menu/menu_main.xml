@@ -1,4 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="stobix.app.lifetracker.MainActivity">
     <!--
@@ -18,7 +19,9 @@
             android:title="@string/show_graphs" />
         <item
             android:id="@+id/show_sugar_weekly"
-            android:title="@string/show_bar_graphs" />
+            android:title="@string/show_bar_graphs"
+            android:icon="@drawable/bar_chart_icon"
+            app:showAsAction="ifRoom" />
     </group>
     <group >
         <item
