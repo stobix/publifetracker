@@ -1,5 +1,7 @@
 package stobix.app.lifetracker
 
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
@@ -7,6 +9,7 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.*
+import kotlinx.android.synthetic.simple.activity_sugar_entry_creation.view.*
 import lecho.lib.hellocharts.formatter.SimpleColumnChartValueFormatter
 import lecho.lib.hellocharts.gesture.ZoomType
 import lecho.lib.hellocharts.listener.ColumnChartOnValueSelectListener
@@ -97,13 +100,20 @@ data class DataSeries (
 class DependentBarLineGraphActivity : AppCompatActivity() {
 
 
-    lateinit var menuEntries:List<String>
+    lateinit var menuEntries:List<Pair<String,Int>>
     lateinit var fragment: PlaceholderFragment
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_weekly,menu)
-        menuEntries.forEachIndexed { i, s ->
-            menu?.add(0,i,0,s)
+        menuEntries.forEachIndexed { i, entry ->
+            val (description,iconRes) = entry
+            @Suppress("ReplaceSingleLineLet")
+            menu?.let{
+                it.add(0,i,0,description)
+                        // Default to a red X if the caller forgot to set iconRes
+                        .setIcon(if(iconRes == 0) android.R.drawable.ic_delete else iconRes)
+                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+            }
         }
         return super.onCreateOptionsMenu(menu)
     }
@@ -122,7 +132,8 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             fragment = PlaceholderFragment()
             val args = intent.extras
-            menuEntries = args.getParcelableArrayList<DataSeries>("series").map{it.description}
+            menuEntries = args.getParcelableArrayList<DataSeries>("series").map{it.description to it.iconRes}
+            setTheme(args.getInt("theme"))
             fragment.arguments = args
             supportFragmentManager.beginTransaction().add(R.id.container, fragment).commit()
         }
@@ -301,6 +312,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                             //
                             .map {
                                 val elems = it.value
+                                @Suppress("NestedLambdaShadowedImplicitParameter")
                                 val weekSum = elems.sumBy {it.first.original}
                                 val weekConverted = convertFromInt(weekSum)
                                 val weekMean: MeanValue = weekConverted / elems.size

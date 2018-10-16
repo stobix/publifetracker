@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity
         // Used for all data base related operations once initiated in onCreate
         private SugarEntryDao dao;
 
+        private int currentTheme=R.style.Theme_Zimmik_NoActionBar;
+
         @Override
         protected void onCreate(Bundle savedInstanceState) {
 
@@ -68,12 +70,10 @@ public class MainActivity extends AppCompatActivity
             SharedPreferences preferences = getSharedPreferences("colorsNstuff",MODE_PRIVATE);
             boolean useTheme = preferences.getBoolean("useTheme",false);
             if(useTheme) {
-                int themeVal = preferences.getInt("theme", R.style.Theme_Zimmik_NoActionBar);
-                Log.d("theme", "setting theme to "+themeVal);
-                setTheme(themeVal);
-            } else
-                setTheme(R.style.Theme_Zimmik_NoActionBar);
-
+                currentTheme = preferences.getInt("theme", R.style.Theme_Zimmik_NoActionBar);
+                Log.d("theme", "setting theme to "+currentTheme);
+            }
+            setTheme(currentTheme);
             SharedPreferences visibilityPrefs = getSharedPreferences("visibility",MODE_PRIVATE);
             listIconsDisplayed= visibilityPrefs.getBoolean("show table icons",false);
 
@@ -355,7 +355,7 @@ public class MainActivity extends AppCompatActivity
                                 a.add(new DataSeries(
                                         "blodsocker",
                                         new ArrayList<>(allSugarBuckets),
-                                        0,
+                                        R.drawable.blood_sugar_icon,
                                         "floatyInt10",
                                         new double[]{4.0,7.0,15.0},
                                         true
@@ -363,7 +363,7 @@ public class MainActivity extends AppCompatActivity
                                 a.add(new DataSeries(
                                         "vikt",
                                         new ArrayList<>(allWeightBuckets),
-                                        0,
+                                        R.drawable.weight_icon,
                                         "floatyInt10",
                                         new double[]{80,85,90},
                                         false
@@ -371,6 +371,7 @@ public class MainActivity extends AppCompatActivity
                                 Bundle b =
                                         DependentBarLineGraphActivity
                                                 .createBarLineActivityBundle( "Veckografer",a);
+                                b.putInt("theme",currentTheme);
                                 m.setData(b);
                                 Log.d("graph","sending bundle");
                                 newGraphHandler.sendMessage(m);
