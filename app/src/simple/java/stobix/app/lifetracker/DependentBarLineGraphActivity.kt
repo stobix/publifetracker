@@ -100,6 +100,8 @@ data class DataSeries (
 class DependentBarLineGraphActivity : AppCompatActivity() {
 
 
+    // TODO Change every color according to current theme!
+
     lateinit var menuEntries:List<Pair<String,Int>>
     lateinit var fragment: PlaceholderFragment
 
