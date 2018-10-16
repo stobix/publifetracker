@@ -353,7 +353,7 @@ public class MainActivity extends AppCompatActivity
                                 Log.d("graph"," request");
                                 ArrayList<DataSeries> a = new ArrayList<>();
                                 a.add(new DataSeries(
-                                        "blodsocker",
+                                        getString(R.string.input_sugar),
                                         new ArrayList<>(allSugarBuckets),
                                         R.drawable.blood_sugar_icon,
                                         "floatyInt10",
@@ -361,7 +361,7 @@ public class MainActivity extends AppCompatActivity
                                         true
                                 ));
                                 a.add(new DataSeries(
-                                        "vikt",
+                                        getString(R.string.input_weight),
                                         new ArrayList<>(allWeightBuckets),
                                         R.drawable.weight_icon,
                                         "floatyInt10",
