@@ -47,4 +47,5 @@
     <string name="input_treatment">Behandling</string>
     <string name="input_drink">Dryck</string>
     <string name="show_hide_icons">Visa/dölj ikoner</string>
+    <string name="title_activity_color_editor">Color Editor</string>
 </resources>

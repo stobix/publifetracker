@@ -13,6 +13,15 @@
                 android:value="stobix.app.lifetracker.MainActivity" />
         </activity>
         <activity
+            android:name="stobix.app.lifetracker.ColorEditorActivity"
+            android:label="@string/title_activity_color_editor"
+            android:parentActivityName="stobix.app.lifetracker.MainActivity"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="stobix.app.lifetracker.MainActivity" />
+        </activity>
+        <activity
             android:name="stobix.app.lifetracker.DependentBarLineGraphActivity"
             android:label="@string/dependent_bar_line_graph_header"
             android:parentActivityName="stobix.app.lifetracker.MainActivity">

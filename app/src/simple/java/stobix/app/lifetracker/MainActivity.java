@@ -221,6 +221,7 @@ public class MainActivity extends AppCompatActivity
                     */
 
 
+
                 case R.id.show_stats:
                     Handler h = new MainHandler(
                             this,
@@ -334,6 +335,22 @@ public class MainActivity extends AppCompatActivity
                             ).start();
 
                     return true;
+                case R.id.action_colors:
+                    MainHandler colorEditorHandler =
+                            new MainHandler(this,(mainActivity, bundle) -> {
+                                Log.d("graph","got bundle");
+                                Intent i = new Intent(this, ColorEditorActivity.class);
+                                i.putExtras(bundle);
+                                startActivity(i);
+                            });
+                    new Thread(
+                            () -> {
+                                Message m = colorEditorHandler.obtainMessage();
+                                colorEditorHandler.sendMessage(m);
+                            }
+                    ).start();
+                    return true;
+
 
                 case R.id.show_sugar_weekly:
                     MainHandler newGraphHandler =
