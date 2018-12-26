@@ -64,7 +64,7 @@ class ThemeArrayAdapter(ctx: Context,  items: ArrayList<ThemeListItem>)
                         R.attr.table_data_row_odd,
                         R.attr.button_plus_color
                 )
-        c.withColorFun(colorList) {
+        c.withColorFun(ColorsMeta.colorsUsed) {
             getColor ->
 
             fun getCol(attr:Int) = getColor(attr)

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.TextView
 import stobix.utils.ColorHandler
@@ -13,28 +12,8 @@ import stobix.utils.ColorHandler
 class ColorEditorActivity : Activity(), AdapterView.OnItemSelectedListener {
     fun setColors(themeId: Int){
         var c = ColorHandler(applicationContext)
-        val colorList =
-                listOf(
-                        R.attr.colorPrimary,
-                        R.attr.colorPrimaryDark,
-                        R.attr.colorAccent,
-
-                        android.R.attr.textColorPrimary,
-                        android.R.attr.textColorSecondary,
-                        android.R.attr.textColorTertiary,
-                        android.R.attr.windowBackground,
-
-                        R.attr.table_header_text,
-                        R.attr.tableView_headerColor,
-
-                        R.attr.table_data_text,
-                        R.attr.table_data_row_even,
-                        R.attr.table_data_row_odd,
-
-                        R.attr.button_plus_color
-                )
         c.themeRes = themeId
-        c.withColorFun(colorList) { getColor ->
+        c.withColorFun(ColorsMeta.colorsUsed) { getColor ->
             fun TextView.color(id: Int) : Int {
                 val color = getColor(id)
                 // Log.d("ColorEditor","color $color")
@@ -81,7 +60,9 @@ class ColorEditorActivity : Activity(), AdapterView.OnItemSelectedListener {
         setContentView(R.layout.activity_fullscreen_color_editor)
         actionBar?.setDisplayHomeAsUpEnabled(true)
         val picker = findViewById<Spinner>(R.id.colorEditThemePicker)
-        picker.adapter = ThemeArrayAdapter(this,MainActivity.COLOR_THEMES).also{it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)}
+        picker.adapter = ThemeArrayAdapter(this,MainActivity.COLOR_THEMES).also{
+            it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        }
         picker.onItemSelectedListener = this
         setColors(R.style.Hjul)
         // var img = findViewById<ImageView>(R.id.colorEditorPreviewImage);
@@ -91,9 +72,7 @@ class ColorEditorActivity : Activity(), AdapterView.OnItemSelectedListener {
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        Log.d("ColorEditor","Item selected: ${MainActivity.COLOR_THEMES[position]}")
         setColors(MainActivity.COLOR_THEMES[position].themeResourceValue)
-        // val child = parent?.getChildAt(position)
     }
 
 }

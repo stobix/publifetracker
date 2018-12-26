@@ -52,7 +52,8 @@
         <item name="android:windowBackground">@color/joelWindowBackground</item>
         <item name="table_data_row_even">@color/joeldata_row_even</item>
         <item name="table_data_row_odd">@color/joeldata_row_odd</item>
-        <item name="table_header_text">@color/joeldata_header_text</item>
+        <!--<item name="table_header_text">@color/joeldata_header_text</item>-->
+        <item name="table_header_text">#ffcb00</item>
         <item name="tableView_headerColor">@color/joeldata_headerColor</item>
         <item name="button_plus_color">@color/joeldata_button_plus</item>
         <item name="entry_labels_color">?android:colorAccent</item>
