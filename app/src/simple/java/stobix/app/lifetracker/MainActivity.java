@@ -61,7 +61,23 @@ public class MainActivity extends AppCompatActivity
         private SugarEntryDao dao;
 
         private int currentTheme=R.style.Theme_Zimmik_NoActionBar;
-
+        //
+        // TODO Put more color themes here, extract this to a build variant common file.
+        //
+        static ArrayList<ThemeListItem> COLOR_THEMES =new ArrayList<ThemeListItem>(){{
+            add(new ThemeListItem( "Zimmik", R.style.Theme_Zimmik_NoActionBar));
+            add(new ThemeListItem( "Joel", R.style.Joel_NoActionBar));
+            add(new ThemeListItem("Mad!",R.style.Theme_Mad_NoActionBar));
+            add(new ThemeListItem("Cold",R.style.Theme_Cold_NoActionBar));
+            add(new ThemeListItem("Spring",R.style.Theme_Spring_NoActionBar));
+            add(new ThemeListItem("Cotton",R.style.Theme_Cotton_NoActionBar));
+            add(new ThemeListItem("Nicecream",R.style.Theme_Nicecream_NoActionBar));
+            add(new ThemeListItem("Strong",R.style.Theme_Strong_NoActionBar));
+            add(new ThemeListItem("Fuel",R.style.Theme_Fuel_NoActionBar));
+            add(new ThemeListItem("Neonight",R.style.Theme_Neonight_NoActionBar));
+            add(new ThemeListItem("Hope",R.style.Hope_NoActionBar));
+            add(new ThemeListItem("Hjul",R.style.Hjul_NoActionBar));
+        }};
         @Override
         protected void onCreate(Bundle savedInstanceState) {
 
@@ -398,24 +414,8 @@ public class MainActivity extends AppCompatActivity
 
                 case R.id.action_switch_theme:
 
-                    ArrayList<ThemeListItem> c = new ArrayList<>();
-                    //
-                    // TODO Put more color themes here, extract this to a build variant common file.
-                    //
-                    c.add(new ThemeListItem( "Zimmik", R.style.Theme_Zimmik_NoActionBar));
-                    c.add(new ThemeListItem( "Joel", R.style.Joel_NoActionBar));
-                    c.add(new ThemeListItem("Mad!",R.style.Theme_Mad_NoActionBar));
-                    c.add(new ThemeListItem("Cold",R.style.Theme_Cold_NoActionBar));
-                    c.add(new ThemeListItem("Spring",R.style.Theme_Spring_NoActionBar));
-                    c.add(new ThemeListItem("Cotton",R.style.Theme_Cotton_NoActionBar));
-                    c.add(new ThemeListItem("Nicecream",R.style.Theme_Nicecream_NoActionBar));
-                    c.add(new ThemeListItem("Strong",R.style.Theme_Strong_NoActionBar));
-                    c.add(new ThemeListItem("Fuel",R.style.Theme_Fuel_NoActionBar));
-                    c.add(new ThemeListItem("Neonight",R.style.Theme_Neonight_NoActionBar));
-                    c.add(new ThemeListItem("Hope",R.style.Hope_NoActionBar));
-                    c.add(new ThemeListItem("Hjul",R.style.Hjul_NoActionBar));
 
-                    new ThemePickerDialog(this, c).show();
+                    new ThemePickerDialog(this, COLOR_THEMES).show();
 
                     return true;
 

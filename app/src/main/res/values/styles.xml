@@ -45,7 +45,7 @@
         <item name="android:textColorPrimary">@color/joeltextColorPrimary</item>
         <item name="android:textColorSecondary">@color/joeltextColorSecondary</item>
         <item name="android:textColorTertiary">@color/joeltextColorTertiary</item>
-        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/joelnavigationBarColor</item>
+        <item name="android:navigationBarColor">@color/joelnavigationBarColor</item>
         <item name="colorPrimary">@color/joelPrimary</item>
         <item name="colorPrimaryDark">@color/joelPrimaryDark</item>
         <item name="colorAccent">@color/joelAccent</item>
