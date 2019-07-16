@@ -1,0 +1,75 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 7,
+    "identityHash": "561e69471ec83536fcfca5b6513cea1d",
+    "entities": [
+      {
+        "tableName": "sugar_entries",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timestamp` INTEGER NOT NULL, `sugar` INTEGER, `extra` TEXT, `weight` INTEGER, `insulin` REAL, `treatment` TEXT, `food` TEXT, `drink` TEXT, PRIMARY KEY(`timestamp`))",
+        "fields": [
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sugarLevel",
+            "columnName": "sugar",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "extra",
+            "columnName": "extra",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "weight",
+            "columnName": "weight",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "insulin",
+            "columnName": "insulin",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "treatment",
+            "columnName": "treatment",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "food",
+            "columnName": "food",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "drink",
+            "columnName": "drink",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "timestamp"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"561e69471ec83536fcfca5b6513cea1d\")"
+    ]
+  }
+}

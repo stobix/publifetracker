@@ -44,8 +44,9 @@
     <string name="input_weight">Vikt</string>
     <string name="show_weight_summary">Viktgrafer</string>
     <string name="input_food">Mat</string>
-    <string name="input_treatment">Behandling</string>
+    <string name="input_treatment">Insulin</string>
     <string name="input_drink">Dryck</string>
     <string name="show_hide_icons">Visa/dölj ikoner</string>
     <string name="title_activity_color_editor">Color Editor</string>
+    <string name="input_treatment_pills">Övrig behandling</string>
 </resources>

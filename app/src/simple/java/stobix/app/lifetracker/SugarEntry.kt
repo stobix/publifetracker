@@ -8,20 +8,32 @@ import android.os.Parcel
 import android.os.Parcelable
 import stobix.utils.DateHandler
 
-private fun Parcel.writeNullableInt(i:Int?){
-    if (i != null) {
+private fun Parcel.writeNullableInt(i:Int?) =
+    nullableWriterWrapper(i) {this.writeInt(it)}
+
+private fun Parcel.readNullableInt()=
+        nullableReaderWrapper { readInt() }
+
+private fun Parcel.writeNullableDouble(d:Double?) =
+    nullableWriterWrapper(d) { writeDouble(it) }
+
+private fun Parcel.readNullableDouble()=
+        nullableReaderWrapper { readDouble() }
+
+private fun <A> Parcel.nullableWriterWrapper(a:A?,fn:(A)->Unit) =
+    if (a != null) {
         this.writeInt(1)
-        this.writeInt(i)
+        fn(a)
     }
     else
         this.writeInt(0)
-}
 
-private fun Parcel.readNullableInt()=
+private fun <A> Parcel.nullableReaderWrapper(fn:()->A) =
         if (this.readInt() != 0)
-            this.readInt()
+            fn()
         else
             null
+
 
 // The Room database entry class/TableView row class that acts as a glue between the two.
 
@@ -40,6 +52,7 @@ data class SugarEntry constructor(
         @ColumnInfo(name = "sugar") var sugarLevel: Int?=null,
         @ColumnInfo(name = "extra") var extra: String?=null,
         @ColumnInfo(name = "weight") var weight: Int?=null,
+        @ColumnInfo(name = "insulin") var insulin: Double?=null,
         @ColumnInfo(name = "treatment") var treatment: String?=null,
         @ColumnInfo(name = "food") var food: String?=null,
         @ColumnInfo(name = "drink") var drink: String?=null
@@ -56,6 +69,7 @@ data class SugarEntry constructor(
             parcel.readNullableInt(), // sugar
             parcel.readString(), // extra
             parcel.readNullableInt(), // weight
+            parcel.readNullableDouble(),//insulin
             parcel.readString(), // treatment
             parcel.readString(), // food
             parcel.readString() // drink
@@ -70,6 +84,7 @@ data class SugarEntry constructor(
         parcel.writeNullableInt(sugarLevel)
         parcel.writeString(extra)
         parcel.writeNullableInt(weight)
+        parcel.writeNullableDouble(insulin)
         parcel.writeString(treatment)
         parcel.writeString(food)
         parcel.writeString(drink)
@@ -98,6 +113,7 @@ data class SugarEntry constructor(
                     && this.extra == other.extra
                     && this.weight == other.weight
                     && this.treatment == other.treatment
+                    && this.insulin == other.insulin
                     && this.food == other.food
                     && this.drink == other.drink
 
@@ -129,5 +145,8 @@ data class SugarEntry constructor(
 
     fun compareDrink(that: SugarEntry) =
             compareNullables(this.drink,that.drink) {a,b -> a.compareTo(b)}
+
+    fun compareInsulin(that: SugarEntry) =
+            compareNullables(this.insulin,that.insulin){a,b -> a.compareTo(b)}
 }
 

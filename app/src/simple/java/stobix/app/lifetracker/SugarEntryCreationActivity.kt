@@ -2,8 +2,6 @@ package stobix.app.lifetracker
 
 import android.annotation.SuppressLint
 import android.app.DialogFragment
-import android.graphics.ColorFilter
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.os.SystemClock
 import android.support.v7.widget.AppCompatImageView
@@ -15,7 +13,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import stobix.utils.ColorHandler
 import stobix.utils.DateHandler
 import stobix.utils.kotlinExtensions.to
 
@@ -44,9 +41,10 @@ open class SugarEntryCreationActivity
     private lateinit var weightView: TextView
     private lateinit var entry: SugarEntry
     private lateinit var foodView: TextView
-    private lateinit var treatmentView: TextView
+    private lateinit var insulinView: TextView
     private lateinit var drinkView: TextView
     private lateinit var extraView: TextView
+    private lateinit var pillsView: TextView
 
 
 
@@ -78,7 +76,8 @@ open class SugarEntryCreationActivity
         sugarView= v.findViewById(R.id.entryCreatorSugar)
         weightView = v.findViewById(R.id.entryCreatorWeight)
         foodView = v.findViewById(R.id.entryCreatorFood)
-        treatmentView = v.findViewById(R.id.entryCreatorTreatment)
+        insulinView = v.findViewById(R.id.entryCreatorInsulin)
+        pillsView = v.findViewById(R.id.entryCreatorPills)
         drinkView = v.findViewById(R.id.entryCreatorDrink)
         extraView = v.findViewById(R.id.entryCreatorExtra)
 
@@ -187,7 +186,9 @@ open class SugarEntryCreationActivity
 
         R.id.entryCreatorFoodToggle to entry.food toggling ( foodView withLabel R.id.entryCreatorFoodLabel )
 
-        R.id.entryCreatorTreatmentToggle to entry.treatment toggling ( treatmentView withLabel R.id.entryCreatorTreatmentLabel )
+        R.id.entryCreatorInsulinToggle to entry.insulin toggling (insulinView withLabel R.id.entryCreatorInsulinLabel )
+
+        R.id.entryCreatorPillsToggle to entry.treatment toggling ( pillsView withLabel R.id.entryCreatorPillsLabel )
 
         R.id.entryCreatorSugarToggle to entry.sugarLevel toggling  ( sugarView withLabel R.id.entryCreatorSugarLabel )
 
@@ -208,7 +209,8 @@ open class SugarEntryCreationActivity
             weightView.text = entry.weight?.toFloat()?.div(10f)?.toString()
             extraView.text = entry.extra
             foodView.text = entry.food
-            treatmentView.text = entry.treatment
+            insulinView.text = entry.insulin?.toString()
+            pillsView.text = entry.treatment
             drinkView.text = entry.drink
             buttonAddClose.text=getString(R.string.edit_dialog_button_update)
             buttonAdd.text=getString(R.string.edit_dialog_button_delete)
@@ -267,14 +269,15 @@ open class SugarEntryCreationActivity
         entry.sugarLevel = sugarView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt()
         entry.weight = weightView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt()
         entry.extra = extraView.text?.toString().nullIfEmpty()
-        entry.treatment = treatmentView.text?.toString().nullIfEmpty()
+        entry.insulin = insulinView.text?.toString()?.toDoubleOrNull()
+        entry.treatment = pillsView.text?.toString().nullIfEmpty()
         entry.food = foodView.text?.toString().nullIfEmpty()
         entry.drink = drinkView.text?.toString().nullIfEmpty()
         if(alreadyDefinedEntry) {
-            d("SugarEntry update", "t ${entry.timestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} d ${entry.drink} tr ${entry.treatment}")
+            d("SugarEntry update", "t ${entry.timestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} d ${entry.drink} tr ${entry.treatment} i ${entry.insulin}")
             (activity as OnSugarEntryChangedHandler).onSugarEntryChanged(entry,originalTimestamp)
         } else {
-            d("SugarEntry submit", "t ${entry.timestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} d ${entry.drink} tr ${entry.treatment}")
+            d("SugarEntry submit", "t ${entry.timestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} d ${entry.drink} tr ${entry.treatment} i ${entry.insulin}")
             (activity as OnSugarEntryEnteredHandler).onSugarEntryEntered(entry)
         }
     }

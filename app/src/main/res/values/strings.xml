@@ -42,8 +42,9 @@
     <string name="input_weight">Weight</string>
     <string name="show_weight_summary">Show weight summary</string>
     <string name="input_food">Food</string>
-    <string name="input_treatment">Treatment</string>
+    <string name="input_treatment">Insulin</string>
     <string name="input_drink">Drink</string>
     <string name="show_hide_icons">show/hide icons</string>
     <string name="title_activity_color_editor">Color Editor</string>
+    <string name="input_treatment_pills">Other treatment</string>
 </resources>

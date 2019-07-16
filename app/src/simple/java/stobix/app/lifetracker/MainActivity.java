@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onCreate(Bundle savedInstanceState) {
 
+            Integer.parseInt("23");
 
 
             SharedPreferences preferences = getSharedPreferences("colorsNstuff",MODE_PRIVATE);
@@ -608,7 +609,6 @@ public class MainActivity extends AppCompatActivity
                 bundleConsumer.accept(activity,b);
             }
         }
-
 
         // Made static (i.e. no outer scope references) to prevent memory issues,
         // since lint complained about the anonymous class instance.

@@ -29,7 +29,7 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
             }
 
         // Increase this each time the JSON generating algorithm gets updated.
-        val currentVersion = 5
+        val currentVersion = 6
 
         val sugarEntryListTypeToken = object: TypeToken<List<SugarEntry>>() {}
 
@@ -54,6 +54,7 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                                 out.name("t").value(timestamp)
                                 out.name("s").value(sugarLevel)
                                 out.name("w").value(weight)
+                                out.name("i").value(insulin)
                                 out.name("tr").value(treatment)
                                 out.name("f").value(food)
                                 out.name("d").value(drink)
@@ -81,6 +82,50 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                     }
 
                     override fun read(reader: JsonReader?): SugarEntryGsonWrapper {
+                        fun splitTreatment(value: String, entry:SugarEntry){
+                            // todo: split string between ", "'s to find insulin values
+                            try {
+                                // assume all lone integers are insulin values
+                                entry.insulin=value.toDouble()
+                                return
+                            } catch (e:NumberFormatException ) {
+                                val values = value.split(", ")
+                                if (values.size <= 1) {
+                                    val maybeADoubleWithComma = value.split(',')
+                                    if(maybeADoubleWithComma.size == 2 && maybeADoubleWithComma[0].toIntOrNull() != null && maybeADoubleWithComma[1].toIntOrNull() != null)
+                                        splitTreatment("${maybeADoubleWithComma[0].toInt()}.${maybeADoubleWithComma[1].toInt()}",entry)
+                                    else {
+                                        entry.treatment = value
+                                    }
+                                    return
+                                }
+                                // probably an int value
+                                var insulin: Double? = null
+                                var res = ""
+                                for(v in values) {
+                                    val maybeInsulin = v.toDoubleOrNull()
+                                    if (maybeInsulin == null)
+                                        if(res == "")
+                                            res = v
+                                        else
+                                            res += ", ${v}"
+                                    else {
+                                        if (insulin == null) {
+                                            insulin = maybeInsulin
+                                        }
+                                        else{
+                                            // Only one insulin value allowed, abort!
+                                            entry.treatment = value
+                                            return
+                                        }
+                                    }
+                                }
+                                entry.insulin = insulin
+                                entry.treatment = res
+                                return
+                            }
+                        }
+
                         @Suppress("NAME_SHADOWING")
                         val reader = reader ?: error("Null reader")
                         val entries: List<SugarEntry> =
@@ -115,7 +160,7 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                                                     "epochTimestamp" -> entry.timestamp = reader.nextLong()
                                                     "sugarLevel" -> entry.sugarLevel = reader.nextInt()
                                                     "weight" -> entry.weight = reader.nextInt()
-                                                    "treatment" -> entry.treatment = reader.nextString()
+                                                    "treatment" -> splitTreatment(reader.nextString(),entry)
                                                     "food" -> entry.food = reader.nextString()
                                                     "drink" -> entry.drink = reader.nextString()
                                                     "extra" -> entry.extra = reader.nextString()
@@ -127,7 +172,7 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                                                     "timestamp" -> entry.timestamp = reader.nextLong()
                                                     "sugarLevel" -> entry.sugarLevel = reader.nextInt()
                                                     "weight" -> entry.weight = reader.nextInt()
-                                                    "treatment" -> entry.treatment = reader.nextString()
+                                                    "treatment" -> splitTreatment(reader.nextString(),entry)
                                                     "food" -> entry.food = reader.nextString()
                                                     "drink" -> entry.drink = reader.nextString()
                                                     "extra" -> entry.extra = reader.nextString()
@@ -139,6 +184,19 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                                                     "t" -> entry.timestamp = reader.nextLong()
                                                     "s" -> entry.sugarLevel = reader.nextInt()
                                                     "w" -> entry.weight = reader.nextInt()
+                                                    "tr" -> splitTreatment(reader.nextString(),entry)
+                                                    "f" -> entry.food = reader.nextString()
+                                                    "d" -> entry.drink = reader.nextString()
+                                                    "e" -> entry.extra = reader.nextString()
+                                                }
+                                            }
+                                            6 -> readObjectArray(reader){
+                                                name,entry ->
+                                                when(name) {
+                                                    "t" -> entry.timestamp = reader.nextLong()
+                                                    "s" -> entry.sugarLevel = reader.nextInt()
+                                                    "w" -> entry.weight = reader.nextInt()
+                                                    "i" -> entry.insulin = reader.nextDouble()
                                                     "tr" -> entry.treatment = reader.nextString()
                                                     "f" -> entry.food = reader.nextString()
                                                     "d" -> entry.drink = reader.nextString()

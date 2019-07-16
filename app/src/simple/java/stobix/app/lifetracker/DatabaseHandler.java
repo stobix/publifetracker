@@ -114,6 +114,21 @@ public class DatabaseHandler {
             }
         }
     };
+    // 6->7: added an insulin column
+
+    final static Migration sugarMig6_7 = new Migration(6,7) {
+
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.beginTransaction();
+            try{
+                database.execSQL("alter table sugar_entries add column insulin real ");
+                database.setTransactionSuccessful();
+            } finally {
+                database.endTransaction();
+            }
+        }
+    };
 
     public static SugarEntryDatabase buildSugarDatabase(Context ctx){
         return Room.databaseBuilder(
@@ -125,6 +140,7 @@ public class DatabaseHandler {
                 .addMigrations(sugarMig3_4)
                 .addMigrations(sugarMig4_5)
                 .addMigrations(sugarMig5_6)
+                .addMigrations(sugarMig6_7)
                 .build();
     }
 }

@@ -53,6 +53,7 @@ class ColorEditorActivity : Activity(), AdapterView.OnItemSelectedListener {
             // tableRowEven    withColor R.attr.table_data_text    withBack R.attr.table_data_row_even
             // tableRowOdd     withColor R.attr.table_data_text    withBack R.attr.table_data_row_odd
         }
+        // "12,2133,423-432,47-59".split(",").partition { it.contains("-") }.run{this.first.flatMap{it.split("-").map{it.toInt()}.run{(this[0]..this[1]).asSequence().toList()}}+this.second.map{it.toInt()}}.sorted().distinct()
 
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +61,7 @@ class ColorEditorActivity : Activity(), AdapterView.OnItemSelectedListener {
         setContentView(R.layout.activity_fullscreen_color_editor)
         actionBar?.setDisplayHomeAsUpEnabled(true)
         val picker = findViewById<Spinner>(R.id.colorEditThemePicker)
+
         picker.adapter = ThemeArrayAdapter(this,MainActivity.COLOR_THEMES).also{
             it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         }
