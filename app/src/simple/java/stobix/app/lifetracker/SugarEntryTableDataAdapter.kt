@@ -46,7 +46,7 @@ class SugarEntryTableDataAdapter(
                             ,
                             R.drawable.treatment_icon pairedIfDefined currRow.insulin ?.let { String.format("%.1f insulin", it )}
                             ,
-                            R.drawable.treatment_icon pairedIfDefined currRow.treatment
+                            R.drawable.pills_icon pairedIfDefined currRow.treatment
                             ,
                             R.drawable.extra_icon pairedIfDefined currRow.extra
                     )

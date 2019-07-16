@@ -397,7 +397,7 @@
             android:background="@drawable/icon_back_circle"
             android:padding="3dp"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/treatment_icon"
+            app:srcCompat="@drawable/pills_icon"
             tools:ignore="ContentDescription" />
 
         <ImageView
