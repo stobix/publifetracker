@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity
             Thread dbInitThread = new Thread(initiateDB);
             dbInitThread.start();
 
-            BuildVairantSpecificCode.onLoad(this);
+            BuildVariantSpecificCode.onLoad(this);
 
             int[] array = {R.attr.colorPrimary};
         TypedArray attrs  = getTheme().obtainStyledAttributes(array);

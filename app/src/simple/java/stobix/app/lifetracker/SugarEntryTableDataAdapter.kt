@@ -21,7 +21,7 @@ class SugarEntryTableDataAdapter(
         entries: ArrayList<SugarEntry>
 ) : TableDataAdapter<SugarEntry>(context, entries) {
 
-    infix fun<A> A.pairedIfDefined(b: String?) = b?.let { this to it }
+    private infix fun<A> A.pairedIfDefined(b: String?) = b?.let { this to it }
 
     override fun getCellView(rowIndex: Int, columnIndex: Int, parentView: ViewGroup): View {
         val currRow = getRowData(rowIndex)
