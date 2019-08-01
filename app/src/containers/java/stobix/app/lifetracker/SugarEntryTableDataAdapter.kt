@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import de.codecrafters.tableview.TableDataAdapter
+import stobix.view.containerview.Container
+import stobix.view.containerview.ContainerView
 import java.util.*
 
 /**
@@ -35,7 +37,25 @@ class SugarEntryTableDataAdapter(
                     renderString("")
             }
 
-            2 -> renderString("${with(currRow.weight," kg, ","")} ${currRow.extra ?: ""}")
+            2 -> {
+                // renderString("${with(currRow.weight," kg, ","")} ${currRow.extra ?: ""}")
+                val cv = ContainerView(context)
+                val c = Container(rowIndex)
+                var g = c
+                for (i in 0..rowIndex) {
+                    var f = Container()
+                    g.addContainer(f)
+                    g=f
+                }
+                g.addInt(rowIndex,"row")
+                // cv.textSize = 30f
+                cv.container = c
+                cv.container.addString("cookies",currRow.epochTimestamp.toInt())
+                cv.showContents = true
+                cv.showIntDescriptions = true
+                cv.recurLevel = 7
+                cv
+            }
             else -> renderString("N/A")
         }
     }

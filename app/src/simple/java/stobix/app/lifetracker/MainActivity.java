@@ -223,14 +223,14 @@ public class MainActivity extends AppCompatActivity
                             .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                             .density(12)
                             .setOnColorSelectedListener(selectedColor ->
-                                    d("COLOR", "Color selected:"
+                                    d("COLOR", "Colour selected:"
                                             + Integer.toHexString(selectedColor)))
                             .setPositiveButton("ok", (dialog, selectedColor, allColors) ->
                                 // TODO Use the color for something.
-                                    d("COLOR", "Color confirmed:"
+                                    d("COLOR", "Colour confirmed:"
                                             + Integer.toHexString(selectedColor)))
                             .setNegativeButton("cancel", (dialog, which) ->
-                                    d("COLOR", "Color aborted"))
+                                    d("COLOR", "Colour aborted"))
                             .build()
                             .show();
 
@@ -541,7 +541,15 @@ public class MainActivity extends AppCompatActivity
                    );
         }
 
+        /*
+        public Consumer<String> lol() {
+            return (s) -> {} ;
+        }
 
+        Consumer<String> kaka = lol();
+
+        kaka.accept(s);
+        */
 
         // An abstraction of all data base followed by table adapter related consumer
         // actions that can be performed on a SugarEntry.

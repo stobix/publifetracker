@@ -80,8 +80,8 @@ open class SugarEntryCreationActivity
         val buttonAddClose: Button =v.findViewById<Button>(R.id.entryAddClose)
 
         // TODO Copy these res's from simple!
-        val buttonClearSugar: AppCompatImageButton = v.findViewById(R.id.entryCreatorSugarDelete)
-        val buttonClearExtra: AppCompatImageButton = v.findViewById(R.id.entryCreatorExtraDelete)
+        //val buttonClearSugar: AppCompatImageButton = v.findViewById(R.id.entryCreatorSugarDelete)
+        //val buttonClearExtra: AppCompatImageButton = v.findViewById(R.id.entryCreatorExtraDelete)
 
         if(alreadyDefinedEntry) {
             sugarView.text=sugarLevelToString()
@@ -95,6 +95,7 @@ open class SugarEntryCreationActivity
 
         dateView.setOnClickListener { (activity as MainActivity).showDatePicker(date.year,date.month,date.day) }
         timeView.setOnClickListener { (activity as MainActivity).showTimePicker(date.hour,date.minute) }
+        /*
         sugarView.setOnClickListener {
             val sugarLevel = sugarLevel
             when {
@@ -113,11 +114,12 @@ open class SugarEntryCreationActivity
                             100)
             }
         }
+        */
 
         buttonAdd.setOnClickListener { onSubmit(extraV) }
         buttonAddClose.setOnClickListener { onSubmitAndClose(extraV) }
-        buttonClearSugar.setOnClickListener { onNumberClear() }
-        buttonClearExtra.setOnClickListener { extraV.text="" }
+        // buttonClearSugar.setOnClickListener { onNumberClear() }
+        // buttonClearExtra.setOnClickListener { extraV.text="" }
 
         return v
 

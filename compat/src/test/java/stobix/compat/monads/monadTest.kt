@@ -88,6 +88,8 @@ class OptionsUnitTest{
     @Test
     fun currying() {
         fun four (a:Int, b: Int, c: Int, d: Int): Int = a+b+c+d+1
+        fun three (a: Int, b:Int, c:Int) : Int = a+b+c
+        fun two (a: Int, b:Int) : Int = a+b
 
         Some(3+1+2+3+1) asEq
                 (Some(3).map(curry(::four)) apply
@@ -95,5 +97,14 @@ class OptionsUnitTest{
                         Some(2) apply
                         Some(3))
 
+        1+2 asEq curry(::two)(1)(2)
+        1+2+3 asEq curry(::three)(1)(2)(3)
+        1+2+3+4+1 asEq curry(::four)(1)(2)(3)(4)
+
+        1+2+3 asEq curry() { a:Int ,b:Int ,c:Int -> a+b+c} (1)(2)(3)
+
+        fun plussa(a: Int, b: Int, c:Int) : Int {
+            return a+b+c
+        }
     }
 }
