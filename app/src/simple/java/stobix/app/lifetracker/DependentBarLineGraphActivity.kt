@@ -37,11 +37,28 @@ typealias WeekPerMeanStructure = List<Pair<MeanValue, Map.Entry<DateInfo, List<P
 
 data class ValueEntry (var timestamp: Timestamp, var value: Float, var original: Int)
 
+enum class SeriesType(val divisor:Float){
+    DIRECT(1f){
+        override val convert = divideBy(this)
+    },
+    FLOATYINT10(10f) {
+        override val convert = divideBy(this)
+    },
+    FLOATYINT100(100f){
+        override val convert = divideBy(this)
+    };
+    abstract val convert: (value: Int) -> Float
+
+    protected fun divideBy(s:SeriesType): (Int) -> Float = { it/s.divisor }
+
+    // fun multiylfBy(s:SeriesType): (Int) -> Float = { it * s.divisor }
+}
+
 data class DataSeries (
         var description: String,
         var data: ArrayList<FloatyIntBucket>,
         var iconRes:Int,
-        var valueType:String="floatyInt10",
+        var valueType:SeriesType=SeriesType.FLOATYINT10,
         var breakPoints: DoubleArray = doubleArrayOf(4.0,7.0,15.0),
         var keepLowZero: Boolean = true
 
@@ -51,10 +68,9 @@ data class DataSeries (
             parcel.readString(),
             parcel.readBundle(DataSeries::class.java.classLoader).getParcelableArrayList("data"),
             parcel.readInt(),
-            parcel.readString(),
+            SeriesType.valueOf(parcel.readString()),
             doubleArrayOf(),
             false
-
     ){
         var arrayLength = parcel.readInt()
         val dArray = DoubleArray(arrayLength)
@@ -69,10 +85,13 @@ data class DataSeries (
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         val b=Bundle()
         b.putParcelableArrayList("data",data)
+        // Constructor args
         parcel.writeString(description)
         parcel.writeBundle(b)
         parcel.writeInt(iconRes)
-        parcel.writeString(valueType)
+        parcel.writeString(valueType.name)
+
+        // Aftermath
         parcel.writeInt(breakPoints.size)
         parcel.writeDoubleArray(breakPoints)
         val flagArray =booleanArrayOf(keepLowZero)
@@ -107,6 +126,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_weekly,menu)
+        // Skapa en ikon för varje dataserie vi får in, och släng in i menyn.
         menuEntries.forEachIndexed { i, entry ->
             val (description,iconRes) = entry
             @Suppress("ReplaceSingleLineLet")
@@ -232,7 +252,6 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                     .filterNotNull()
                     .sortedBy { it.timestamp }
 
-            val thingToPick = data.valueType
             val breakPoints = data.breakPoints
             val colorByLevel:(Float) -> Int = when ( breakPoints.size ) {
                 0 -> {
@@ -284,12 +303,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                 }
             }
 
-            val convertFromInt :(Int) -> Float = when(thingToPick){
-                "int" -> {{it.toFloat()}}
-                "floatyInt10" -> {{it.toFloat()/10f}}
-                "floatyInt100" -> {{it.toFloat()/100f}}
-                else -> {{it.toFloat()}}
-            }
+            val convertFromInt :(Int) -> Float = data.valueType.convert
 
             val mapper : (FloatyIntBucket) -> ValueEntry = {
                 ValueEntry(it.timestamp,convertFromInt(it.value),it.value)

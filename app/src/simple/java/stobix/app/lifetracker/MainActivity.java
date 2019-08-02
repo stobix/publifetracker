@@ -141,8 +141,6 @@ public class MainActivity extends AppCompatActivity
 
             Handler db_data_handler = new DataLoadHandler(this, tableView);
 
-
-
             Runnable initiateDB = () -> {
 
                 SugarEntryDatabase db =DatabaseHandler.buildSugarDatabase(getApplicationContext());
@@ -370,47 +368,71 @@ public class MainActivity extends AppCompatActivity
 
 
                 case R.id.show_sugar_weekly:
+                    // En MainHandler tar ett Message från en tråd, packar upp dess Bundle och
+                    // skickar vidare till en funktion tillsammans med en referens
+                    // till this för MainActivity.
+                    // Detta behövs eftersom en Handler måste vara static, så funktionen nedan kan
+                    // inte direkt hänvisa till MainActivity som this utan referensen måste skickas
+                    // in som ett argument till funktionen. (Annars kunde jag skrivit this istället
+                    // för mainActivity nedan.)
                     MainHandler newGraphHandler =
-                            new MainHandler(this,(mainActivity, bundle) -> {
-                                Log.d("graph","got bundle");
-                                Intent i = new Intent(this, DependentBarLineGraphActivity.class);
-                                i.putExtras(bundle);
-                                startActivity(i);
-                            });
+                            new MainHandler(this,
+                                    // Körs när all data hämtats från databasen och lagts i en bundle
+                                    (mainActivity, bundle) -> {
+                                        Intent i = new Intent(mainActivity, DependentBarLineGraphActivity.class);
+                                        // släng in bundlen i intent så activityn kan hämta ut data och färgtema
+                                        i.putExtras(bundle);
+                                        // Starta grafactivity
+                                        startActivity(i);
+                                    });
 
+                    // Databashantering måste ske i en separat tråd.
                     new Thread(
                             () -> {
-                                Log.d("graph","got request");
                                 Message m = newGraphHandler.obtainMessage();
+                                // Alla blodsockervärden
                                 List<FloatyIntBucket> allSugarBuckets = dao.getAllSugarBuckets();
+                                // Alla viktvärden
                                 List<FloatyIntBucket> allWeightBuckets = dao.getAllWeightBuckets();
-                                Log.d("graph"," request");
+                                // Lista med dataserier
                                 ArrayList<DataSeries> a = new ArrayList<>();
+                                // Allt som behövs för att skapa blodsockergrafen
                                 a.add(new DataSeries(
+                                        // Menynamn om ikonen ej får plats.
                                         getString(R.string.input_sugar),
+                                        // Data
                                         new ArrayList<>(allSugarBuckets),
+                                        // Ikonresursen
                                         R.drawable.blood_sugar_icon,
-                                        "floatyInt10",
+                                        // Typ av data ("floatyInt10" = float med en decimal som sparats som int i databasen.
+                                        // Exempelvis 10.2f sparas som 102)
+                                        SeriesType.FLOATYINT10,
+                                        // Skiljevärden mellan olika färger för grafen.
+                                        // Här: lila under 4, grönt innan 7, brandgult innan 15, rött över 15
                                         new double[]{4.0,7.0,15.0},
+                                        // Skall veckomedelsstaplarna börja från 0 eller från lägsta uppmätta medel?
                                         true
                                 ));
+                                // Samma fast för viktgrafen
                                 a.add(new DataSeries(
                                         getString(R.string.input_weight),
                                         new ArrayList<>(allWeightBuckets),
                                         R.drawable.weight_icon,
-                                        "floatyInt10",
+                                        SeriesType.FLOATYINT10,
                                         new double[]{80,85,90},
                                         false
                                 ));
+                                // Skapar en bundle med dataserierna inlagda.
                                 Bundle b =
                                         DependentBarLineGraphActivity
                                                 .createBarLineActivityBundle( "Veckografer",a);
+                                // Skicka med appens tema
                                 b.putInt("theme",currentTheme);
                                 m.setData(b);
-                                Log.d("graph","sending bundle");
+                                // Starta MainHandlern, så funktionen ovan innan tråden körs.
                                 newGraphHandler.sendMessage(m);
                             }
-                    ).start();
+                    ).start(); // Starta tråden.
                     return true;
 
                 case R.id.action_switch_theme:
