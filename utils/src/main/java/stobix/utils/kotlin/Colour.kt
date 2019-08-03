@@ -5,80 +5,91 @@ import stobix.utils.kotlinExtensions.*
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-typealias  FloatQuad = Quadruple<Float,Float,Float,Float>
+@ExperimentalUnsignedTypes
+class Colour(val a:UByte, val r:UByte, val g:UByte, val b:UByte) {
 
-class Colour(val a:Float, val r:Float, val g:Float, val b:Float) {
+    init{println("a $a r $r g $g b $b")}
 
-    constructor(color:Int):this( Color.alpha(color).toFloat(), Color.red(color).toFloat(), Color.green(color).toFloat(), Color.blue(color).toFloat())
-    constructor(q:Quadruple<Float,Float,Float,Float>):this(q.first,q.second,q.third,q.fourth)
+    constructor(color:Int):this(
+            ((color ushr 6) and 0xFF).toUByte(),
+            ((color ushr 4) and 0xFF).toUByte(),
+            ((color ushr 2) and 0xFF).toUByte(),
+            (color and 0xFF).toUByte())
 
-
-    val ra = a*a
-    val rr = r*r
-    val rg = g*g
-    val rb = b*b
-
-    init{
-        println("a $a r $r g $g b $b -> $ra $rr $rg $rb")
-    }
+    constructor(q: Quadruple<UByte,UByte,UByte,UByte>): this(q.first,q.second,q.third,q.fourth)
 
     override fun toString() = "$a $r $g $b"
 
-    /**
-     * Maps a function over a quadruple of the real colour values.
-     * @return A color with the new values
-     */
-    fun quadMap(f: (Quadruple<Float,Float,Float,Float>) -> Quadruple<Float,Float,Float,Float>) =
-            Colour(f(ra to rr to rg to rb).map {sqrt(it)})
 
-    fun toRealQuad() = ra to rr to rg to rb
+    private fun minusTo00i(a:Int, b:Int) = if (a < 0) 0 else a
 
+    private fun <A,B,C> generateBinaryOn(a: A, b: A, f: (B, B) -> C) : (((A)->B)-> C) =
+            {ac -> f(ac(a),ac(b))}
+
+    private fun <A,B,C,D> generateBinaryOf(a: A, c: C, f: (B, C) -> D) : (((A)->B)-> D)
+            =
+            {ac -> f(ac(a),c)}
+
+
+
+    private fun <A> createApplyToAll(f:((Colour) -> UByte) -> A) =
+            f {it.a} to f {it.r} to f {it.r} to f {it.r}
+
+    private class ColorDimensionPoint(val c1:Colour, val c2:Colour, val steps:UInt, var currentPoint:UInt) {
+
+
+        // Since pixels are stored as square roots, we need to "unpack" them here and "pack" them again when finished
+        private fun unwrapComponent(a:Int) = (a*a).toFloat()
+        private fun wrapComponent(f:Float) = sqrt(f).roundToInt().toUByte()
+        private fun plus(a:Float,b:Float)=a+b
+        private fun minus(a:Float,b:Float)=a-b
+
+        val c1q = c1.toQuad().map(::unwrapComponent)
+        val c2q= c2.toQuad().map(::unwrapComponent)
+
+        val step= c2q.zipWith(::minus,c1q).map {it/steps.toFloat()}
+
+        fun currStep(currentPoint: UInt) = step.map { it * currentPoint.toFloat()}
+
+        val color:Colour
+            get() = Colour( c1q.zipWith(::plus,currStep(currentPoint)).map(::wrapComponent))
+    }
+
+    fun toByteQuad() = this.a to this.r to this.g to this.b
+    fun toQuad() = (this.a to this.r to this.g to this.b).map {it.toInt()}
+
+
+    class ColorRangeIterator(val start:Colour, val endInclusive: Colour, val steps:UInt = 10u): Iterator<Colour> {
+
+        override fun hasNext(): Boolean = dimensionPoint.steps>=dimensionPoint.currentPoint
+
+        private val dimensionPoint = ColorDimensionPoint(start,endInclusive,steps,0u)
+
+        override fun next(): Colour =
+                if (hasNext()) {
+                    val c = dimensionPoint.color
+                    dimensionPoint.currentPoint++
+                    c
+                }
+                else
+                    throw IndexOutOfBoundsException("lol")
+    }
+
+
+    class ColorRange(val start:Colour, val endInclusive: Colour, private val steps:UInt = 10u): Iterable<Colour> {
+
+        override fun iterator() = ColorRangeIterator(start, endInclusive, steps)
+
+        infix fun steps(steps: UInt) = ColorRange(start,endInclusive,steps)
+        infix fun steps(steps: Int) = steps(steps.toUInt())
+
+    }
 
     operator fun rangeTo(other:Colour)= ColorRange(this,other)
 
+    // fun toColor(): Int = (a.toInt() shl 6) + (r.toInt() shl 4) + (g.toInt() shl 2) + (b.toInt())
+
     val color
-        get() = Color.argb(a.roundToInt(),r.roundToInt(),g.roundToInt(),b.roundToInt())
+        get() = Color.argb(a.toInt(),r.toInt(),g.toInt(),b.toInt())
 
-    companion object {
-        fun fromRealQuad(q:FloatQuad) = Colour(q.map{sqrt(it)})
-    }
-}
-
-class ColorRange(val start:Colour, val endInclusive: Colour, private val steps:Int = 10): Iterable<Colour> {
-
-    override fun iterator() = ColorRangeIterator(start, endInclusive, steps)
-
-    infix fun steps(steps: Int) = ColorRange(start,endInclusive,steps)
-}
-
-class ColorRangeIterator(val start:Colour, val endInclusive: Colour, val steps:Int = 10): Iterator<Colour> {
-
-    override fun hasNext(): Boolean = dimensionPoint.steps>=dimensionPoint.currentPoint
-
-    private val dimensionPoint = ColorDimensionPoint(start,endInclusive,steps,0)
-
-    override fun next(): Colour =
-            if (hasNext()) {
-                val c = dimensionPoint.color
-                dimensionPoint.currentPoint++
-                c
-            }
-            else
-                throw IndexOutOfBoundsException("lol")
-}
-
-class ColorDimensionPoint(val c1:Colour, val c2:Colour, val steps:Int, var currentPoint:Int) {
-
-    // Since pixels are stored as square roots, we need to "unpack" them here and "pack" them again when finished
-    private fun plus(a:Float,b:Float)=a+b
-    private fun minus(a:Float,b:Float)=a-b
-
-    val step = c2.toRealQuad().zipWith(c1.toRealQuad()){c2c, c1c ->
-        (c2c-c1c)/steps.toFloat()
-    }
-
-    fun currStep(currentPoint: Int):FloatQuad = step.map { it * currentPoint.toFloat()}
-
-    val color:Colour
-        get() = Colour.fromRealQuad(c1.toRealQuad().zipWith(currStep(currentPoint),::plus))
 }
