@@ -69,6 +69,11 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
             Log.d("ContainerView container",stringifyContainer())
         }
 
+    var containerWidth = 5f
+        set(value) = update {
+            field = value
+        }
+
 
     private fun update (f:()->Unit) {
         f()
@@ -86,7 +91,9 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
     }
 
     private var textPaint = Paint()
+    private var strokePaint = Paint()
     private var fillPaint = Paint()
+    private var fillStrokePaint = Paint()
     private var rectColorDarkPaint = Paint()
     private var rectColorLightPaint = Paint()
     /**
@@ -145,7 +152,9 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
             container.addContainer(c1, description = "frukost")
         }
 
+        strokePaint.style = Paint.Style.STROKE
         fillPaint.style = Paint.Style.FILL
+        fillStrokePaint.style = Paint.Style.FILL_AND_STROKE
         a.recycle()
 
         Log.d("ContainerView init",stringifyContainer())
@@ -156,6 +165,7 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
     }
 
     private var measurement = 0 to 0
+
 
     override fun onMeasure(wSpec: Int, hSpec: Int) {
         fun getSize(spec:Int,desired: Int) = when(MeasureSpec.getMode(spec)){
@@ -173,7 +183,7 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
         textView.measure(wSpec,hSpec)
 
 
-        val (hdescr,height )= getSize(hSpec,(textSize+6*layers).toInt())
+        val (hdescr,height )= getSize(hSpec,(textSize+(2*containerWidth)*layers).toInt())
         val (wdescr,width) = getSize(wSpec,textView.measuredWidth)
         setMeasuredDimension(width,height)
         Log.d("ContainerView","measure $wdescr $width $hdescr $height for ${stringifyContainer()}")
@@ -195,18 +205,16 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
         Log.d("ContainerView draw","text size: $textSize")
         canvas.drawColor(backColor)
 
+        fillStrokePaint.strokeWidth = 1f
+
         for((i:Int,c: Colour) in (Colour(rectColorDark)..Colour(rectColorLight) steps countLayers()).withIndex() ) {
-            val left = 3f*i
-            val top = 3f*i
-            val right = measuredWidth-3f*i
-            val bottom= measuredHeight-3f*i
+            val left = containerWidth*i
+            val top = containerWidth*i
+            val right = measuredWidth-containerWidth*i
+            val bottom= measuredHeight-containerWidth*i
             Log.d("ContainerView draw","drawing rect: $left $top $right $bottom")
-            canvas.drawRect(
-                    left,
-                    top,
-                    right,
-                    bottom,
-                    fillPaint.also { fillPaint.color = c.color })
+            canvas.drawRect( left, top, right, bottom, fillStrokePaint.also { fillStrokePaint.color = c.color })
+            canvas.drawRect( left, top, right, bottom, strokePaint)
         }
 
         val drawThis = stringifyContainer(container) ?:""
@@ -214,8 +222,8 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
         val textBounds = Rect()
         textPaint.getTextBounds(drawThis,0,drawThis.length,textBounds)
         canvas.drawText(drawThis,
-                (countLayers()+1)*3f,
-                measuredHeight-(countLayers())*3f-textBounds.bottom,
+                (countLayers()+1)*containerWidth,
+                measuredHeight-(countLayers())*containerWidth-textBounds.bottom,
                 textPaint)
 
         textPaint.textSize
