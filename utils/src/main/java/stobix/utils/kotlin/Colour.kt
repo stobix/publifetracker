@@ -47,9 +47,9 @@ class Colour(val a:UByte, val r:UByte, val g:UByte, val b:UByte) {
         val c1q = c1.toQuad().map(::unwrapComponent)
         val c2q= c2.toQuad().map(::unwrapComponent)
 
-        val step= c2q.zipWith(::minus,c1q).map {it/steps.toFloat()}
+        val step= c2q.zipWith(::minus,c1q).map {it/steps.toInt().toFloat()}
 
-        fun currStep(currentPoint: UInt) = step.map { it * currentPoint.toFloat()}
+        fun currStep(currentPoint: UInt) = step.map { it * currentPoint.toInt().toFloat()}
 
         val color:Colour
             get() = Colour( c1q.zipWith(::plus,currStep(currentPoint)).map(::wrapComponent))

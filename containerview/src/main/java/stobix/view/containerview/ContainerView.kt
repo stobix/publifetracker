@@ -139,7 +139,7 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
 
             container.addInt(3, "insulin")
             container.addString("godis", 3, "mums")
-            var c1 = Container()
+            val c1 = Container()
             c1.addString("mte")
             c1.addContainer(
                     Container()
@@ -164,9 +164,6 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
         super.onSizeChanged(w, h, oldw, oldh)
     }
 
-    private var measurement = 0 to 0
-
-
     override fun onMeasure(wSpec: Int, hSpec: Int) {
         fun getSize(spec:Int,desired: Int) = when(MeasureSpec.getMode(spec)){
             MeasureSpec.EXACTLY -> "exactly" to MeasureSpec.getSize(spec)
@@ -183,21 +180,10 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
         textView.measure(wSpec,hSpec)
 
 
-        val (hdescr,height )= getSize(hSpec,(textSize+(2*containerWidth)*layers).toInt())
+        val (hdescr,height )= getSize(hSpec,(textSize+(2*containerWidth)*(layers+1)).toInt())
         val (wdescr,width) = getSize(wSpec,textView.measuredWidth)
         setMeasuredDimension(width,height)
         Log.d("ContainerView","measure $wdescr $width $hdescr $height for ${stringifyContainer()}")
-    }
-
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        Log.d("ContainerView","attached ${stringifyContainer()}")
-    }
-
-
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        super.onLayout(changed, left, top, right, bottom)
-        Log.d("ContainerView","layout ${stringifyContainer()}")
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -223,7 +209,7 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
         textPaint.getTextBounds(drawThis,0,drawThis.length,textBounds)
         canvas.drawText(drawThis,
                 (countLayers()+1)*containerWidth,
-                measuredHeight-(countLayers())*containerWidth-textBounds.bottom,
+                measuredHeight-(countLayers()+1)*containerWidth-textBounds.bottom,
                 textPaint)
 
         textPaint.textSize
