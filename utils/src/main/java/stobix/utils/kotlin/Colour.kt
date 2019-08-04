@@ -21,7 +21,7 @@ class Colour(val a:UByte, val r:UByte, val g:UByte, val b:UByte) {
     override fun toString() = "$a $r $g $b"
 
 
-    private fun minusTo00i(a:Int, b:Int) = if (a < 0) 0 else a
+    private fun minusTo00i(a:Int) = if (a < 0) 0 else a
 
     private fun <A,B,C> generateBinaryOn(a: A, b: A, f: (B, B) -> C) : (((A)->B)-> C) =
             {ac -> f(ac(a),ac(b))}
@@ -35,7 +35,7 @@ class Colour(val a:UByte, val r:UByte, val g:UByte, val b:UByte) {
     private fun <A> createApplyToAll(f:((Colour) -> UByte) -> A) =
             f {it.a} to f {it.r} to f {it.r} to f {it.r}
 
-    private class ColorDimensionPoint(val c1:Colour, val c2:Colour, val steps:UInt, var currentPoint:UInt) {
+    private class ColorDimensionPoint(c1:Colour, c2:Colour, val steps:UInt, var currentPoint:UInt) {
 
 
         // Since pixels are stored as square roots, we need to "unpack" them here and "pack" them again when finished
@@ -59,7 +59,7 @@ class Colour(val a:UByte, val r:UByte, val g:UByte, val b:UByte) {
     fun toQuad() = (this.a to this.r to this.g to this.b).map {it.toInt()}
 
 
-    class ColorRangeIterator(val start:Colour, val endInclusive: Colour, val steps:UInt = 10u): Iterator<Colour> {
+    class ColorRangeIterator(start:Colour, endInclusive: Colour, steps:UInt = 10u): Iterator<Colour> {
 
         override fun hasNext(): Boolean = dimensionPoint.steps>=dimensionPoint.currentPoint
 
@@ -82,6 +82,15 @@ class Colour(val a:UByte, val r:UByte, val g:UByte, val b:UByte) {
 
         infix fun steps(steps: UInt) = ColorRange(start,endInclusive,steps)
         infix fun steps(steps: Int) = steps(steps.toUInt())
+
+        private val dimensionPoint = ColorDimensionPoint(start,endInclusive,steps,0u)
+
+        operator fun get(i:Int): Colour =
+                if(i !in 0..(steps.toInt())) throw java.lang.IndexOutOfBoundsException("$i is not in (0,${steps.toInt()})")
+                else {
+                    dimensionPoint.currentPoint=i.toUInt()
+                    dimensionPoint.color
+                }
 
     }
 
