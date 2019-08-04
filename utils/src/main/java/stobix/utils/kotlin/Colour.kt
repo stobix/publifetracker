@@ -8,7 +8,9 @@ import kotlin.math.sqrt
 @ExperimentalUnsignedTypes
 class Colour(val a:UByte, val r:UByte, val g:UByte, val b:UByte) {
 
-    init{println("a $a r $r g $g b $b")}
+    init{
+        //println("a $a r $r g $g b $b")
+    }
 
     constructor(color:Int):this(
             ((color ushr 6) and 0xFF).toUByte(),
