@@ -73,16 +73,18 @@ public class SortableSugarEntryTableView extends SortableTableView<SugarEntry> {
                 new TableColumnWeightModel(hdrs.length);
 
         tableColumnWeightModel.setColumnWeight(0, 2);
-        tableColumnWeightModel.setColumnWeight(1, 1);
-        tableColumnWeightModel.setColumnWeight(2, 3);
+        //tableColumnWeightModel.setColumnWeight(1, 1);
+        //tableColumnWeightModel.setColumnWeight(2, 3);
         setColumnModel(tableColumnWeightModel);
 
+        /*
         setColumnComparator(0, (a,b) -> {
             long x= a.getEpochTimestamp() - b.getEpochTimestamp();
             return (x>0)?1:(x<0)?-1:0;
         });
         setColumnComparator(1, (a,b) -> a.getSugarLevel() - b.getSugarLevel());
-        setColumnComparator(2, (a,b) -> {
+        */
+        setColumnComparator(0, (a,b) -> {
                     if(a.getExtra()== null) return 1;
                     else if(b.getExtra() == null) return -1;
                     else return a.getExtra().compareTo(b.getExtra());

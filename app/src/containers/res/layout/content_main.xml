@@ -36,7 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="visible"
-            app:tableView_columnCount="4">
+            app:tableView_columnCount="1">
 
         </stobix.app.lifetracker.SortableSugarEntryTableView>
 

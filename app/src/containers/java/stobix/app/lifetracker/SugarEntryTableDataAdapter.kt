@@ -23,6 +23,7 @@ class SugarEntryTableDataAdapter(
     override fun getCellView(rowIndex: Int, columnIndex: Int, parentView: ViewGroup): View {
         val currRow = getRowData(rowIndex)
         return when (columnIndex) {
+            /*
             0 -> {
                 val formatString = resources.getString(R.string.dateTimeFormat)
                 val myDate = Date(currRow.epochTimestamp)
@@ -36,14 +37,16 @@ class SugarEntryTableDataAdapter(
                 else
                     renderString("")
             }
+            */
 
-            2 -> {
+            0 -> {
                 // renderString("${with(currRow.weight," kg, ","")} ${currRow.extra ?: ""}")
                 val cv = ContainerView(context)
                 val c = Container(rowIndex)
                 var g = c
                 for (i in 0..rowIndex) {
-                    var f = Container()
+                    val f = Container()
+                    f.addInt(i)
                     g.addContainer(f)
                     g=f
                 }
