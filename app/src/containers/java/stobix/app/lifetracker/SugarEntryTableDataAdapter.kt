@@ -20,6 +20,7 @@ class SugarEntryTableDataAdapter(
         entries: ArrayList<SugarEntry>
 ) : TableDataAdapter<SugarEntry>(context, entries) {
 
+    @Suppress("KDocMissingDocumentation")
     override fun getCellView(rowIndex: Int, columnIndex: Int, parentView: ViewGroup): View {
         val currRow = getRowData(rowIndex)
         return when (columnIndex) {
@@ -51,12 +52,12 @@ class SugarEntryTableDataAdapter(
                     g.addContainer(f,rowIndex*10+i+1,"$i:$rowIndex")
                     g=f
                 }
-                c.addInt(rowIndex,"rad")
+                c.addString("rad",rowIndex,"(radnummer)")
                 cv.container = c
-                cv.showContents = true
-                cv.showIntDescriptions = true
-                cv.showContentDescriptions = true
-                cv.showStringDescriptions = true
+                cv.showContents = rowIndex % 3 == 0
+                cv.showIntDescriptions = rowIndex % 4 == 0
+                cv.showContentDescriptions = rowIndex % 5 == 0
+                cv.showStringDescriptions = rowIndex % 6 == 0
                 cv.recurLevel = 7
                 cv
             }
