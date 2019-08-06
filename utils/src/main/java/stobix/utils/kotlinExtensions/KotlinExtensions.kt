@@ -60,5 +60,9 @@ infix fun <A> Quadruple<A,A,A,A>.folding(f:(A,A) -> A) = first to second folding
 infix fun <A> Quintuple<A,A,A,A,A>.folding(f:(A,A) -> A) = first to second folding f to third folding f to fourth folding f to fifth folding f
 infix fun <A> Sextuple<A,A,A,A,A,A>.folding(f:(A,A) -> A) = first to second folding f to third folding f to fourth folding f to fifth folding f to sixth folding f
 
+fun <A,B> Pair<A,B>.flip() = second to first
+
+infix fun <A,B,C> Pair<A,B>.onFirst(f:(A) -> C) = f(first) to second
+infix fun <A,B,C> Pair<A,B>.onSecond(f:(A) -> C) =flip().let{ f(first) to second}
 
 
