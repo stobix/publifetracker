@@ -1,9 +1,7 @@
 package stobix.view.containerview
 
-import android.icu.util.Measure
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
-import org.junit.Test
 
 /**
  * Created by stobix on 2018-02-28.

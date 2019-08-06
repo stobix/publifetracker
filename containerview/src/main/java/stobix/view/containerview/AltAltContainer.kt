@@ -1,6 +1,5 @@
 package stobix.view.containerview
 
-import android.app.ActivityManager
 import android.util.Log
 import stobix.utils.DateHandler
 
@@ -12,7 +11,7 @@ import stobix.utils.DateHandler
  *
  */
 
-class AltAltContainer(){
+class AltAltContainer {
     companion object {
         @JvmStatic fun getAllSubmissions(dao: AltAltContainerDao): List<CSubmission> =
                 dao.submissions.map {it.convertToClass(dao)}

@@ -9,5 +9,4 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class AACInstrumentedTest {
-}
+class AACInstrumentedTest
