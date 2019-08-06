@@ -105,7 +105,7 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
 
 
     init {
-        Log.d("ContainerView init","mupp")
+        // Log.d("ContainerView init","mupp")
 
         val a = context.theme.obtainStyledAttributes(attrs, R.styleable.ContainerView, defStyleAttr, defStyleRes)
 
@@ -142,7 +142,7 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
             container.addInt(3, "insulin")
             container.addString("godis", 3, "mums")
             val c1 = Container()
-            c1.addString("mte")
+            c1.addString("mte", 1)
             c1.addContainer(
                     Container()
                             .addString("bröd", 1, "energibröd")
@@ -271,7 +271,7 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
 
     private infix fun Any?.space(that:Any?) = this.intersperce(that," ")
     private infix fun Any?.colon(that:Any?) = this.intersperce(that,": ")
-    private infix fun Any?.equals(that:Any?) = this.intersperce(that," = ")
+    private infix fun Any?.eq(that:Any?) = this.intersperce(that," = ")
     private infix fun Any?.comma(that:Any?) = this.intersperce(that,", ")
 
     private var memoHeightMeasurement = HashMap<Pair<Int,Int>,Float>()
@@ -280,27 +280,27 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
                 2 * containerBorderWidth +
                         max(heightAcc,
                                 when (c) {
-                            is IntContent -> {
-                                textPaint.textSize
-                            }
-                            is StringContent -> {
-                                textPaint.textSize
-                            }
-                            is ContainerContent -> {
-                                if (currRecurLevel < recurLevel)
-                                    when {
-                                        showContentDescriptions ->
-                                            textPaint.textSize +
-                                                    measureContainerHeight(c.value, currRecurLevel + 1)
-                                        showContents ->
-                                            measureContainerHeight(c.value, currRecurLevel + 1)
-                                        else -> textPaint.textSize
+                                    is IntContent -> {
+                                        textPaint.textSize
                                     }
-                                else
-                                    0f
-                            }
-                            else -> 0f
-                        })
+                                    is StringContent -> {
+                                        textPaint.textSize
+                                    }
+                                    is ContainerContent -> {
+                                        if (currRecurLevel < recurLevel)
+                                            when {
+                                                showContentDescriptions ->
+                                                    textPaint.textSize +
+                                                            measureContainerHeight(c.value, currRecurLevel + 1)
+                                                showContents ->
+                                                    measureContainerHeight(c.value, currRecurLevel + 1)
+                                                else -> textPaint.textSize
+                                            }
+                                        else
+                                            0f
+                                    }
+                                    else -> 0f
+                                })
             } ?: 0f
 
     private var memoWidthMeasurement = HashMap<Pair<Int,Int>,Float>()
@@ -309,18 +309,18 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
      */
     private fun measureContainerWidth(container: Container? = this.container, currRecurLevel: Int = 0):Float =
             container?.let {
-                memoWidthMeasurement[container.hashCode() to currRecurLevel] ?:
+                 // memoWidthMeasurement[container.hashCode() to currRecurLevel] ?:
                 container.contents.fold(0f){ acc, c ->
                     when (c) {
                         is IntContent -> {
                             val intString = c.value space c.description.drawIf(showIntDescriptions) ?: ""
                             val measurement = textPaint.measureText(intString)
-                            measurement+2*containerBorderWidth
+                            acc+measurement+2*containerBorderWidth
                         }
                         is StringContent -> {
                             val stringString = c.amount space c.value space c.description.inParens().drawIf(showStringDescriptions) ?: ""
                             val measurement = textPaint.measureText(stringString)
-                            measurement+2*containerBorderWidth
+                            acc+measurement+2*containerBorderWidth
                         }
                         is ContainerContent -> {
                             val initialText = c.description?.let{
@@ -334,11 +334,11 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
                                     it
                             } ?: ""
                             val measurement = textPaint.measureText(initialText) + measureContainerWidth(c.value,currRecurLevel+1)
-                            measurement+2*containerBorderWidth
+                            acc+measurement+2*containerBorderWidth
                         }
-                        else -> 0f
+                        else -> acc
                     }
-                }.also { memoWidthMeasurement[container.hashCode() to currRecurLevel]=it }
+                }// .also { memoWidthMeasurement[container.hashCode() to currRecurLevel]=it }
             } ?: 0f
 
     /**
@@ -363,14 +363,11 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
                             *(recurLevel-currRecurLevel+1)
                             *containerBorderWidth
     ): Float{
-        val rectRect = Rect(
-                xPos.toInt(),
-                yPos.toInt(),
-                containerWidth.toInt(),
-                containerHeight.toInt())
+        val rectRect = Rect( xPos.toInt(), yPos.toInt(), containerWidth.toInt(), containerHeight.toInt())
         this.drawRect( rectRect, strokePaint)
         this.drawRect( rectRect, fillPaint.also { fillPaint.color = color })
-        return (rectRect.right - rectRect.left).toFloat()
+        Log.d("drawing","border: $str\t(x:$xPos\ty:$yPos\tw:$containerWidth,\th:$containerHeight)")
+        return containerWidth
     }
 
     /**
@@ -387,7 +384,7 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
      */
     private fun Canvas.drawTextBetter(str: String, xPos: Float, yPos: Float, paint: Paint = textPaint){
         val m = -textPaint.fontMetrics.top // because of course this is defined to be negative
-        Log.d("drawing","text: $str ($xPos, $yPos $m, ${textPaint.measureText(str)})")
+        Log.d("drawing","text: $str\t(x:$xPos\ty:$yPos\thd:$m,\tw:${textPaint.measureText(str)})")
         this.drawText(str, xPos, yPos+m, paint)
     }
     /**
@@ -401,26 +398,31 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
             yPos: Float = 0f,
             colors: Colour.ColorRange = Colour(rectColorDark)..Colour(rectColorLight) steps recurLevel+1
         ) : Float =
-            container?.contents?.fold(xPos ){ xPos, c ->
-                when (c) {
+            container?.contents?.foldIndexed(xPos+containerBorderWidth){ i, acc, c ->
+                acc.also { Log.d("xPos","$currRecurLevel $i $it") }+when (c) {
                     is IntContent -> {
+                        Log.d("type","int")
                         val string =
                                 c.value space c.description.drawIf(showIntDescriptions) ?: ""
-                        val drawLength=
-                                this.drawContainerBorder(string, xPos, yPos, currRecurLevel, colors[currRecurLevel].color)
-                        this.drawTextBetter(string,(xPos to yPos) .map {it+containerBorderWidth})
-                        drawLength
+                        // val drawLength= this.drawContainerBorder(string, acc, yPos, currRecurLevel, colors[currRecurLevel].color)
+                        this.drawTextBetter(string,(acc to yPos) .map {it+containerBorderWidth})
+                        // drawLength .also{Log.d("xPos inc","$it")}
+                        val inc =textPaint.measureText(string) +containerBorderWidth
+                        inc.also{Log.d("xPos inc","$it")}
                     }
                     is StringContent -> {
+                        Log.d("type","string")
                         val string =
                                 c.amount space c.value space c.description.inParens().drawIf(showStringDescriptions) ?: ""
-                        val drawLength=
-                                this.drawContainerBorder(string, xPos, yPos, currRecurLevel, colors[currRecurLevel].color)
-                        this.drawTextBetter(string,(xPos to yPos) .map {it+containerBorderWidth})
-                        drawLength
+                        // val drawLength= this.drawContainerBorder(string, acc, yPos, currRecurLevel, colors[currRecurLevel].color)
+                        this.drawTextBetter(string,(acc to yPos) .map {it+containerBorderWidth})
+                        // drawLength.also{Log.d("xPos inc","$it")}
+                        val inc =textPaint.measureText(string) +containerBorderWidth
+                        inc.also{Log.d("xPos inc","$it")}
                     }
                     is ContainerContent -> {
                         if(currRecurLevel < recurLevel) {
+                            Log.d("type","container")
                             val description = c.description ?: "a"
                             val string =
                                     if (currRecurLevel < recurLevel)
@@ -433,29 +435,30 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
                                         description
                             val restWidth = measureContainerWidth(c.value,currRecurLevel+1)
                             val totalWidth=this.drawContainerBorder(
-                                    string, xPos, yPos,
+                                    string, acc, yPos,
                                     currRecurLevel, colors[currRecurLevel].color,
                                     extraWidth = restWidth+containerBorderWidth)
                             val textWidth= textPaint.measureText(string)
                             this.drawContainer(c.value,
                                     currRecurLevel = currRecurLevel + 1,
-                                    xPos = xPos + textWidth+containerBorderWidth,
+                                    xPos = acc + textWidth,
                                     yPos = yPos+containerBorderWidth,
                                     colors = colors)
-                            this.drawTextBetter(string,(xPos to yPos) .map {it+containerBorderWidth})
-                            totalWidth
+                            this.drawTextBetter(string,(acc to yPos) .map {it+containerBorderWidth})
+                            totalWidth.also{Log.d("xPos inc","$it")}
 
                         } else {
+                            Log.d("type","container (recur max)")
                             val string = c.description ?: " "
                             val totalWidth=this.drawContainerBorder(
-                                    string, xPos, yPos,
+                                    string, acc, yPos,
                                     currRecurLevel, colors[currRecurLevel].color
                                     )
-                            this.drawTextBetter(string,(xPos to yPos) .map {it+containerBorderWidth})
-                            totalWidth
+                            this.drawTextBetter(string,(acc to yPos) .map {it+containerBorderWidth})
+                            totalWidth.also{Log.d("xPos inc","$it")}
                         }
                     }
-                    else -> xPos
+                    else -> 0f
                 }
             }?: xPos
 
@@ -481,7 +484,7 @@ open class ContainerView(ctx : Context, attrs: AttributeSet? = null, defStyleAtt
                     val recurDesc =
                             if (recurLevel > currRecurLevel)
                                 if (showContents)
-                                    c.description.drawIf(showContentDescriptions) equals stringifyContainer(c.value,currRecurLevel+1).inBracks()
+                                    c.description.drawIf(showContentDescriptions) eq stringifyContainer(c.value,currRecurLevel+1).inBracks()
                                 else
                                     c.description ?: stringifyContainer(c.value,currRecurLevel+1).inBracks()
                             else

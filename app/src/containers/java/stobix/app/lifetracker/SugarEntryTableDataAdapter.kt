@@ -51,6 +51,7 @@ class SugarEntryTableDataAdapter(
                     g=f
                 }
                 g.addInt(rowIndex,"row")
+                g.addInt(rowIndex,"row")
                 // cv.textSize = 30f
                 cv.container = c
                 cv.container.addString("cookies",currRow.epochTimestamp.toInt())
