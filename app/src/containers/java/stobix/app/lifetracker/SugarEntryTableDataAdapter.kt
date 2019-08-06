@@ -1,7 +1,6 @@
 package stobix.app.lifetracker
 
 import android.content.Context
-import android.text.format.DateFormat
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -58,7 +57,7 @@ class SugarEntryTableDataAdapter(
                 cv.showIntDescriptions = rowIndex % 3 == 0
                 cv.showContentDescriptions = rowIndex % 4 == 0
                 cv.showStringDescriptions = rowIndex % 5 == 0
-                cv.recurLevel = 7
+                cv.maxRecurLevel = 7
                 cv
             }
             else -> renderString("N/A")

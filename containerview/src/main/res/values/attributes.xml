@@ -4,7 +4,8 @@
         <attr name="colorBorderDarkest" format="color">black</attr>
         <attr name="colorBorderLightest" format="color">gray70</attr>
         <attr name="colorText" format="color">#ffcb00</attr>
-        <attr name="colorBackground" format="color">#ffcb00</attr>
+        <attr name="colorBackground" format="color">#000000</attr>
+        <attr name="colorBorder" format="color">#FFFFFF</attr>
         <attr name="textSize" format="dimension" ></attr>
     </declare-styleable>
 </resources>

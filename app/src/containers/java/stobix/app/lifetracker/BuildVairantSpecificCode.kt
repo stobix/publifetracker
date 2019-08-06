@@ -21,7 +21,7 @@ class BuildVairantSpecificCode {
           //((View b) -> v.setShowContents(((CheckBox) b).isChecked()))
             c.findViewById<CheckBox>(R.id.checkRecDesc).setOnClickListener{b -> v.showContentDescriptions=(b as CheckBox).isChecked}
           //((View b) -> v.setShowContentDescriptions(((CheckBox) b).isChecked()))
-            c.findViewById<CheckBox>(R.id.checkRecDeep).setOnClickListener{b -> v.recurLevel=if((b as CheckBox).isChecked) 2 else 1}
+            c.findViewById<CheckBox>(R.id.checkRecDeep).setOnClickListener{b -> v.maxRecurLevel=if((b as CheckBox).isChecked) 2 else 1}
           //((View b) -> v.setRecurLevel(((CheckBox) b).isChecked() ? 2 : 1) )
 
 
