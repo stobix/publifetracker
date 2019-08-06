@@ -43,20 +43,20 @@ class SugarEntryTableDataAdapter(
                 // renderString("${with(currRow.weight," kg, ","")} ${currRow.extra ?: ""}")
                 val cv = ContainerView(context)
                 val c = Container(rowIndex)
+                c.addInt(currRow.epochTimestamp.toInt(),"s")
                 var g = c
                 for (i in 0..rowIndex) {
                     val f = Container()
-                    f.addInt(i)
-                    g.addContainer(f)
+                    f.addInt(i, "☐")
+                    g.addContainer(f,rowIndex*10+i+1,"$i:$rowIndex")
                     g=f
                 }
-                g.addInt(rowIndex,"row")
-                g.addInt(rowIndex,"row")
-                // cv.textSize = 30f
+                c.addInt(rowIndex,"rad")
                 cv.container = c
-                cv.container.addString("cookies",currRow.epochTimestamp.toInt())
                 cv.showContents = true
                 cv.showIntDescriptions = true
+                cv.showContentDescriptions = true
+                cv.showStringDescriptions = true
                 cv.recurLevel = 7
                 cv
             }

@@ -83,7 +83,7 @@ open class Content( var type: ContentType ) {
 }
 
 @Entity(tableName="int_content")
-class IntContent @JvmOverloads constructor(
+data class IntContent @JvmOverloads constructor(
         @PrimaryKey(autoGenerate = true) var id: Int?=null,
         var value: Int?=null,
         var description: String?=null
@@ -107,7 +107,7 @@ class IntContent @JvmOverloads constructor(
 
 @Suppress("EqualsOrHashCode")
 @Entity(tableName="string_content")
-class StringContent(
+data class StringContent(
         @PrimaryKey(autoGenerate = true) var id: Int?=null,
         var value: String?=null,
         var amount: Int?=null,
@@ -129,7 +129,7 @@ class StringContent(
 }
 
 
-class ContainerContent(
+data class ContainerContent(
         @PrimaryKey(autoGenerate = true) var id: Int?=null,
         var value: Container?=null,
         var amount: Int?=null,
@@ -236,6 +236,7 @@ class ContainerAdapterFactory : TypeAdapterFactory {
 
                     override fun read(reader: JsonReader?): Content {
                         reader!!.beginArray()
+                        @Suppress("RemoveRedundantQualifierName")
                         val ctype = ContentType.valueOf(reader.nextString())
 
                         val ret: Content = when (ctype) {
