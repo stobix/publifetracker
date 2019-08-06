@@ -19,10 +19,9 @@
         <stobix.view.containerview.ContainerView
             android:id="@+id/containerView2"
             android:layout_width="match_parent"
-            android:layout_height="20dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            app:textSize="18sp"
-            />
+            app:textSize="18sp" />
 
         <TextView
             android:id="@+id/textView5"

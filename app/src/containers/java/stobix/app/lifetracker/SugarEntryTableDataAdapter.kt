@@ -54,10 +54,10 @@ class SugarEntryTableDataAdapter(
                 }
                 c.addString("rad",rowIndex,"(radnummer)")
                 cv.container = c
-                cv.showContents = rowIndex % 3 == 0
-                cv.showIntDescriptions = rowIndex % 4 == 0
-                cv.showContentDescriptions = rowIndex % 5 == 0
-                cv.showStringDescriptions = rowIndex % 6 == 0
+                cv.showContents = rowIndex % 2 == 0
+                cv.showIntDescriptions = rowIndex % 3 == 0
+                cv.showContentDescriptions = rowIndex % 4 == 0
+                cv.showStringDescriptions = rowIndex % 5 == 0
                 cv.recurLevel = 7
                 cv
             }
