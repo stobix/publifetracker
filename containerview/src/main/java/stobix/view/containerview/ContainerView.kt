@@ -24,7 +24,9 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int) : this(context, attrs, defStyleAttr, 0)
 
-    private var isExternalSet = true
+    private var isSetExternally = true
+
+    //TODO rearrange how containers are drawn: 1 [smörgås] instead of [1 smörgås]
 
     /*
     The view needs to tell its parent that it needs to be redrawn if one of these
@@ -93,7 +95,7 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
 
     private fun update(f: () -> Unit) {
         f()
-        if (isExternalSet) {
+        if (isSetExternally) {
             Log.d("ContainerView", "invalidating")
             invalidate()
         }
@@ -101,9 +103,9 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
 
     // properties set in f will not trigger invalidate()
     private fun setInternally(f: () -> Unit) {
-        isExternalSet = false
+        isSetExternally = false
         f()
-        isExternalSet = true
+        isSetExternally = true
     }
 
     private var textPaint = Paint()
