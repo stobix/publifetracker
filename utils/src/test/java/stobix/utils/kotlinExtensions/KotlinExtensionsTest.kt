@@ -41,4 +41,14 @@ class KotlinExtensionsTest {
     fun altNames(){
         1 to 2 to3 3 to4 4 to5 5 to6 6 asEq Sextuple(1,2,3,4,5,6)
     }
+
+    @Test
+    fun breakdown(){
+        val quad = 1 to 2 to 3 to 4
+        val(one,two,three,four)  = quad
+        one asEq 1
+        two asEq 2
+        three asEq 3
+        four asEq 4
+    }
 }
