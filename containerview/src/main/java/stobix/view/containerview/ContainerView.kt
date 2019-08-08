@@ -15,6 +15,7 @@ import stobix.utils.kotlin.Colour
 import stobix.utils.kotlinExtensions.folding
 import stobix.utils.kotlinExtensions.map
 import stobix.utils.kotlinExtensions.onFirst
+import stobix.utils.kotlinExtensions.onSecond
 import kotlin.math.max
 import kotlin.math.min
 
@@ -25,8 +26,6 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
     constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int) : this(context, attrs, defStyleAttr, 0)
 
     private var isSetExternally = true
-
-    //TODO rearrange how containers are drawn: 1 [smörgås] instead of [1 smörgås]
 
     /*
     The view needs to tell its parent that it needs to be redrawn if one of these
@@ -44,6 +43,7 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
         set(value) = update {
             field = value
             textPaint.color = value
+            smallTextPaint.color = value
         }
 
     var borderColor: Int = Color.WHITE
@@ -74,6 +74,7 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
             if (value > 0f) {
                 field = value
                 textPaint.textSize = value
+                smallTextPaint.textSize = value * 2 / 3
                 textView.textSize = value
             }
         }
@@ -109,6 +110,7 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
     }
 
     private var textPaint = Paint()
+    private var smallTextPaint = Paint()
     private var strokePaint = Paint()
     private var fillPaint = Paint()
     private var fillStrokePaint = Paint()
@@ -151,11 +153,13 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
             textSize = a.getDimension(R.styleable.ContainerView_textSize, TextView(context).textSize)
             Log.d("TEXT", "size: $textSize")
             textPaint.textSize = textSize
+            smallTextPaint.textSize = textSize * 2 / 3
 
-            container.addInt(3, "insulin")
-            container.addString("godis", 3, "mums")
+            //container.addInt(3, "insulin")
+            //container.addString("godis", 3, "mums")
             val c1 = Container()
-            c1.addString("mte", 1)
+            c1.addString("kaka", 1)
+            c1.addContainer(Container().addString("te", description = "normalstor").addString("mjölk"), 1, "mte")
             c1.addContainer(
                     Container()
                             .addString("bröd", 1, "energibröd")
@@ -295,39 +299,88 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
      */
     private fun Pair<Int, Int>.notMax() = this folding { a, b -> a < b }
 
+    private fun Pair<Int, Int>.notNextMax() = this folding { a, b -> a + 1 < b }
+
     /**
      * Returns the width of the [ContainerContent] if drawn at the [recurLevel]
      */
     private fun ContainerContent.measureWidth(recurLevel: Pair<Int, Int>): Float =
-            textPaint.measureText(this.showInit(recurLevel)) + 2 * containerBorderWidth +
-                    if (recurLevel.notMax())
-                        this.value.measureWidth(recurLevel onFirst { it + 1 })
-                    else 0f
+            this.run {
+                containerBorderWidth +
+                        measureAmount(recurLevel) +
+                        measureDescription(recurLevel) +
+                        measureContainer(recurLevel) +
+                        containerBorderWidth
+            }
 
+    private fun ContainerContent.measureDescription(recurLevel: Pair<Int, Int>) =
+            (this.description?.let {
+                (if (recurLevel.notMax()) smallTextPaint else textPaint)
+                        .measureText(this.showInit(recurLevel)).let{
+                            if(it > 0f)
+                                it + 2 * containerBorderWidth
+                            else 0f
+                        }
+            } ?: 0f).also { Log.d("measure", "${this.description}: $it") }
+
+    private fun ContainerContent.measureAmount(recurLevel: Pair<Int, Int>) =
+            this.amount
+                    ?.let {
+                        textPaint.measureText(this.showAmount(recurLevel)) + 2 * containerBorderWidth
+                    }
+                    ?: 0f
+
+    private fun ContainerContent.measureContainer(recurLevel: Pair<Int, Int>) =
+            if (recurLevel.notMax())
+                this.value.measureWidth(recurLevel onFirst { it + 1 }) +
+                        ((this.value?.contents?.size ?: 1) - 1) * textPaint.measureText(",")
+            else 0f
+
+
+    /**
+     * "Show" the contents akin to Haskell's Show class
+     */
     private fun IntContent.show() =
             this.value space
             this.description.drawIf(showIntDescriptions) ?: ""
 
+    /**
+     * "Show" the contents akin to Haskell's Show class
+     */
     private fun StringContent.show() =
             this.amount space
             this.value space
             this.description.inParens().drawIf(showStringDescriptions) ?: ""
 
-    private fun ContainerContent.showInit(recurLevel: Pair<Int, Int>) =
-            this.description?.let {
-                (this.amount?.toString()?.plus(" x ") ?: "") to it
-            }?.let { (amount, descr) ->
+
+    private fun ContainerContent.showAmount(recurLevel: Pair<Int, Int>) =
+            this.amount?.toString()?.let {
                 if (recurLevel.notMax())
                     when {
-                        showContentDescriptions -> "$amount$descr"
-                        showContents -> amount
+                        showContentDescriptions -> it
+                        showContents -> it
+                        else -> ""
+                    }
+                else
+                    it
+            } ?: ""
+
+    /**
+     * "Show" the contents akin to Haskell's Show class
+     */
+    private fun ContainerContent.showInit(recurLevel: Pair<Int, Int>) =
+            this.description?.let {
+                if (recurLevel.notMax())
+                    when {
+                        showContentDescriptions -> it
+                        showContents -> ""
                         else -> ""
                     }
                 else
                     when {
-                        showContentDescriptions -> "$amount$descr"
-                        showContents -> "$amount${descr}…"
-                        else -> "$amount$descr"
+                        showContentDescriptions -> it
+                        showContents -> "${it}…"
+                        else -> it
                     }
             } ?: ""
 
@@ -337,68 +390,98 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
      * Draws the container on the canvas, recursively. Returns the last x position of the drawing.
      */
     @ExperimentalUnsignedTypes
-    private fun Canvas.drawContainer(container: Container?, maxRecurLevelAmount: Int, currRecurLevel: Int = 0, xPos: Float = 0f, yPos: Float = 0f, colors: Colour.ColorRange = Colour(rectColorDark)..Colour(rectColorLight) steps maxRecurLevel+1) =
-            drawContainer(container, currRecurLevel to maxRecurLevelAmount, xPos, yPos, colors)
+    private fun Canvas.drawContainer(container: Container?, maxRecurLevelAmount: Int, currRecurLevel: Int = 0, xPos: Float = 0f, yPos: Float = 0f, colors: Colour.ColorRange = Colour(rectColorDark)..Colour(rectColorLight) steps maxRecurLevel + 1) =
+            drawContainer(container, currRecurLevel to maxRecurLevelAmount, xPos to yPos, colors)
 
-    private fun Canvas.drawContainer(container: Container?, recurLevel: Pair<Int, Int>, xPos: Float = 0f, yPos: Float = 0f, colors: Colour.ColorRange = Colour(rectColorDark)..Colour(rectColorLight) steps maxRecurLevel+1) =
-            container?.also { Log.d("drawing", "${indentationStr(recurLevel)}>>>(container selection:$recurLevel)") }?.contents?.foldIndexed(xPos) { i, acc, c ->
-                acc.also { } + when (c) {
-                    is IntContent -> this.draw(c, acc, yPos, recurLevel)
-                    is StringContent -> this.draw(c, acc, yPos, recurLevel)
-                    is ContainerContent -> this.draw(c, acc, yPos, recurLevel, colors)
+    private fun Canvas.drawContainer(container: Container?, recurLevel: Pair<Int, Int>, pos: Pair<Float, Float>, colors: Colour.ColorRange): Float {
+        if (container?.contents == null) {
+            return 0f
+        } else {
+            Log.d("drawing", "${indentationStr(recurLevel)}>>>(container selection:$recurLevel)")
+            val imax = container.contents.size
+            val nextPos = container.contents.foldIndexed(pos.first) { i, acc, c ->
+                (acc + when (c) {
+                    is IntContent -> this.draw(c, acc to pos.second, recurLevel)
+                    is StringContent -> this.draw(c, acc to pos.second, recurLevel)
+                    is ContainerContent -> this.draw(c, acc to pos.second, recurLevel, colors)
                     else -> 0f
+                }).let {
+                    it + if (i < imax - 1)
+                        this.drawTextBetter(",", it to pos.second, recurLevel = recurLevel)
+                    else 0f
                 }
-            }.also { Log.d("drawing", "${indentationStr(recurLevel)}<<<(container selection:$recurLevel) $xPos += $it") }
+            }
+            Log.d("drawing",
+                    "${indentationStr(recurLevel)}<<<" +
+                            "(container selection:$recurLevel) $pos += ${nextPos to 0}")
+            return nextPos
+        }
+    }
 
     /**
      * Draw the [IntContent] to the canvas. Returns the width of the drawn object
      */
-    private fun Canvas.draw(content: IntContent, xPos: Float, yPos: Float, recurLevel: Pair<Int, Int>): Float {
+    private fun Canvas.draw(content: IntContent, pos: Pair<Float, Float>, recurLevel: Pair<Int, Int>): Float {
         val string = content.show()
-        Log.d("drawing", "${indentationStr(recurLevel)}>>>(int) $string ($xPos $yPos)")
-        this.drawTextBetter(string, (xPos to yPos).map { it + containerBorderWidth }, recurLevel = recurLevel)
+        Log.d("drawing", "${indentationStr(recurLevel)}>>>(int) $string $pos")
+        this.drawTextBetter(string, pos.map(::addBW), recurLevel = recurLevel)
         val inc = content.measureWidth()
-        return inc.also { Log.d("drawing", "${indentationStr(recurLevel)}<<<(int) $xPos += $it") }
+        return inc.also { Log.d("drawing", "${indentationStr(recurLevel)}<<<(int) $pos += ($it,0)") }
     }
 
     /**
      * Draw the [StringContent] to the canvas. Returns the width of the drawn object
      */
-    private fun Canvas.draw(content: StringContent, xPos: Float, yPos: Float, recurLevel: Pair<Int, Int>): Float {
+    private fun Canvas.draw(content: StringContent, pos: Pair<Float, Float>, recurLevel: Pair<Int, Int>): Float {
 
         val string = content.show()
-        Log.d("drawing", "${indentationStr(recurLevel)}>>>(string) $string ($xPos $yPos)")
-        this.drawTextBetter(string, (xPos to yPos).map { it + containerBorderWidth }, recurLevel = recurLevel)
+        Log.d("drawing", "${indentationStr(recurLevel)}>>>(string) $string $pos")
+        drawTextBetter(string, pos.map(::addBW), recurLevel = recurLevel)
         val inc = content.measureWidth()
-        return inc.also { Log.d("drawing", "${indentationStr(recurLevel)}<<<(string) $xPos += $it") }
+        return inc.also { Log.d("drawing", "${indentationStr(recurLevel)}<<<(string) $pos += ${it to 0}") }
     }
 
     /**
      * Draw the [ContainerContent] to the canvas. Returns the width of the drawn object
      */
     @ExperimentalUnsignedTypes
-    private fun Canvas.draw(content: ContainerContent, xPos: Float, yPos: Float, recurLevel: Pair<Int, Int>,
+    private fun Canvas.draw(content: ContainerContent, pos: Pair<Float, Float>, recurLevel: Pair<Int, Int>,
                             colors: Colour.ColorRange): Float {
-        val initString = content.showInit(recurLevel)
-        val textWidth = textPaint.measureText(initString)
-        val totalWidth = content.measureWidth(recurLevel)
-        Log.d("drawing", "${indentationStr(recurLevel)}>>>(container:$recurLevel $initString ($xPos $yPos $totalWidth)")
-        this.drawContainerBorder(
-                initString, xPos, yPos,
-                recurLevel,
-                color = colors[recurLevel.first].color,
-                containerWidth = totalWidth)
-        if (recurLevel.notMax()) {
-            also { Log.d("drawing", "${indentationStr(recurLevel)}===(container:$recurLevel=>${recurLevel onFirst { it + 1 }}) $xPos+=$textWidth") }
-            this.drawContainer(content.value,
-                    recurLevel onFirst { it + 1 },
-                    xPos + textWidth,
-                    yPos + containerBorderWidth,
-                    colors = colors)
+        with(content) {
+            val amountString = showAmount(recurLevel)
+            val initString = showInit(recurLevel)
+            val initWidth = measureDescription(recurLevel)
+            val totalWidth = measureWidth(recurLevel)
+            Log.d("drawing", "${indentationStr(recurLevel)}>>>(container:$recurLevel $initString ($pos $totalWidth)")
+            var drawPos = pos.map(::addBW)
+            drawTextBetter(amountString, drawPos, recurLevel = recurLevel)
+            drawPos = drawPos onFirst { it + measureAmount(recurLevel) }
+            drawContainerBorder(
+                    initString, drawPos,
+                    recurLevel,
+                    color = colors[recurLevel.first].color,
+                    containerWidth = measureContainer(recurLevel) + measureDescription(recurLevel)
+            )
+
+            drawTextBetter(initString, drawPos onFirst ::addBW,
+                    recurLevel = recurLevel,
+                    paint = if (recurLevel.notMax()) smallTextPaint else textPaint)
+
+            if (recurLevel.notMax()) {
+                Log.d("drawing",
+                        "${indentationStr(recurLevel)}===(container:$recurLevel=>${recurLevel onFirst { it + 1 }}) " +
+                                "$pos+=${initWidth to containerBorderWidth}")
+                drawContainer(content.value,
+                        recurLevel onFirst { it + 1 },
+                        drawPos onFirst { it + initWidth } onSecond ::addBW,
+                        colors = colors)
+            }
+            Log.d("drawing", "${indentationStr(recurLevel)}<<<(container:$recurLevel) $pos+=${totalWidth to 0}")
+            return totalWidth
         }
-        this.drawTextBetter(initString, (xPos to yPos).map { it + containerBorderWidth }, recurLevel = recurLevel)
-        return totalWidth.also { Log.d("drawing", "${indentationStr(recurLevel)}<<<(container:$recurLevel) $xPos+=$it") }
     }
+
+    private fun addBW(f: Float) = f + containerBorderWidth
 
 
     /**
@@ -412,19 +495,24 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
     // * @param containerWidth the width of the whole drawn container. (usually calculated automatically)
      */
     private fun Canvas.drawContainerBorder(
-            str: String, xPos: Float, yPos: Float
-            , recurLevel: Pair<Int, Int>
-            , color: Int,
-            textWidth: Float = textPaint.measureText(str), extraWidth: Float = 0f, containerWidth: Float = textWidth + extraWidth + 2 * containerBorderWidth,
+            str: String, pos: Pair<Float, Float>,
+            recurLevel: Pair<Int, Int>,
+            color: Int,
+            textWidth: Float = textPaint.measureText(str),
+            extraWidth: Float = 0f,
+            containerWidth: Float = textWidth + extraWidth + 2 * containerBorderWidth,
             containerHeight: Float = textSize + 2 * (recurLevel.second - recurLevel.first + 1) * containerBorderWidth
     ): Float {
+        val (xPos, yPos) = pos.map { it.toInt() }
         Log.d("drawing", "${indentationStr(recurLevel)}>>>(border) ($xPos $yPos $recurLevel)")
-        val rectRect = Rect(xPos.toInt(), yPos.toInt(), (xPos + containerWidth).toInt(), (yPos + containerHeight).toInt())
+        val rectRect = Rect(xPos, yPos, xPos + containerWidth.toInt(), yPos + containerHeight.toInt())
         this.drawRect(rectRect, strokePaint.also { strokePaint.color })
         this.drawRect(rectRect, fillPaint.also { fillPaint.color = color })
         Log.d("drawing",
                 "${indentationStr(recurLevel)}border: $str\t(x:$xPos\ty:$yPos\tw:$containerWidth,\th:$containerHeight\te:${xPos + containerWidth})")
-        return containerWidth.also { Log.d("drawing", "${indentationStr(recurLevel)}<<<(border:) $xPos+=$it") }
+
+        Log.d("drawing", "${indentationStr(recurLevel)}<<<(border:) $pos+=${containerWidth to 0}")
+        return containerWidth
     }
 
     /**
@@ -439,10 +527,11 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
      * @param xPos starting position x
      * @param yPos starting position y, and not from the fucking baseline
      */
-    private fun Canvas.drawTextBetter(str: String, xPos: Float, yPos: Float, paint: Paint = textPaint, recurLevel: Pair<Int, Int>) {
-        val m = -textPaint.fontMetrics.top // because of course this is defined to be negative
-        Log.d("drawing", "${indentationStr(recurLevel)}text: $str\t(x:$xPos\ty:$yPos\thd:$m,\tw:${textPaint.measureText(str)})")
+    private fun Canvas.drawTextBetter(str: String, xPos: Float, yPos: Float, paint: Paint = textPaint, recurLevel: Pair<Int, Int>): Float {
+        val m = -paint.fontMetrics.top // because of course this is defined to be negative
+        Log.d("drawing", "${indentationStr(recurLevel)}text: $str\t(x:$xPos\ty:$yPos\thd:$m,\tw:${paint.measureText(str)})")
         this.drawText(str, xPos, yPos + m, paint)
+        return paint.measureText(str)
     }
 
     ////
