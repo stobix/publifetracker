@@ -15,10 +15,12 @@ import stobix.utils.kotlin.Colour
 import stobix.utils.kotlinExtensions.folding
 import stobix.utils.kotlinExtensions.map
 import stobix.utils.kotlinExtensions.onFirst
-import stobix.utils.kotlinExtensions.onSecond
 import kotlin.math.max
 import kotlin.math.min
 
+/**
+ * A View to draw recursive [Container]s
+ */
 @Suppress("NAME_SHADOWING")
 open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0, defStyleRes: Int = 0) : View(ctx, attrs, defStyleAttr, defStyleRes) {
     constructor(context: Context) : this(context, null)
@@ -33,12 +35,18 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
     The update function handles this automagically.
      */
 
+    /**
+     * The background color of the canvas that [Container]s are drawn on
+     */
     var backColor = 0
         set(value) = update {
             field = value
             fillPaint.color = value
         }
 
+    /**
+     * The color of the container text
+     */
     var textColor: Int = 0
         set(value) = update {
             field = value
@@ -46,19 +54,28 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
             smallTextPaint.color = value
         }
 
+    /**
+     * Border color for the [Container]s
+     */
     var borderColor: Int = Color.WHITE
         set(value) = update {
             field = value
             strokePaint.color = value
         }
 
-    var rectColorDark: Int = 0
+    /**
+     * The outermost background color for recursive containers
+     */
+    var outermostRectColor: Int = 0
         set(value) = update {
             field = value
             rectColorDarkPaint.color = value
         }
 
-    var rectColorLight: Int = 0
+    /**
+     * The innermost background color for recursive containers
+     */
+    var innermostRectColor: Int = 0
         set(value) = update {
             field = value
             rectColorLightPaint.color = value
@@ -79,6 +96,9 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
             }
         }
 
+    /**
+     * The [Container] to draw on this [ContainerView]
+     */
     var container: Container = Container()
         set(value) = update {
             field = value
@@ -86,7 +106,7 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
         }
 
     /**
-     *
+     * The margin from the container edge to its inner elements
      */
     var containerBorderWidth = 5f
         set(value) = update {
@@ -119,7 +139,7 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
     /**
      * returns a paint object with the current paint level
      */
-    private fun paintLevel(current: Int, max: Int) = Paint().also { it.color = current * (rectColorLight - rectColorDark) / max }
+    private fun paintLevel(current: Int, max: Int) = Paint().also { it.color = current * (innermostRectColor - outermostRectColor) / max }
 
 
     init {
@@ -146,8 +166,8 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
         setInternally {
             backColor = a.getColor(R.styleable.ContainerView_colorBackground, android.R.attr.colorPrimary, Color.WHITE)
             textColor = a.getColor(R.styleable.ContainerView_colorText, android.R.attr.textColorPrimary, Color.BLACK)
-            rectColorDark = a.getColor(R.styleable.ContainerView_colorBorderDarkest, android.R.attr.colorAccent, Color.DKGRAY)
-            rectColorLight = a.getColor(R.styleable.ContainerView_colorBorderLightest, android.R.attr.colorBackground, Color.LTGRAY)
+            outermostRectColor = a.getColor(R.styleable.ContainerView_colorBorderDarkest, android.R.attr.colorAccent, Color.DKGRAY)
+            innermostRectColor = a.getColor(R.styleable.ContainerView_colorBorderLightest, android.R.attr.colorBackground, Color.LTGRAY)
             borderColor = a.getColor(R.styleable.ContainerView_colorBorder, android.R.attr.colorAccent, Color.WHITE)
 
             textSize = a.getDimension(R.styleable.ContainerView_textSize, TextView(context).textSize)
@@ -162,10 +182,14 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
             c1.addContainer(Container().addString("te", description = "normalstor").addString("mjölk"), 1, "mte")
             c1.addContainer(
                     Container()
-                            .addString("bröd", 1, "energibröd")
-                            .addString("ost", 1, "cheddar")
-                            .addString("smör", description = "bregott")
-                    , 1
+                            .addContainer(
+                                    Container()
+                                            .addString("bröd", 1, "energibröd")
+                                            .addString("smör", description = "bregott"),
+                                    description = "senergi"
+                            )
+                            .addString("ostskiva", 3, "cheddar")
+                    , 2
                     , "smörgås"
             )
             container.addContainer(c1, description = "frukost")
@@ -178,6 +202,7 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
 
     }
 
+    @Suppress("KDocMissingDocumentation")
     override fun onMeasure(wSpec: Int, hSpec: Int) {
         fun getSize(spec: Int, desired: Int) = when (MeasureSpec.getMode(spec)) {
             MeasureSpec.EXACTLY -> "exactly" to MeasureSpec.getSize(spec)
@@ -194,6 +219,7 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
         Log.d("ContainerView", "measure w $wdescr $width h $hdescr $height for ${stringifyContainer()}")
     }
 
+    @Suppress("KDocMissingDocumentation")
     @ExperimentalUnsignedTypes
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -208,9 +234,10 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
 
 
     /**
-     * The maximum recursion level to show for container containing containers
+     * Whether to show amounts for [ContainerContent] and [StringContent] below 2.
+     * If set to true, only null values are not shown.
      */
-    open var maxRecurLevel = 1
+    open var showAmountsBelowTwo = false
         set(value) = update { field = value }
 
     /**
@@ -223,11 +250,20 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
      */
     open var showIntDescriptions = false
         set(value) = update { field = value }
+
     /**
-     * Show container contents down to level [maxRecurLevel]
+     * Whether to show container contents down to level [maxRecurLevel].
+     * Setting this false has the same effect as setting [maxRecurLevel] = 0
      */
-    open var showContents = false
+    open var showContents = true
         set(value) = update { field = value }
+
+    /**
+     * The maximum recursion level to show for container containing containers
+     */
+    open var maxRecurLevel = 1
+        set(value) = update { field = value }
+
     /**
      * Show content description for recursive content before reaching [maxRecurLevel]
      */
@@ -316,8 +352,8 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
     private fun ContainerContent.measureDescription(recurLevel: Pair<Int, Int>) =
             (this.description?.let {
                 (if (recurLevel.notMax()) smallTextPaint else textPaint)
-                        .measureText(this.showInit(recurLevel)).let{
-                            if(it > 0f)
+                        .measureText(this.showInit(recurLevel)).let {
+                            if (it > 0f)
                                 it + 2 * containerBorderWidth
                             else 0f
                         }
@@ -325,10 +361,10 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
 
     private fun ContainerContent.measureAmount(recurLevel: Pair<Int, Int>) =
             this.amount
+                    .ifAboveTreshold(active = !showAmountsBelowTwo)
                     ?.let {
                         textPaint.measureText(this.showAmount(recurLevel)) + 2 * containerBorderWidth
-                    }
-                    ?: 0f
+                    } ?: 0f
 
     private fun ContainerContent.measureContainer(recurLevel: Pair<Int, Int>) =
             if (recurLevel.notMax())
@@ -341,29 +377,34 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
      * "Show" the contents akin to Haskell's Show class
      */
     private fun IntContent.show() =
-            this.value space
+            this.value.ifAboveTreshold(active = !showAmountsBelowTwo) space
             this.description.drawIf(showIntDescriptions) ?: ""
 
     /**
      * "Show" the contents akin to Haskell's Show class
      */
     private fun StringContent.show() =
-            this.amount space
+            this.amount.ifAboveTreshold(active = !showAmountsBelowTwo) space
             this.value space
             this.description.inParens().drawIf(showStringDescriptions) ?: ""
 
 
     private fun ContainerContent.showAmount(recurLevel: Pair<Int, Int>) =
-            this.amount?.toString()?.let {
-                if (recurLevel.notMax())
-                    when {
-                        showContentDescriptions -> it
-                        showContents -> it
-                        else -> ""
-                    }
-                else
-                    it
-            } ?: ""
+            this.amount.ifAboveTreshold(active = !showAmountsBelowTwo)
+                    ?.toString()
+                    ?.let {
+                        if (recurLevel.notMax())
+                            when {
+                                showContentDescriptions -> it
+                                showContents -> it
+                                else -> ""
+                            }
+                        else
+                            it
+                    } ?: ""
+
+    private fun Int?.ifAboveTreshold(treshold: Int = 1, active: Boolean = true) =
+            this?.let { if ( !active || it > treshold ) it else null }
 
     /**
      * "Show" the contents akin to Haskell's Show class
@@ -390,7 +431,7 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
      * Draws the container on the canvas, recursively. Returns the last x position of the drawing.
      */
     @ExperimentalUnsignedTypes
-    private fun Canvas.drawContainer(container: Container?, maxRecurLevelAmount: Int, currRecurLevel: Int = 0, xPos: Float = 0f, yPos: Float = 0f, colors: Colour.ColorRange = Colour(rectColorDark)..Colour(rectColorLight) steps maxRecurLevel + 1) =
+    private fun Canvas.drawContainer(container: Container?, maxRecurLevelAmount: Int, currRecurLevel: Int = 0, xPos: Float = 0f, yPos: Float = 0f, colors: Colour.ColorRange = Colour(outermostRectColor)..Colour(innermostRectColor) steps maxRecurLevel + 1) =
             drawContainer(container, currRecurLevel to maxRecurLevelAmount, xPos to yPos, colors)
 
     private fun Canvas.drawContainer(container: Container?, recurLevel: Pair<Int, Int>, pos: Pair<Float, Float>, colors: Colour.ColorRange): Float {
@@ -473,7 +514,7 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
                                 "$pos+=${initWidth to containerBorderWidth}")
                 drawContainer(content.value,
                         recurLevel onFirst { it + 1 },
-                        drawPos onFirst { it + initWidth } onSecond ::addBW,
+                        drawPos onFirst { it + initWidth } ,
                         colors = colors)
             }
             Log.d("drawing", "${indentationStr(recurLevel)}<<<(container:$recurLevel) $pos+=${totalWidth to 0}")
@@ -488,7 +529,7 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
      * Draw a container border around some text, possibly with space for more contents
      * @param str the string to draw
      * @param color the [Color] to draw the container border in
-     * @param xPos the start of the container for
+     * @param pos the start upper left corner of the container
     // * @param textWidth the width of the text (usually calculated automatically)
     // * @param borderWidth the width of the container border (usually calculated automatically)
      * @param extraWidth set this to allow some extra space after the text

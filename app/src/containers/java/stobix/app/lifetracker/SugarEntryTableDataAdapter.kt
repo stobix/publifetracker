@@ -21,7 +21,7 @@ class SugarEntryTableDataAdapter(
 
     @Suppress("KDocMissingDocumentation")
     override fun getCellView(rowIndex: Int, columnIndex: Int, parentView: ViewGroup): View {
-        val currRow = getRowData(rowIndex)
+        @Suppress("UNUSED_VARIABLE") val currRow = getRowData(rowIndex)
         return when (columnIndex) {
             /*
             0 -> {
@@ -55,11 +55,11 @@ class SugarEntryTableDataAdapter(
                 c.addString("rad",rowIndex,"(radnummer)")
                 cv.container = c
                 */
-                cv.showContents = rowIndex % 2 == 0
+                cv.maxRecurLevel = rowIndex % 7
+                cv.showContents = true // rowIndex % 2 == 0
                 cv.showIntDescriptions = rowIndex % 3 == 0
                 cv.showContentDescriptions = rowIndex % 4 == 0
                 cv.showStringDescriptions = rowIndex % 5 == 0
-                cv.maxRecurLevel = 7
                 cv
             }
             else -> renderString("N/A")
