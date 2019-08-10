@@ -15,8 +15,14 @@ import stobix.utils.kotlin.Colour
 import stobix.utils.kotlinExtensions.folding
 import stobix.utils.kotlinExtensions.map
 import stobix.utils.kotlinExtensions.onFirst
+import stobix.utils.kotlinExtensions.to
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.Float as XCoord
+import kotlin.Float as YCoord
+import kotlin.Float as TextYCoord
+import kotlin.Float
+
 
 /**
  * A View to draw recursive [Container]s
@@ -357,7 +363,7 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
                                 it + 2 * containerBorderWidth
                             else 0f
                         }
-            } ?: 0f).also { Log.d("measure", "${this.description}: $it") }
+            } ?: 0f).also { Log.d("measure", "${indentationStr(recurLevel)}${this.description}: $it") }
 
     private fun ContainerContent.measureAmount(recurLevel: Pair<Int, Int>) =
             this.amount
@@ -431,24 +437,34 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
      * Draws the container on the canvas, recursively. Returns the last x position of the drawing.
      */
     @ExperimentalUnsignedTypes
-    private fun Canvas.drawContainer(container: Container?, maxRecurLevelAmount: Int, currRecurLevel: Int = 0, xPos: Float = 0f, yPos: Float = 0f, colors: Colour.ColorRange = Colour(outermostRectColor)..Colour(innermostRectColor) steps maxRecurLevel + 1) =
-            drawContainer(container, currRecurLevel to maxRecurLevelAmount, xPos to yPos, colors)
+    private fun Canvas.drawContainer(
+            container: Container?,
+            maxRecurLevelAmount: Int,
+            currRecurLevel: Int = 0,
+            xPos: Float = 0f,
+            yPos: Float = 0f,
+            colors: Colour.ColorRange = Colour(outermostRectColor)..Colour(innermostRectColor) steps maxRecurLevel + 1
+    ) {
 
-    private fun Canvas.drawContainer(container: Container?, recurLevel: Pair<Int, Int>, pos: Pair<Float, Float>, colors: Colour.ColorRange): Float {
+        val textYPos = countLayers(container)*containerBorderWidth
+        drawContainer(container, currRecurLevel to maxRecurLevelAmount, xPos to yPos to textYPos, colors)
+    }
+
+    private fun Canvas.drawContainer(container: Container?, recurLevel: Pair<Int, Int>, pos: Triple<XCoord, YCoord, TextYCoord>, colors: Colour.ColorRange): Float {
         if (container?.contents == null) {
             return 0f
         } else {
             Log.d("drawing", "${indentationStr(recurLevel)}>>>(container selection:$recurLevel)")
-            val imax = container.contents.size
+            val iMax = container.contents.size
             val nextPos = container.contents.foldIndexed(pos.first) { i, acc, c ->
                 (acc + when (c) {
-                    is IntContent -> this.draw(c, acc to pos.second, recurLevel)
-                    is StringContent -> this.draw(c, acc to pos.second, recurLevel)
-                    is ContainerContent -> this.draw(c, acc to pos.second, recurLevel, colors)
+                    is IntContent -> this.draw(c, pos.onFirst { acc }, recurLevel)
+                    is StringContent -> this.draw(c, pos.onFirst { acc }, recurLevel)
+                    is ContainerContent -> this.draw(c, pos.onFirst { acc }, recurLevel, colors)
                     else -> 0f
                 }).let {
-                    it + if (i < imax - 1)
-                        this.drawTextBetter(",", it to pos.second, recurLevel = recurLevel)
+                    it + if (i < iMax - 1)
+                        this.drawTextBetter(",",  it to pos.third ,  recurLevel = recurLevel)
                     else 0f
                 }
             }
@@ -461,32 +477,43 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
 
     /**
      * Draw the [IntContent] to the canvas. Returns the width of the drawn object
+     * @param content the [StringContent] to draw
+     * @param pos the start upper left corner of the container
+     * @param recurLevel the current recursion level
      */
-    private fun Canvas.draw(content: IntContent, pos: Pair<Float, Float>, recurLevel: Pair<Int, Int>): Float {
+    private fun Canvas.draw(content: IntContent, pos: Triple<Float, Float, Float>, recurLevel: Pair<Int, Int> ): Float {
         val string = content.show()
         Log.d("drawing", "${indentationStr(recurLevel)}>>>(int) $string $pos")
-        this.drawTextBetter(string, pos.map(::addBW), recurLevel = recurLevel)
+        this.drawTextBetter(string, addBW(pos.first) to pos.third, recurLevel = recurLevel)
         val inc = content.measureWidth()
-        return inc.also { Log.d("drawing", "${indentationStr(recurLevel)}<<<(int) $pos += ($it,0)") }
+        Log.d("drawing", "${indentationStr(recurLevel)}<<<(int) $pos += ${inc to 0}")
+        return inc
     }
 
     /**
      * Draw the [StringContent] to the canvas. Returns the width of the drawn object
+     * @param content the [StringContent] to draw
+     * @param pos the start upper left corner of the container
+     * @param recurLevel the current recursion level
      */
-    private fun Canvas.draw(content: StringContent, pos: Pair<Float, Float>, recurLevel: Pair<Int, Int>): Float {
-
+    private fun Canvas.draw(content: StringContent, pos: Triple<Float, Float, Float>, recurLevel: Pair<Int, Int>): Float {
         val string = content.show()
         Log.d("drawing", "${indentationStr(recurLevel)}>>>(string) $string $pos")
-        drawTextBetter(string, pos.map(::addBW), recurLevel = recurLevel)
+        drawTextBetter(string, addBW(pos.first) to pos.third, recurLevel = recurLevel)
         val inc = content.measureWidth()
-        return inc.also { Log.d("drawing", "${indentationStr(recurLevel)}<<<(string) $pos += ${it to 0}") }
+        Log.d("drawing", "${indentationStr(recurLevel)}<<<(string) $pos += ${inc to 0}")
+        return inc
     }
 
     /**
      * Draw the [ContainerContent] to the canvas. Returns the width of the drawn object
+     * @param content the [ContainerContent] to draw
+     * @param pos the start upper left corner of the container
+     * @param recurLevel the current recursion level
+     * @param colors the range of colors to use
      */
     @ExperimentalUnsignedTypes
-    private fun Canvas.draw(content: ContainerContent, pos: Pair<Float, Float>, recurLevel: Pair<Int, Int>,
+    private fun Canvas.draw(content: ContainerContent, pos: Triple<Float, Float, Float>, recurLevel: Pair<Int, Int>,
                             colors: Colour.ColorRange): Float {
         with(content) {
             val amountString = showAmount(recurLevel)
@@ -494,9 +521,13 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
             val initWidth = measureDescription(recurLevel)
             val totalWidth = measureWidth(recurLevel)
             Log.d("drawing", "${indentationStr(recurLevel)}>>>(container:$recurLevel $initString ($pos $totalWidth)")
-            var drawPos = pos.map(::addBW)
-            drawTextBetter(amountString, drawPos, recurLevel = recurLevel)
+            val textY = pos.third
+            var drawPos = (pos.first to pos.second).map(::addBW)
+            var textPos = drawPos.first to textY
+            drawTextBetter(amountString, textPos, recurLevel = recurLevel)
+
             drawPos = drawPos onFirst { it + measureAmount(recurLevel) }
+            textPos = textPos onFirst {drawPos.first}
             drawContainerBorder(
                     initString, drawPos,
                     recurLevel,
@@ -504,9 +535,12 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
                     containerWidth = measureContainer(recurLevel) + measureDescription(recurLevel)
             )
 
-            drawTextBetter(initString, drawPos onFirst ::addBW,
-                    recurLevel = recurLevel,
-                    paint = if (recurLevel.notMax()) smallTextPaint else textPaint)
+            if(recurLevel.notMax()){
+                drawTextBetter(initString, drawPos onFirst ::addBW, recurLevel = recurLevel, paint = smallTextPaint )
+            } else {
+                drawTextBetter(initString, textPos onFirst ::addBW, recurLevel = recurLevel, paint = textPaint)
+            }
+
 
             if (recurLevel.notMax()) {
                 Log.d("drawing",
@@ -514,7 +548,7 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
                                 "$pos+=${initWidth to containerBorderWidth}")
                 drawContainer(content.value,
                         recurLevel onFirst { it + 1 },
-                        drawPos onFirst { it + initWidth } ,
+                        drawPos onFirst { it + initWidth } to textY,
                         colors = colors)
             }
             Log.d("drawing", "${indentationStr(recurLevel)}<<<(container:$recurLevel) $pos+=${totalWidth to 0}")
@@ -558,18 +592,13 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
 
     /**
      * Draw the string with the upper left corner starting at [pos]
-     * @param pos a pair with starting position x, starting position y as in [Canvas.drawTextBetter]
+     * @param pos the coordinate of the upper left (x,y) corner of the text to be drawn
+     * @param paint the [Paint] to draw the text with
+     * @param recurLevel for debugging purposes
      */
-    private fun Canvas.drawTextBetter(str: String, pos: Pair<Float, Float>, paint: Paint = textPaint, recurLevel: Pair<Int, Int>) =
-            this.drawTextBetter(str, pos.first, pos.second, paint, recurLevel)
-
-    /**
-     * Draw the string with the upper left corner starting at [xPos] [yPos]
-     * @param xPos starting position x
-     * @param yPos starting position y, and not from the fucking baseline
-     */
-    private fun Canvas.drawTextBetter(str: String, xPos: Float, yPos: Float, paint: Paint = textPaint, recurLevel: Pair<Int, Int>): Float {
+    private fun Canvas.drawTextBetter(str: String, pos: Pair<Float, Float>, paint: Paint = textPaint, recurLevel: Pair<Int, Int>) :Float {
         val m = -paint.fontMetrics.top // because of course this is defined to be negative
+        val (xPos, yPos) = pos
         Log.d("drawing", "${indentationStr(recurLevel)}text: $str\t(x:$xPos\ty:$yPos\thd:$m,\tw:${paint.measureText(str)})")
         this.drawText(str, xPos, yPos + m, paint)
         return paint.measureText(str)
