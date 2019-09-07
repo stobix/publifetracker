@@ -23,16 +23,14 @@ import android.view.MenuItem;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import de.codecrafters.tableview.SortingOrder;
 import de.codecrafters.tableview.TableDataAdapter;
-import stobix.utils.ColorHandler;
+import kotlin.Pair;
 import stobix.utils.DateHandler;
 
 import static android.util.Log.d;
@@ -58,9 +56,9 @@ public class MainActivity extends AppCompatActivity
         private SortableSugarEntryTableView tableView;
 
         // Used for all data base related operations once initiated in onCreate
-        private SugarEntryDao dao;
+        public SugarEntryDao dao;
 
-        private int currentTheme=R.style.Theme_Zimmik_NoActionBar;
+        public int currentTheme=R.style.Theme_Zimmik_NoActionBar;
         //
         // TODO Put more color themes here, extract this to a build variant common file.
         //
@@ -80,9 +78,6 @@ public class MainActivity extends AppCompatActivity
         }};
         @Override
         protected void onCreate(Bundle savedInstanceState) {
-
-            Integer.parseInt("23");
-
 
             SharedPreferences preferences = getSharedPreferences("colorsNstuff",MODE_PRIVATE);
             boolean useTheme = preferences.getBoolean("useTheme",false);
@@ -148,7 +143,7 @@ public class MainActivity extends AppCompatActivity
                 dao = db.userDao();
 
                 List<SugarEntry> entries = dao.getAll();
-                d("LOL","Entries "+entries.size());
+                d("initiateDB","Entries "+entries.size());
 
                 Message msg = db_data_handler.obtainMessage();
                 Bundle bundle = new Bundle();
@@ -205,263 +200,18 @@ public class MainActivity extends AppCompatActivity
             // Handle action bar item clicks here. The action bar will
             // automatically handle clicks on the Home/Up button, so long
             // as you specify a parent activity in AndroidManifest.xml.
-
-            switch(item.getItemId()) {
-                /*
-                case R.id.action_settings:
-                    Log.i("MenuClick", "onOptionsItemSelected: ");
-                    return true;
-
-                case R.id.action_colors:
-
-                    ColorPickerDialogBuilder
-                            .with(this)
-                            .setTitle("Choose color")
-                            .initialColor(0xFFFFFFFF)
-                            .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
-                            .density(12)
-                            .setOnColorSelectedListener(selectedColor ->
-                                    d("COLOR", "Colour selected:"
-                                            + Integer.toHexString(selectedColor)))
-                            .setPositiveButton("ok", (dialog, selectedColor, allColors) ->
-                                // TODO Use the color for something.
-                                    d("COLOR", "Colour confirmed:"
-                                            + Integer.toHexString(selectedColor)))
-                            .setNegativeButton("cancel", (dialog, which) ->
-                                    d("COLOR", "Colour aborted"))
-                            .build()
-                            .show();
-
-                    return true;
-                    */
-
-
-
-                case R.id.show_stats:
-                    Handler h = new MainHandler(
-                            this,
-                            (main,b) ->{
-                                String message = b.getString("message");
-                                AlertDialog.Builder builder = new AlertDialog.Builder(main);
-                                builder.setTitle(R.string.stat_window_title)
-                                        .setMessage(message)
-                                        .setPositiveButton(android.R.string.yes,
-                                                (dialog, which) -> {
-                                                })
-                                        .setIcon(android.R.drawable.ic_dialog_info)
-                                        .show();
-                            });
-
-                    Runnable getStats = () -> {
-                        Message m = h.obtainMessage();
-                        Bundle b = new Bundle();
-                        String message="";
-
-                        // Get all sugar levels mean
-                        List<Long> levels  = dao.getAllSugarLevels();
-                        Long s = 0L;
-                        for (Long l : levels) s += l;
-                        message += getString(R.string.stat_window_header_total_bs)+"\n";
-                        if ( s == 0 )
-                            message += getString(R.string.stat_window_no_bs)+"\n";
-                        else {
-                            double totAvg = s.doubleValue() / (levels.size()*10);
-                            message += String.format(Locale.getDefault(),
-                                    "\t"+getString(R.string.stat_window_avg_bs)+"\n" , totAvg);
-                            message += "\t"+getString(R.string.stat_window_bs_entries)+levels.size()+"\n";
-                        }
-
-                        // Get previous 30 days sugar levels mean
-                        DateHandler dateHandler = new DateHandler();
-                        levels = dao.getAllSugarLevels(
-                                dateHandler.clone().subtractDays(30).getTimestamp(),
-                                dateHandler.getTimestamp()
-                        );
-                        message += getString(R.string.stat_window_header_total_bs_30)+"\n";
-                        s=0L;
-                        for (Long l : levels) s += l;
-                        if ( s == 0 )
-                            message += getString(R.string.stat_window_no_bs)+"\n";
-                        else {
-                            double totAvg = s.doubleValue() / (levels.size()*10);
-                            message += String.format(Locale.getDefault(),"\t"+
-                                    getString(R.string.stat_window_avg_bs)+"\n" , totAvg);
-                            message += "\t"+getString(R.string.stat_window_bs_entries)+levels.size()+"\n";
-                        }
-
-                        b.putString("message",message);
-                        m.setData(b);
-                        h.sendMessage(m);
-                    };
-                    Thread getStatsT= new Thread(getStats);
-                    getStatsT.start();
-                    return true;
-
-                case R.id.show_graphs:
-                    MainHandler graphHandler =
-                            new MainHandler(this,(mainActivity, bundle) -> {
-                                Log.d("graph","got bundle");
-                                Intent i = new Intent(this, FullscreenGraphActivity.class);
-                                i.putExtras(bundle);
-                                startActivity(i);
-                            });
-
-                    new Thread(
-                            () -> {
-                                Log.d("graph","got request");
-                                Message m = graphHandler.obtainMessage();
-                                Bundle b = new Bundle();
-                                List<FloatyIntBucket> entries = dao.getAllSugarBuckets();
-                                Log.d("graph"," request");
-                                ArrayList<FloatyIntBucket> entryArrayList = new ArrayList<>(entries);
-                                b.putParcelableArrayList("entries", entryArrayList);
-                                ArrayList<Integer> colorArrayList = new ArrayList<>();
-                                ColorHandler c = new ColorHandler(this);
-                                ArrayList<Integer> colorsIDs = new ArrayList<>();
-                                colorsIDs.add(android.R.attr.textColorPrimary);
-                                colorsIDs.add(android.R.attr.textColorSecondary);
-                                colorsIDs.add(android.R.attr.textColorTertiary);
-                                colorsIDs.add(R.attr.colorPrimary);
-                                colorsIDs.add(R.attr.table_data_row_odd);
-                                colorsIDs.add(R.attr.table_data_row_even);
-                                Collections.sort(colorsIDs);
-                                Map<Integer,Integer> colMap;
-                                c.withColorMap(colorsIDs,
-                                        colorMap -> {
-                                            ArrayList<Integer> colorValues = new ArrayList<>();
-                                            // These are in an array instead of sending individiual
-                                            // values simply because this works and the other
-                                            // method didn't
-                                            colorValues.add(0,colorMap.get(android.R.attr.textColorPrimary));
-                                            colorValues.add(1,colorMap.get(android.R.attr.textColorSecondary));
-                                            colorValues.add(2,colorMap.get(android.R.attr.textColorSecondary));
-                                            colorValues.add(3,colorMap.get(R.attr.colorPrimary));
-                                            colorValues.add(4,colorMap.get(R.attr.table_data_row_even));
-                                            colorValues.add(5,colorMap.get(R.attr.table_data_row_odd));
-                                            b.putIntegerArrayList("colors",colorValues);
-                                            return null;
-                                        }
-                                );
-
-                                m.setData(b);
-                                Log.d("graph","sending bundle");
-                                graphHandler.sendMessage(m);
-                            }
-                            ).start();
-
-                    return true;
-                case R.id.action_colors:
-                    MainHandler colorEditorHandler =
-                            new MainHandler(this,(mainActivity, bundle) -> {
-                                Log.d("graph","got bundle");
-                                Intent i = new Intent(this, ColorEditorActivity.class);
-                                i.putExtras(bundle);
-                                startActivity(i);
-                            });
-                    new Thread(
-                            () -> {
-                                Message m = colorEditorHandler.obtainMessage();
-                                colorEditorHandler.sendMessage(m);
-                            }
-                    ).start();
-                    return true;
-
-
-                case R.id.show_sugar_weekly:
-                    // En MainHandler tar ett Message från en tråd, packar upp dess Bundle och
-                    // skickar vidare till en funktion tillsammans med en referens
-                    // till this för MainActivity.
-                    // Detta behövs eftersom en Handler måste vara static, så funktionen nedan kan
-                    // inte direkt hänvisa till MainActivity som this utan referensen måste skickas
-                    // in som ett argument till funktionen. (Annars kunde jag skrivit this istället
-                    // för mainActivity nedan.)
-                    MainHandler newGraphHandler =
-                            new MainHandler(this,
-                                    // Körs när all data hämtats från databasen och lagts i en bundle
-                                    (mainActivity, bundle) -> {
-                                        Intent i = new Intent(mainActivity, DependentBarLineGraphActivity.class);
-                                        // släng in bundlen i intent så activityn kan hämta ut data och färgtema
-                                        i.putExtras(bundle);
-                                        // Starta grafactivity
-                                        startActivity(i);
-                                    });
-
-                    // Databashantering måste ske i en separat tråd.
-                    new Thread(
-                            () -> {
-                                Message m = newGraphHandler.obtainMessage();
-                                // Alla blodsockervärden
-                                List<FloatyIntBucket> allSugarBuckets = dao.getAllSugarBuckets();
-                                // Alla viktvärden
-                                List<FloatyIntBucket> allWeightBuckets = dao.getAllWeightBuckets();
-                                // Lista med dataserier
-                                ArrayList<DataSeries> a = new ArrayList<>();
-                                // Allt som behövs för att skapa blodsockergrafen
-                                a.add(new DataSeries(
-                                        // Menynamn om ikonen ej får plats.
-                                        getString(R.string.input_sugar),
-                                        // Data
-                                        new ArrayList<>(allSugarBuckets),
-                                        // Ikonresursen
-                                        R.drawable.blood_sugar_icon,
-                                        // Typ av data ("floatyInt10" = float med en decimal som sparats som int i databasen.
-                                        // Exempelvis 10.2f sparas som 102)
-                                        SeriesType.FLOATYINT10,
-                                        // Skiljevärden mellan olika färger för grafen.
-                                        // Här: lila under 4, grönt innan 7, brandgult innan 15, rött över 15
-                                        new double[]{4.0,7.0,15.0},
-                                        // Skall veckomedelsstaplarna börja från 0 eller från lägsta uppmätta medel?
-                                        true
-                                ));
-                                // Samma fast för viktgrafen
-                                a.add(new DataSeries(
-                                        getString(R.string.input_weight),
-                                        new ArrayList<>(allWeightBuckets),
-                                        R.drawable.weight_icon,
-                                        SeriesType.FLOATYINT10,
-                                        new double[]{80,85,90},
-                                        false
-                                ));
-                                // Skapar en bundle med dataserierna inlagda.
-                                Bundle b =
-                                        DependentBarLineGraphActivity
-                                                .createBarLineActivityBundle( "Veckografer",a);
-                                // Skicka med appens tema
-                                b.putInt("theme",currentTheme);
-                                m.setData(b);
-                                // Starta MainHandlern, så funktionen ovan innan tråden körs.
-                                newGraphHandler.sendMessage(m);
-                            }
-                    ).start(); // Starta tråden.
-                    return true;
-
-                case R.id.action_switch_theme:
-
-
-                    new ThemePickerDialog(this, COLOR_THEMES).show();
-
-                    return true;
-
-                case R.id.action_import_db:
-                    fa.userReplaceDb();
-                    return true;
-
-                case R.id.action_merge_db:
-                    fa.userMergeDb();
-                    return true;
-
-                case R.id.action_export_db:
-                    fa.userCreateFile();
-                    return true;
-
-                case R.id.action_toggle_list_icons:
-                    doChangeIconVisibility();
-                    return true;
-
-                default:
-                    return super.onOptionsItemSelected(item);
+            int värde = item.getItemId();
+            Pair<Boolean, Boolean> result = BuildVariantSpecificCode.handleMenu(this,värde);
+            if(result.component1())
+                return result.component2();
+            else if(result.component2()){
+                return super.onOptionsItemSelected(item);
+            } else {
+                switch(värde) {
+                    default:
+                        return true;
+                }
             }
-
         }
 
         public void doChangeIconVisibility(){
@@ -626,7 +376,7 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-        private static class MainHandler extends Handler {
+        public static class MainHandler extends Handler {
             final MainActivity activity;
             final BiConsumer<MainActivity,Bundle> bundleConsumer;
             MainHandler(MainActivity a,BiConsumer<MainActivity,Bundle> messageHandler) {
@@ -643,7 +393,7 @@ public class MainActivity extends AppCompatActivity
         // Made static (i.e. no outer scope references) to prevent memory issues,
         // since lint complained about the anonymous class instance.
         // See https://stackoverflow.com/questions/11407943/this-handler-class-should-be-static-or-leaks-might-occur-incominghandler
-        private static class DataLoadHandler extends Handler {
+        public static class DataLoadHandler extends Handler {
             final MainActivity mainActivity;
             final SortableSugarEntryTableView tableView;
 
@@ -698,7 +448,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // Used to glue together all pieces of code that handles import/export of the database to/from a JSON file
-        private FileActions fa = new FileActions(this);
+        public FileActions fa = new FileActions(this);
 
         @Override
         public void handleFileCreated(@NotNull Uri uri) {
@@ -730,6 +480,10 @@ public class MainActivity extends AppCompatActivity
                         Message m =restarter.obtainMessage();
                         switch (what) {
                             case "replace":
+                                List<SugarEntry> tries = dao.getAll();
+                                List<FloatyIntBucket> buckits = dao.getAllSugarBuckets();
+                                Log.d("replace","Old entries: "+tries.size()+" buckets: "+buckits.size());
+
                                 dao.clear_sugar_entries();
                                 dao.insertAll(entries);
                                 break;
