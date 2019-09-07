@@ -29,7 +29,7 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
             }
 
         // Increase this each time the JSON generating algorithm gets updated.
-        val currentVersion = 6
+        val currentVersion = 7
 
         val sugarEntryListTypeToken = object: TypeToken<List<SugarEntry>>() {}
 
@@ -52,6 +52,7 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                             out.beginObject()
                             with(entry){
                                 out.name("t").value(timestamp)
+                                out.name("te").value(endTimestamp)
                                 out.name("s").value(sugarLevel)
                                 out.name("w").value(weight)
                                 out.name("i").value(insulin)
@@ -194,6 +195,20 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                                                 name,entry ->
                                                 when(name) {
                                                     "t" -> entry.timestamp = reader.nextLong()
+                                                    "s" -> entry.sugarLevel = reader.nextInt()
+                                                    "w" -> entry.weight = reader.nextInt()
+                                                    "i" -> entry.insulin = reader.nextDouble()
+                                                    "tr" -> entry.treatment = reader.nextString()
+                                                    "f" -> entry.food = reader.nextString()
+                                                    "d" -> entry.drink = reader.nextString()
+                                                    "e" -> entry.extra = reader.nextString()
+                                                }
+                                            }
+                                            7 -> readObjectArray(reader){
+                                                name,entry ->
+                                                when(name) {
+                                                    "t" -> entry.timestamp = reader.nextLong()
+                                                    "te" -> entry.endTimestamp = reader.nextLong()
                                                     "s" -> entry.sugarLevel = reader.nextInt()
                                                     "w" -> entry.weight = reader.nextInt()
                                                     "i" -> entry.insulin = reader.nextDouble()

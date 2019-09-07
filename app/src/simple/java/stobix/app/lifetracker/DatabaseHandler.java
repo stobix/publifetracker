@@ -130,6 +130,21 @@ public class DatabaseHandler {
         }
     };
 
+    // 7->8: added an end date column
+
+    final static Migration sugarMig7_8 = new Migration(7,8) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.beginTransaction();
+            try{
+                database.execSQL("alter table sugar_entries add column end_timestamp integer default null");
+                database.setTransactionSuccessful();
+            } finally {
+                database.endTransaction();
+            }
+        }
+    };
+
     public static SugarEntryDatabase buildSugarDatabase(Context ctx){
         return Room.databaseBuilder(
                 ctx,
@@ -141,6 +156,7 @@ public class DatabaseHandler {
                 .addMigrations(sugarMig4_5)
                 .addMigrations(sugarMig5_6)
                 .addMigrations(sugarMig6_7)
+                .addMigrations(sugarMig7_8)
                 .build();
     }
 }

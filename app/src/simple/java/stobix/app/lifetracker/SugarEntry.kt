@@ -14,6 +14,12 @@ private fun Parcel.writeNullableInt(i:Int?) =
 private fun Parcel.readNullableInt()=
         nullableReaderWrapper { readInt() }
 
+private fun Parcel.writeNullableLong(i:Long?) =
+        nullableWriterWrapper(i) {this.writeLong(it)}
+
+private fun Parcel.readNullableLong()=
+        nullableReaderWrapper { readLong() }
+
 private fun Parcel.writeNullableDouble(d:Double?) =
     nullableWriterWrapper(d) { writeDouble(it) }
 
@@ -49,6 +55,7 @@ private fun <A> Parcel.nullableReaderWrapper(fn:()->A) =
     */
 data class SugarEntry constructor(
         @PrimaryKey @ColumnInfo(name = "timestamp", typeAffinity = INTEGER) var timestamp: Timestamp=0,
+        @ColumnInfo(name="end_timestamp") var endTimestamp: Timestamp?=null,
         @ColumnInfo(name = "sugar") var sugarLevel: Int?=null,
         @ColumnInfo(name = "extra") var extra: String?=null,
         @ColumnInfo(name = "weight") var weight: Int?=null,
@@ -66,6 +73,7 @@ data class SugarEntry constructor(
     // IMPORTANT: These calls need to be in the same order as in writeToParcel below!
     private constructor(parcel: Parcel) : this(
             parcel.readLong(), // timestamp
+            parcel.readNullableLong(), // end timestamp
             parcel.readNullableInt(), // sugar
             parcel.readString(), // extra
             parcel.readNullableInt(), // weight
@@ -81,6 +89,7 @@ data class SugarEntry constructor(
     // Parcel function
     override fun writeToParcel(parcel: Parcel, i: Int) {
         parcel.writeLong(timestamp)
+        parcel.writeNullableLong(endTimestamp)
         parcel.writeNullableInt(sugarLevel)
         parcel.writeString(extra)
         parcel.writeNullableInt(weight)
@@ -103,7 +112,8 @@ data class SugarEntry constructor(
     infix fun sameAs(other:Any?) = when(other){
         is SugarEntry ->
             this.timestamp == other.timestamp
-            && this sameValuesAs other
+                    && (if(this.endTimestamp!=null) this.endTimestamp == other.endTimestamp else true)
+                    && this sameValuesAs other
         else ->
                 false
     }

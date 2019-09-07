@@ -25,17 +25,26 @@ class SugarEntryTableDataAdapter(
 
     override fun getCellView(rowIndex: Int, columnIndex: Int, parentView: ViewGroup): View {
         val currRow = getRowData(rowIndex)
+        val formatString = resources.getString(R.string.dateTimeFormat)
         return when (columnIndex) {
             0 -> {
-                val formatString = resources.getString(R.string.dateTimeFormat)
-                val myDate = Date(currRow.timestamp)
-                val myDateString = DateFormat.format(formatString, myDate).toString()
-                renderString(myDateString)
+                val startDate = Date(currRow.timestamp)
+                val startString = DateFormat.format(formatString, startDate).toString()
+                val totalString = currRow.endTimestamp?.let{
+                    val date = Date(it)
+                    "$startString -\n"+DateFormat.format(formatString,date).toString()
+                } ?: startString
+                renderString(totalString)
             }
 
             1 ->
                 if((context as MainActivity).displaysListIcons())
                     renderStringsWithIcons(
+                            /*R.drawable.datetime_icon pairedIfDefined currRow.endTimestamp?.let{
+                                val date = Date(it)
+                                DateFormat.format(formatString,date).toString()
+                            }
+                            ,*/
                             R.drawable.blood_sugar_icon pairedIfDefined currRow.sugarLevel?.let { String.format("%.1f mmol/l", it / 10f)}
                             ,
                             R.drawable.weight_icon pairedIfDefined currRow.weight?.let { String.format("%.1f kg", it / 10f) }

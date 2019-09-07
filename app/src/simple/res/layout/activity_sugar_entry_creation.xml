@@ -7,68 +7,101 @@
     android:layout_height="match_parent">
 
 
-    <!-- date -->
+    <!-- start date -->
 
     <TextView
-        android:id="@+id/entryCreatorDateLabel"
+        android:id="@+id/entryCreatorStartTimeLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:labelFor="@id/entryCreatorDate"
-        android:text="@string/input_date"
+        android:text="@string/input_start_date"
+        android:visibility="visible"
         app:layout_constraintStart_toStartOf="parent"
-        android:visibility="gone"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorDate" />
 
     <EditText
         android:id="@+id/entryCreatorDate"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:clickable="true"
         android:ems="10"
         android:focusable="false"
         android:inputType="none"
         android:singleLine="true"
         android:text="@string/input_date"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/entryCreatorDateLabel"
+        app:layout_constraintEnd_toStartOf="@+id/entryCreatorTime"
+        app:layout_constraintStart_toEndOf="@+id/entryCreatorStartTimeLabel"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="KeyboardInaccessibleWidget,TextFields" />
-
-    <!-- time -->
-
-    <TextView
-        android:id="@+id/entryCreatorTimeLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:labelFor="@+id/entryCreatorTime"
-        android:text="@string/input_time"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/entryCreatorTime" />
 
     <EditText
         android:id="@+id/entryCreatorTime"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:clickable="true"
         android:ems="10"
         android:focusable="false"
         android:inputType="none"
         android:singleLine="true"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/entryCreatorDate"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="KeyboardInaccessibleWidget"
+        tools:text="Time" />
+
+    <!-- end date -->
+
+    <TextView
+        android:id="@+id/entryCreatorEndTimeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:labelFor="@id/entryCreatorEndDate"
+        android:text="@string/input_end_date"
         android:visibility="gone"
-        app:layout_constraintStart_toStartOf="@+id/entryCreatorDate"
-        app:layout_constraintTop_toBottomOf="@+id/entryCreatorDate"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/entryCreatorEndDate" />
+
+    <EditText
+        android:id="@+id/entryCreatorEndDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:clickable="true"
+        android:ems="10"
+        android:focusable="false"
+        android:inputType="none"
+        android:singleLine="true"
+        android:text="@string/input_end_date"
+        app:layout_constraintEnd_toStartOf="@+id/entryCreatorEndTime"
+        app:layout_constraintStart_toEndOf="@+id/entryCreatorEndTimeLabel"
+        app:layout_constraintTop_toBottomOf="@id/entryCreatorDate"
+        tools:ignore="KeyboardInaccessibleWidget,TextFields" />
+
+    <EditText
+        android:id="@+id/entryCreatorEndTime"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:clickable="true"
+        android:ems="10"
+        android:focusable="false"
+        android:inputType="none"
+        android:singleLine="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/entryCreatorEndDate"
+        app:layout_constraintTop_toBottomOf="@id/entryCreatorDate"
         tools:ignore="KeyboardInaccessibleWidget"
         tools:text="Time" />
 
@@ -83,7 +116,6 @@
         android:layout_marginTop="8dp"
         android:labelFor="@+id/entryCreatorWeight"
         android:text="@string/input_weight"
-        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorWeight" />
 
@@ -98,12 +130,11 @@
         android:inputType="numberDecimal"
         android:selectAllOnFocus="false"
         android:singleLine="true"
-        android:visibility="gone"
         android:textColor="?android:textColorPrimary"
         android:nextFocusDown="@+id/entryCreatorSugar"
         app:layout_constraintStart_toEndOf="@+id/entryCreatorWeightLabel"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/entryCreatorTime"
+        app:layout_constraintTop_toBottomOf="@+id/entryCreatorEndDate"
         tools:text="@string/input_weight"
         android:focusable="true" />
 
@@ -119,7 +150,6 @@
         android:layout_marginTop="8dp"
         android:labelFor="@+id/entryCreatorSugar"
         android:text="@string/input_sugar"
-        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorSugar" />
 
@@ -132,7 +162,6 @@
         android:layout_marginTop="8dp"
         android:minWidth="60dp"
         android:clickable="true"
-        android:visibility="gone"
         android:ems="10"
         android:focusable="true"
         android:inputType="numberDecimal"
@@ -153,7 +182,6 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:labelFor="@+id/entryCreatorInsulin"
-        android:visibility="gone"
         android:text="@string/input_treatment"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorInsulin" />
@@ -170,7 +198,6 @@
         android:clickable="true"
         android:ems="10"
         android:focusable="true"
-        android:visibility="gone"
         android:inputType="numberDecimal"
         android:selectAllOnFocus="false"
         android:singleLine="true"
@@ -190,7 +217,6 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:labelFor="@+id/entryCreatorPills"
-        android:visibility="gone"
         android:text="@string/input_treatment_pills"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorPills" />
@@ -207,7 +233,6 @@
         android:clickable="true"
         android:ems="10"
         android:focusable="true"
-        android:visibility="gone"
         android:inputType="textAutoComplete"
         android:selectAllOnFocus="false"
         android:singleLine="true"
@@ -228,7 +253,6 @@
         android:layout_marginTop="8dp"
         android:labelFor="@+id/entryCreatorFood"
         android:text="@string/input_food"
-        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorFood" />
 
@@ -246,7 +270,6 @@
         app:layout_constraintStart_toEndOf="@+id/entryCreatorFoodLabel"
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorPills"
         tools:clickable="false"
-        android:visibility="gone"
         tools:text="@string/input_food" />
 
     <!-- drink -->
@@ -259,7 +282,6 @@
         android:layout_marginTop="8dp"
         android:labelFor="@+id/entryCreatorDrink"
         android:text="@string/input_drink"
-        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorDrink" />
 
@@ -273,7 +295,6 @@
         android:inputType="text"
         android:nextFocusForward="@+id/entryCreatorExtra"
         android:selectAllOnFocus="false"
-        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/entryCreatorDrinkLabel"
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorFood"
@@ -290,7 +311,6 @@
         android:layout_marginTop="8dp"
         android:labelFor="@+id/entryCreatorExtra"
         android:text="@string/input_extra"
-        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorExtra" />
 
@@ -301,7 +321,6 @@
         app:layout_constraintEnd_toEndOf="@+id/entryCreatorExtra"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorExtra"
         app:srcCompat="@android:drawable/ic_input_delete"
-        android:visibility="gone"
         tools:ignore="ContentDescription" />
 
     <EditText
@@ -314,7 +333,6 @@
         android:inputType="text"
         android:imeOptions="actionDone"
         android:selectAllOnFocus="false"
-        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/entryCreatorExtraLabel"
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorDrink"

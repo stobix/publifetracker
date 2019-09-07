@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -415,21 +414,31 @@ public class MainActivity extends AppCompatActivity
 
 
 
-        public void showDatePicker(int year,int month,int day) {
+        public void showDatePicker(int token, DateHandler date) {
+            showDatePicker(token,date.getYear(),date.getMonth(),date.getDay());
+        }
+
+        public void showDatePicker(int token, int year,int month,int day) {
             DatePickerFragment datePickerFragment=new DatePickerFragment();
             Bundle b = new Bundle();
             b.putInt("year",year);
             b.putInt("month",month);
             b.putInt("day",day);
+            b.putInt("token",token);
             datePickerFragment.setArguments(b);
             datePickerFragment.show(getSupportFragmentManager(), "datePicker");
         }
 
-        public void showTimePicker(int hour, int minute) {
+        public void showTimePicker(int token, DateHandler date) {
+            showTimePicker(token,date.getHour(),date.getMinute());
+        }
+
+        public void showTimePicker(int token, int hour, int minute) {
             TimePickerFragment t = new TimePickerFragment();
             Bundle b = new Bundle();
             b.putInt("hour",hour);
             b.putInt("minute",minute);
+            b.putInt("token",token);
             t.setArguments(b);
             t.show(getSupportFragmentManager(), "timePicker");
         }
@@ -439,12 +448,12 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        public void handleDate(int year, int month, int day) {
-            creationActivity().handleDate(year,month,day);
+        public void handleDate(int token, int year, int month, int day) {
+            creationActivity().handleDate(token, year,month,day);
         }
         @Override
-        public void handleTime(int hour, int minute) {
-            creationActivity().handleTime(hour, minute) ;
+        public void handleTime(int token, int hour, int minute) {
+            creationActivity().handleTime(token, hour, minute) ;
         }
 
         // Used to glue together all pieces of code that handles import/export of the database to/from a JSON file

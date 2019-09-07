@@ -33,10 +33,13 @@ open class SugarEntryCreationActivity
 {
 
     private var date: DateHandler = DateHandler()
+    private var endDate: DateHandler? = null
     private var alreadyDefinedEntry: Boolean = false
     private var originalTimestamp: StartingTimestamp = 0
-    private lateinit var dateView: TextView
-    private lateinit var timeView: TextView
+    private lateinit var startDateView: TextView
+    private lateinit var startTimeView: TextView
+    private lateinit var endDateView: TextView
+    private lateinit var endTimeView: TextView
     private lateinit var sugarView: TextView
     private lateinit var weightView: TextView
     private lateinit var entry: SugarEntry
@@ -53,7 +56,11 @@ open class SugarEntryCreationActivity
         alreadyDefinedEntry = arguments.getBoolean("EditCurrent")
         if(alreadyDefinedEntry) {
             entry=arguments.getParcelable("entry")
-            date.timestamp= entry.timestamp
+            date.timestamp = entry.timestamp
+            entry.endTimestamp?.let {ts ->
+                endDate = DateHandler()
+                endDate?.timestamp=ts
+            }
             originalTimestamp = entry.timestamp
             d( "SugarEntry create",
                     "already defined; timestamp:${entry.timestamp}, sugar: ${entry.sugarLevel}, extra: ${entry.timestamp}"
@@ -71,8 +78,10 @@ open class SugarEntryCreationActivity
 
         v ?:throw Error("could not create view")
 
-        dateView= v.findViewById(R.id.entryCreatorDate)
-        timeView= v.findViewById(R.id.entryCreatorTime)
+        startDateView= v.findViewById(R.id.entryCreatorDate)
+        startTimeView= v.findViewById(R.id.entryCreatorTime)
+        endDateView= v.findViewById(R.id.entryCreatorEndDate)
+        endTimeView= v.findViewById(R.id.entryCreatorEndTime)
         sugarView= v.findViewById(R.id.entryCreatorSugar)
         weightView = v.findViewById(R.id.entryCreatorWeight)
         foodView = v.findViewById(R.id.entryCreatorFood)
@@ -176,8 +185,9 @@ open class SugarEntryCreationActivity
 
 
 
-        R.id.entryCreatorToggleDateTime togglingWithoutFocus (
-                (dateView withLabel R.id.entryCreatorDateLabel) + (timeView withLabel R.id.entryCreatorTimeLabel)
+        R.id.entryCreatorToggleDateTime to entry.endTimestamp togglingWithoutFocus (
+                // (startDateView withLabel R.id.entryCreatorDateLabel) + (startTimeView withLabel R.id.entryCreatorTimeLabel)
+                (endDateView withLabel R.id.entryCreatorEndTimeLabel) + (endTimeView withLabel R.id.entryCreatorStartTimeLabel)
                 )
 
         R.id.entryCreatorWeightToggle to entry.weight toggling ( weightView withLabel R.id.entryCreatorWeightLabel )
@@ -196,8 +206,17 @@ open class SugarEntryCreationActivity
 
         val dateText="%d-%02d-%02d".format(date.year,date.month+1,date.day)
         val timeText="%02d:%02d".format(date.hour,date.minute)
-        dateView.text=dateText
-        timeView.text=timeText
+        startDateView.text=dateText
+        startTimeView.text=timeText
+        endDate?.let{
+            val endDateText = "%d-%02d-%02d".format(it.year,it.month+1,it.day)
+            val endTimeText="%02d:%02d".format(it.hour,it.minute)
+            endDateView.text=endDateText
+            endTimeView.text=endTimeText
+        }?:let{
+            endDateView.text="---------"
+            endTimeView.text="---------"
+        }
 
         val buttonAdd: Button = v.findViewById(R.id.entrySubmitAction2)
         val buttonAddClose: Button =v.findViewById(R.id.entrySubmitAction1)
@@ -219,8 +238,12 @@ open class SugarEntryCreationActivity
             buttonAdd.visibility=View.VISIBLE
         }
 
-        dateView.setOnClickListener { (activity as MainActivity).showDatePicker(date.year,date.month,date.day) }
-        timeView.setOnClickListener { (activity as MainActivity).showTimePicker(date.hour,date.minute) }
+        startDateView.setOnClickListener { (activity as MainActivity).showDatePicker(PickedType.start.ordinal,date) }
+        startTimeView.setOnClickListener { (activity as MainActivity).showTimePicker(PickedType.start.ordinal,date) }
+
+        endDateView.setOnClickListener { (activity as MainActivity).showDatePicker(PickedType.end.ordinal,endDate?:DateHandler()) }
+
+        endTimeView.setOnClickListener { (activity as MainActivity).showTimePicker(PickedType.end.ordinal,endDate?:DateHandler()) }
 
         buttonAdd.setOnClickListener { onSubmit() }
         buttonAddClose.setOnClickListener { onSubmitAndClose() }
@@ -229,6 +252,8 @@ open class SugarEntryCreationActivity
         return v
 
     }
+
+    enum class PickedType {start,end}
 
 
     // Sending a full SugarEntry since I'm not sure what fields it will contain in the future.
@@ -266,6 +291,7 @@ open class SugarEntryCreationActivity
     // Handles the submission of the entered data, either creating a new SugarEntry or updating the existing one.
     private fun handleSubmission(){
         entry.timestamp=date.timestamp
+        entry.endTimestamp=endDate?.timestamp
         entry.sugarLevel = sugarView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt()
         entry.weight = weightView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt()
         entry.extra = extraView.text?.toString().nullIfEmpty()
@@ -283,18 +309,40 @@ open class SugarEntryCreationActivity
     }
 
     // Called by the main activity when the user changes the date.
-    fun handleDate(year: Int, month: Int, day: Int) {
-        date.setDate(year,month,day)
-        // Calendars use a 0-indexed gregorian/julian month for some reason!
-        val dateText="%d-%02d-%02d".format(year,month+1,day)
-        dateView.text=dateText
+    fun handleDate(token: Int, year: Int, month: Int, day: Int) {
+        when(token){
+            PickedType.start.ordinal ->{
+                date.setDate(year,month,day)
+                // Calendars use a 0-indexed gregorian/julian month for some reason!
+                // TODO either change this or the SugarEntryTableDataAdapter way of formatting dates
+                val dateText="%d-%02d-%02d".format(year,month+1,day)
+                startDateView.text=dateText
+            }
+                PickedType.end.ordinal ->{
+                    endDate = endDate ?: DateHandler()
+                    endDate?.setDate(year,month,day)
+                    // Calendars use a 0-indexed gregorian/julian month for some reason!
+                    val dateText="%d-%02d-%02d".format(year,month+1,day)
+                    endDateView.text=dateText
+                }
+        }
     }
 
     // Called by the main activity when the user changes the time.
-    fun handleTime(hour: Int, minute: Int) {
-        date.setTime(hour,minute)
-        val timeText= "%02d:%02d".format(hour,minute)
-        timeView.text=timeText
+    fun handleTime(token: Int, hour: Int, minute: Int) {
+        when(token){
+            PickedType.start.ordinal ->{
+                date.setTime(hour,minute)
+                val timeText= "%02d:%02d".format(hour,minute)
+                startTimeView.text=timeText
+            }
+            PickedType.end.ordinal ->{
+                endDate = endDate ?: DateHandler()
+                endDate?.setTime(hour,minute)
+                val timeText= "%02d:%02d".format(hour,minute)
+                endTimeView.text=timeText
+            }
+        }
     }
 
     companion object Creator{

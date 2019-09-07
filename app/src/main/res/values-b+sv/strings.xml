@@ -8,6 +8,8 @@
     <string name="input_sugar">Socker</string>
     <string name="input_extra">Annat</string>
     <string name="dateTimeFormat">yyyy dd/MM kk:mm</string>
+    <string name="dateFormat">yyyy dd/MM</string>
+    <string name="timeFormat">kk:mm</string>
     <string name="creation_dialog_button_add_close">Lägg till och stäng</string>
     <string name="input_time">Tid</string>
     <string name="creation_dialog_button_close">Stäng</string>
@@ -47,4 +49,6 @@
     <string name="show_hide_icons">Visa/dölj ikoner</string>
     <string name="title_activity_color_editor">Color Editor</string>
     <string name="input_treatment_pills">Övrig behandling</string>
+    <string name="input_start_date">Start</string>
+    <string name="input_end_date">Slut</string>
 </resources>
