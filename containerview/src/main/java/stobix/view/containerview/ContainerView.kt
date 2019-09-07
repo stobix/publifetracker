@@ -12,10 +12,7 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.TextView
 import stobix.utils.kotlin.Colour
-import stobix.utils.kotlinExtensions.folding
-import stobix.utils.kotlinExtensions.map
-import stobix.utils.kotlinExtensions.onFirst
-import stobix.utils.kotlinExtensions.to
+import stobix.utils.kotlinExtensions.*
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.Float as XCoord
@@ -119,6 +116,13 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
             field = value
         }
 
+    /**
+     * Whether to draw the commas
+     */
+    var drawCommas = false
+        set(value) = update {
+            field = value
+        }
 
     private fun update(f: () -> Unit) {
         f()
@@ -334,7 +338,7 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
             } ?: 0f
 
     private fun IntContent.measureWidth() = textPaint.measureText(this.show()) + 2 * containerBorderWidth
-    private fun StringContent.measureWidth() = textPaint.measureText(this.show()) + 2 * containerBorderWidth
+    private fun StringContent.measureWidth() = textPaint.measureText(this.show()) + 4 * containerBorderWidth
 
     /**
      * @return false if the first value has not reached the second value (aka "max")
@@ -375,7 +379,10 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
     private fun ContainerContent.measureContainer(recurLevel: Pair<Int, Int>) =
             if (recurLevel.notMax())
                 this.value.measureWidth(recurLevel onFirst { it + 1 }) +
-                        ((this.value?.contents?.size ?: 1) - 1) * textPaint.measureText(",")
+                      if(drawCommas)
+                          ((this.value?.contents?.size ?: 1) - 1) * textPaint.measureText(",")
+                      else
+                          0f
             else 0f
 
 
@@ -458,12 +465,12 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
             val iMax = container.contents.size
             val nextPos = container.contents.foldIndexed(pos.first) { i, acc, c ->
                 (acc + when (c) {
-                    is IntContent -> this.draw(c, pos.onFirst { acc }, recurLevel)
-                    is StringContent -> this.draw(c, pos.onFirst { acc }, recurLevel)
+                    is IntContent -> this.draw(c, pos.onFirst { acc }, recurLevel, colors)
+                    is StringContent -> this.draw(c, pos.onFirst { acc }, recurLevel, colors)
                     is ContainerContent -> this.draw(c, pos.onFirst { acc }, recurLevel, colors)
                     else -> 0f
                 }).let {
-                    it + if (i < iMax - 1)
+                    it + if (drawCommas && i < iMax - 1)
                         this.drawTextBetter(",",  it to pos.third ,  recurLevel = recurLevel)
                     else 0f
                 }
@@ -481,7 +488,7 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
      * @param pos the start upper left corner of the container
      * @param recurLevel the current recursion level
      */
-    private fun Canvas.draw(content: IntContent, pos: Triple<Float, Float, Float>, recurLevel: Pair<Int, Int> ): Float {
+    private fun Canvas.draw(content: IntContent, pos: Triple<Float, Float, Float>, recurLevel: Pair<Int, Int>, colors: Colour.ColorRange ): Float {
         val string = content.show()
         Log.d("drawing", "${indentationStr(recurLevel)}>>>(int) $string $pos")
         this.drawTextBetter(string, addBW(pos.first) to pos.third, recurLevel = recurLevel)
@@ -496,10 +503,11 @@ open class ContainerView(ctx: Context, attrs: AttributeSet? = null, defStyleAttr
      * @param pos the start upper left corner of the container
      * @param recurLevel the current recursion level
      */
-    private fun Canvas.draw(content: StringContent, pos: Triple<Float, Float, Float>, recurLevel: Pair<Int, Int>): Float {
+    private fun Canvas.draw(content: StringContent, pos: Triple<Float, Float, Float>, recurLevel: Pair<Int, Int>, colors: Colour.ColorRange): Float {
         val string = content.show()
         Log.d("drawing", "${indentationStr(recurLevel)}>>>(string) $string $pos")
-        drawTextBetter(string, addBW(pos.first) to pos.third, recurLevel = recurLevel)
+        drawContainerBorder(string,(pos.first to pos.second).map(::addBW),recurLevel, color = colors[recurLevel.first].color)
+        drawTextBetter(string, (::addBW o ::addBW)(pos.first) to pos.third, recurLevel = recurLevel)
         val inc = content.measureWidth()
         Log.d("drawing", "${indentationStr(recurLevel)}<<<(string) $pos += ${inc to 0}")
         return inc
