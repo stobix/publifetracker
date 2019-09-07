@@ -1,6 +1,10 @@
 package stobix.utils.kotlinExtensions
 
+import android.os.Build
+import android.support.annotation.RequiresApi
 import java.io.Serializable
+import java.util.function.BiFunction
+import java.util.function.Function
 
 /**
  * Makes a [Triple] from a [Pair]
@@ -103,14 +107,49 @@ fun <A, B, C, D> Quadruple<A, B, C, D>.flip1() = second to first to third to fou
 fun <A, B, C, D> Quadruple<A, B, C, D>.flip2() = first to third to second to fourth
 fun <A, B, C, D> Quadruple<A, B, C, D>.flip3() = first to second to fourth to third
 
-infix fun <A, B, C> Pair<A, B>.onFirst(f: (A) -> C): Pair<C, B> = f(first) to second
-infix fun <A, B, C> Pair<A, B>.onSecond(f: (B) -> C): Pair<A, C> = flip().onFirst(f).flip()
+fun <A, B, C, D, E> Quintuple<A, B, C, D, E>.flip1() = second to first to third to fourth to fifth
+fun <A, B, C, D, E> Quintuple<A, B, C, D, E>.flip2() = first to third to second to fourth to fifth
+fun <A, B, C, D, E> Quintuple<A, B, C, D, E>.flip3() = first to second to fourth to third to fifth
+fun <A, B, C, D, E> Quintuple<A, B, C, D, E>.flip4() = first to second to third to fifth to fourth
 
-infix fun <A, B, C, D> Triple<A, B, C>.onFirst(f: (A) -> D): Triple<D, B, C> = f(first) to second to third
-infix fun <A, B, C, D> Triple<A, B, C>.onSecond(f: (B) -> D): Triple<A, D, C> = flip1().onFirst(f).flip1()
-infix fun <A, B, C, D> Triple<A, B, C>.onThird(f: (C) -> D): Triple<A, B, D> = flip2().onSecond(f).flip2()
+fun <A, B, C, D, E, F> Sextuple<A, B, C, D, E, F>.flip1() = second to first to third to fourth to fifth to sixth
+fun <A, B, C, D, E, F> Sextuple<A, B, C, D, E, F>.flip2() = first to third to second to fourth to fifth to sixth
+fun <A, B, C, D, E, F> Sextuple<A, B, C, D, E, F>.flip3() = first to second to fourth to third to fifth to sixth
+fun <A, B, C, D, E, F> Sextuple<A, B, C, D, E, F>.flip4() = first to second to third to fifth to fourth to sixth
+fun <A, B, C, D, E, F> Sextuple<A, B, C, D, E, F>.flip5() = first to second to third to fourth to sixth to fifth
 
-infix fun <A, B, C, E, D> Quadruple<A, B, C, D>.onFirst(f: (A) -> E): Quadruple<E, B, C, D> = f(first) to second to third to fourth
-infix fun <A, B, C, E, D> Quadruple<A, B, C, D>.onSecond(f: (B) -> E): Quadruple<A, E, C, D> = flip1().onFirst(f).flip1()
-infix fun <A, B, C, E, D> Quadruple<A, B, C, D>.onThird(f: (C) -> E): Quadruple<A, B, E, D> = flip2().onSecond(f).flip2()
-infix fun <A, B, C, E, D> Quadruple<A, B, C, D>.onFourth(f: (D) -> E): Quadruple<A, B, C, E> = flip3().onThird(f).flip3()
+infix fun <A, B, X> Pair<A, B>.onFirst(f: (A) -> X):  Pair<X, B> = f(first) to second
+infix fun <A, B, X> Pair<A, B>.onSecond(f: (B) -> X): Pair<A, X> = flip().onFirst(f).flip()
+
+infix fun <A, B, C, X> Triple<A, B, C>.onFirst(f: (A) -> X):  Triple<X, B, C> = f(first) to second to third
+infix fun <A, B, C, X> Triple<A, B, C>.onSecond(f: (B) -> X): Triple<A, X, C> = flip1().onFirst(f).flip1()
+infix fun <A, B, C, X> Triple<A, B, C>.onThird(f: (C) -> X):  Triple<A, B, X> = flip2().onSecond(f).flip2()
+
+infix fun <A, B, C, D, X> Quadruple<A, B, C, D>.onFirst(f: (A) -> X):  Quadruple<X, B, C, D> = f(first) to second to third to fourth
+infix fun <A, B, C, D, X> Quadruple<A, B, C, D>.onSecond(f: (B) -> X): Quadruple<A, X, C, D> = flip1().onFirst(f).flip1()
+infix fun <A, B, C, D, X> Quadruple<A, B, C, D>.onThird(f: (C) -> X):  Quadruple<A, B, X, D> = flip2().onSecond(f).flip2()
+infix fun <A, B, C, D, X> Quadruple<A, B, C, D>.onFourth(f: (D) -> X): Quadruple<A, B, C, X> = flip3().onThird(f).flip3()
+
+infix fun <A, B, C, E, D, X> Quintuple<A, B, C, D, E>.onFirst(f: (A) -> X):  Quintuple<X, B, C, D, E> = f(first) to second to third to fourth to fifth
+infix fun <A, B, C, E, D, X> Quintuple<A, B, C, D, E>.onSecond(f: (B) -> X): Quintuple<A, X, C, D, E> = flip1().onFirst(f).flip1()
+infix fun <A, B, C, E, D, X> Quintuple<A, B, C, D, E>.onThird(f: (C) -> X):  Quintuple<A, B, X, D, E> = flip2().onSecond(f).flip2()
+infix fun <A, B, C, E, D, X> Quintuple<A, B, C, D, E>.onFourth(f: (D) -> X): Quintuple<A, B, C, X, E> = flip3().onThird(f).flip3()
+infix fun <A, B, C, E, D, X> Quintuple<A, B, C, D, E>.onFifth(f: (E) -> X):  Quintuple<A, B, C, D, X> = flip4().onFourth(f).flip4()
+
+infix fun <A, B, C, D, E, F, X> Sextuple<A, B, C, D, E, F>.onFirst(f: (A) -> X):  Sextuple<X, B, C, D, E, F> = f(first) to second to third to fourth to fifth to sixth
+infix fun <A, B, C, D, E, F, X> Sextuple<A, B, C, D, E, F>.onSecond(f: (B) -> X): Sextuple<A, X, C, D, E, F> = flip1().onFirst(f).flip1()
+infix fun <A, B, C, D, E, F, X> Sextuple<A, B, C, D, E, F>.onThird(f: (C) -> X):  Sextuple<A, B, X, D, E, F> = flip2().onSecond(f).flip2()
+infix fun <A, B, C, D, E, F, X> Sextuple<A, B, C, D, E, F>.onFourth(f: (D) -> X): Sextuple<A, B, C, X, E, F> = flip3().onThird(f).flip3()
+infix fun <A, B, C, D, E, F, X> Sextuple<A, B, C, D, E, F>.onFifth(f: (E) -> X):  Sextuple<A, B, C, D, X, F> = flip4().onFourth(f).flip4()
+infix fun <A, B, C, D, E, F, X> Sextuple<A, B, C, D, E, F>.onSixth(f: (F) -> X):  Sextuple<A, B, C, D, E, X> = flip5().onFifth(f).flip5()
+
+infix fun <A,B,X> ((B) -> X).o(fab: (A) -> B) = { a: A -> this(fab(a)) }
+
+infix fun <A,B,C,D> ((C) -> D).o(fabc: (A,B) -> C) = { a: A, b: B -> this(fabc(a, b)) }
+
+infix fun <A,B,C,D> ((B,C) -> D).o(fab: (A) -> B) = { a: A, c: C -> this(fab(a), c) }
+
+
+
+@RequiresApi(Build.VERSION_CODES.N)
+infix fun <A,B,C,X> Function<C,X>.o(fabc: BiFunction<A,B,C>) = { a: A -> { b: B -> this.apply(fabc.apply(a,b))}}
