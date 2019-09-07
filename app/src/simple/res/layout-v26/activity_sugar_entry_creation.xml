@@ -37,7 +37,7 @@
         app:layout_constraintEnd_toStartOf="@+id/entryCreatorTime"
         app:layout_constraintStart_toEndOf="@+id/entryCreatorStartTimeLabel"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="Autofill,KeyboardInaccessibleWidget,TextFields" />
+        tools:ignore="KeyboardInaccessibleWidget,TextFields" />
 
     <EditText
         android:id="@+id/entryCreatorTime"
@@ -53,7 +53,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/entryCreatorDate"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="Autofill,KeyboardInaccessibleWidget,LabelFor"
+        tools:ignore="KeyboardInaccessibleWidget"
         tools:text="Time" />
 
     <!-- end date -->
@@ -82,11 +82,12 @@
         android:focusable="false"
         android:inputType="none"
         android:singleLine="true"
-        android:text="End"
+        android:text="@string/input_end_date"
         app:layout_constraintEnd_toStartOf="@+id/entryCreatorEndTime"
         app:layout_constraintStart_toEndOf="@+id/entryCreatorEndTimeLabel"
         app:layout_constraintTop_toBottomOf="@id/entryCreatorDate"
-        tools:ignore="Autofill,HardcodedText,KeyboardInaccessibleWidget,TextFields" />
+        tools:ignore="KeyboardInaccessibleWidget,TextFields"
+        android:importantForAutofill="no" />
 
     <EditText
         android:id="@+id/entryCreatorEndTime"
