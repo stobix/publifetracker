@@ -21,10 +21,12 @@ import stobix.utils.kotlinExtensions.to
  * The list of views that are hidden when the views in HiddenList are shown
  */
 typealias ShownList = List<View>
+
 /**
  * The list of views that are hidden when the views in ShownList are shown
  */
 typealias HiddenList = List<View>
+
 /**
  * An ID to a Resource
  */
@@ -118,6 +120,10 @@ open class SugarEntryCreationActivity
             this.setBackgroundResource(if (b) R.drawable.icon_back_circle else R.drawable.icon_back_circle_inactive)
         }
 
+        fun ResourceID.toggle() {
+            val view = v.findViewById<ImageView>(this)
+            view.click()
+        }
 
         // Make the resource run the listener function on each click on the resource, with a boolean toggled each time.
         infix fun <A> Pair<ResourceID, A?>.togglingWithFun(listener: (Boolean) -> Unit) {
@@ -219,6 +225,8 @@ open class SugarEntryCreationActivity
         val timeText = "%02d:%02d".format(date.hour, date.minute)
         startDateView.text = dateText
         startTimeView.text = timeText
+        setEndTimes(endDate)
+        /*
         endDate?.let {
             val endDateText = "%d-%02d-%02d".format(it.year, it.month + 1, it.day)
             val endTimeText = "%02d:%02d".format(it.hour, it.minute)
@@ -228,9 +236,11 @@ open class SugarEntryCreationActivity
             endDateView.text = "---------"
             endTimeView.text = "---------"
         }
+        */
 
         val buttonAdd: Button = v.findViewById(R.id.entrySubmitAction2)
         val buttonAddClose: Button = v.findViewById(R.id.entrySubmitAction1)
+
 
 
         if (alreadyDefinedEntry) {
@@ -264,10 +274,38 @@ open class SugarEntryCreationActivity
         buttonAdd.setOnClickListener { onSubmit() }
         buttonAddClose.setOnClickListener { onSubmitAndClose() }
         buttonClearEndTime.setOnClickListener {
+            setEndTimes(null)
             endDate = null
-            endDateView.text = "------"
-            endTimeView.text = "------"
         }
+
+        val actionSleep: ImageView = v.findViewById(R.id.entryCreatorSleepAction)
+
+        actionSleep.setOnClickListener {
+            val slepStr = getString(R.string.EntryCreatorSleepString)
+            extraView.text = slepStr
+            onSubmitAndClose()
+        }
+        actionSleep.visibility = if (entry.extra == null) View.VISIBLE else View.GONE
+
+        fun ResourceID.sleepStarInit(n: Int) {
+            v.findViewById<ImageView>(this).also {
+                val slepStr = getString(R.string.EntryCreatorSleepString)
+                it.setOnClickListener {
+                    extraView.text = "$slepStr: $n"
+                    setEndTimes(DateHandler())
+                    onSubmitAndClose()
+                }
+                it.visibility = if (entry.extra == slepStr) View.VISIBLE else View.GONE
+            }
+        }
+
+        R.id.entryCreatorSleepAction0.sleepStarInit(0)
+        R.id.entryCreatorSleepAction1.sleepStarInit(1)
+        R.id.entryCreatorSleepAction2.sleepStarInit(2)
+        R.id.entryCreatorSleepAction3.sleepStarInit(3)
+        R.id.entryCreatorSleepAction4.sleepStarInit(4)
+        R.id.entryCreatorSleepAction5.sleepStarInit(5)
+
 
         return v
 
@@ -374,11 +412,17 @@ open class SugarEntryCreationActivity
     /**
      *
      */
-    private fun setEndTimes(d: DateHandler){
-        val dateText = "%d-%02d-%02d".format(d.year, d.month + 1, d.day)
-        val timeText = "%02d:%02d".format(d.hour, d.minute)
-        endDateView.text = dateText
-        endTimeView.text = timeText
+    private fun setEndTimes(d: DateHandler?) {
+        endDate = d
+        endDate?.let {
+            val dateText = "%d-%02d-%02d".format(it.year, it.month + 1, it.day)
+            val timeText = "%02d:%02d".format(it.hour, it.minute)
+            endDateView.text = dateText
+            endTimeView.text = timeText
+        } ?: {
+            endDateView.text = "-------"
+            endTimeView.text = "-------"
+        }()
 
     }
 

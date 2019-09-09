@@ -51,4 +51,5 @@
     <string name="input_treatment_pills">Övrig behandling</string>
     <string name="input_start_date">Start</string>
     <string name="input_end_date">Slut</string>
+    <string name="EntryCreatorSleepString">Sömn</string>
 </resources>

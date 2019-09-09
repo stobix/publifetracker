@@ -50,4 +50,5 @@
     <string name="input_treatment_pills">Other treatment</string>
     <string name="input_start_date">Start</string>
     <string name="input_end_date">End</string>
+    <string name="EntryCreatorSleepString">Sleep</string>
 </resources>
