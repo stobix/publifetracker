@@ -347,9 +347,8 @@
         android:layout_height="28dp"
         android:layout_marginTop="8dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/entryCreatorExtra"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteX="8dp">
+        app:layout_constraintTop_toBottomOf="@id/entryCreationQuickActions">
 
         <ImageView
             android:id="@+id/entryCreatorToggleDateTime"
@@ -459,54 +458,63 @@
 
     </LinearLayout>
 
-    <!-- submit buttons -->
+    <!-- Quick actions -->
 
     <LinearLayout
         android:id="@+id/entryCreationQuickActions"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="28dp"
         android:layout_marginTop="16dp"
         android:layout_weight="1"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/entryCreatorButtonBar">
+        app:layout_constraintTop_toBottomOf="@+id/entryCreatorExtra">
 
         <ImageView
             android:id="@+id/entryCreatorSleepAction"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:layout_weight="1"
-            app:srcCompat="@android:drawable/btn_star_big_on" />
+            android:adjustViewBounds="false"
+            android:background="@drawable/icon_back_circle"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/zzz_icon" />
+
         <ImageView
             android:id="@+id/entryCreatorSleepAction0"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             app:srcCompat="@android:drawable/btn_star_big_on" />
+
         <ImageView
             android:id="@+id/entryCreatorSleepAction1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             app:srcCompat="@android:drawable/btn_star_big_on" />
+
         <ImageView
             android:id="@+id/entryCreatorSleepAction2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             app:srcCompat="@android:drawable/btn_star_big_on" />
+
         <ImageView
             android:id="@+id/entryCreatorSleepAction3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             app:srcCompat="@android:drawable/btn_star_big_on" />
+
         <ImageView
             android:id="@+id/entryCreatorSleepAction4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             app:srcCompat="@android:drawable/btn_star_big_on" />
+
         <ImageView
             android:id="@+id/entryCreatorSleepAction5"
             android:layout_width="wrap_content"
@@ -514,6 +522,8 @@
             android:layout_weight="1"
             app:srcCompat="@android:drawable/btn_star_big_on" />
     </LinearLayout>
+
+    <!-- submit buttons -->
 
     <Button
         android:id="@+id/entrySubmitAction1"
@@ -527,7 +537,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/entrySubmitAction2"
-        app:layout_constraintTop_toBottomOf="@id/entryCreationQuickActions" />
+        app:layout_constraintTop_toBottomOf="@id/entryCreatorButtonBar" />
 
     <Button
         android:id="@+id/entrySubmitAction2"
@@ -541,7 +551,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/entrySubmitAction1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/entryCreationQuickActions" />
+        app:layout_constraintTop_toBottomOf="@id/entryCreatorButtonBar" />
 
 
 
