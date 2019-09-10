@@ -8,33 +8,32 @@ import android.os.Parcel
 import android.os.Parcelable
 import stobix.utils.DateHandler
 
-private fun Parcel.writeNullableInt(i:Int?) =
-    nullableWriterWrapper(i) {this.writeInt(it)}
+private fun Parcel.writeNullableInt(i: Int?) =
+        nullableWriterWrapper(i) { this.writeInt(it) }
 
-private fun Parcel.readNullableInt()=
+private fun Parcel.readNullableInt() =
         nullableReaderWrapper { readInt() }
 
-private fun Parcel.writeNullableLong(i:Long?) =
-        nullableWriterWrapper(i) {this.writeLong(it)}
+private fun Parcel.writeNullableLong(i: Long?) =
+        nullableWriterWrapper(i) { this.writeLong(it) }
 
-private fun Parcel.readNullableLong()=
+private fun Parcel.readNullableLong() =
         nullableReaderWrapper { readLong() }
 
-private fun Parcel.writeNullableDouble(d:Double?) =
-    nullableWriterWrapper(d) { writeDouble(it) }
+private fun Parcel.writeNullableDouble(d: Double?) =
+        nullableWriterWrapper(d) { writeDouble(it) }
 
-private fun Parcel.readNullableDouble()=
+private fun Parcel.readNullableDouble() =
         nullableReaderWrapper { readDouble() }
 
-private fun <A> Parcel.nullableWriterWrapper(a:A?,fn:(A)->Unit) =
-    if (a != null) {
-        this.writeInt(1)
-        fn(a)
-    }
-    else
-        this.writeInt(0)
+private fun <A> Parcel.nullableWriterWrapper(a: A?, fn: (A)->Unit) =
+        if (a != null) {
+            this.writeInt(1)
+            fn(a)
+        } else
+            this.writeInt(0)
 
-private fun <A> Parcel.nullableReaderWrapper(fn:()->A) =
+private fun <A> Parcel.nullableReaderWrapper(fn: ()->A) =
         if (this.readInt() != 0)
             fn()
         else
@@ -43,6 +42,9 @@ private fun <A> Parcel.nullableReaderWrapper(fn:()->A) =
 
 // The Room database entry class/TableView row class that acts as a glue between the two.
 
+/**
+ * An entry in both the database table and the table view for the app. Contains all data needed for an event.
+ */
 @Entity(tableName = "sugar_entries")
 /*
     room wants an empty constructor in kotlin to be able to parse the file.
@@ -54,22 +56,54 @@ private fun <A> Parcel.nullableReaderWrapper(fn:()->A) =
     By setting a default value for all constructor parameters, I get an empty constructor for free.
     */
 data class SugarEntry constructor(
-        @PrimaryKey @ColumnInfo(name = "timestamp", typeAffinity = INTEGER) var timestamp: Timestamp=0,
-        @ColumnInfo(name="end_timestamp") var endTimestamp: Timestamp?=null,
-        @ColumnInfo(name = "sugar") var sugarLevel: Int?=null,
-        @ColumnInfo(name = "extra") var extra: String?=null,
-        @ColumnInfo(name = "weight") var weight: Int?=null,
-        @ColumnInfo(name = "insulin") var insulin: Double?=null,
-        @ColumnInfo(name = "treatment") var treatment: String?=null,
-        @ColumnInfo(name = "food") var food: String?=null,
-        @ColumnInfo(name = "drink") var drink: String?=null
+        /**
+         * When the thing happened
+         */
+        @PrimaryKey @ColumnInfo(name = "timestamp", typeAffinity = INTEGER)
+        var timestamp: Timestamp = 0,
+        /**
+         * The timestamp for when the thing ended, if applicable
+         */
+        @ColumnInfo(name = "end_timestamp") var endTimestamp: Timestamp? = null,
+        /**
+         * Blood sugar level at the time
+         */
+        @ColumnInfo(name = "sugar") var sugarLevel: Int? = null,
+        /**
+         * Any extra info about the event
+         */
+        @ColumnInfo(name = "extra") var extra: String? = null,
+        /**
+         * Current weight
+         */
+        @ColumnInfo(name = "weight") var weight: Int? = null,
+        /**
+         * Current insulin level, in mmol/l
+         */
+        @ColumnInfo(name = "insulin") var insulin: Double? = null,
+        /**
+         * Any form of treatment - pills, sugar, going for a walk
+         */
+        @ColumnInfo(name = "treatment") var treatment: String? = null,
+        /**
+         * What the user ate
+         */
+        @ColumnInfo(name = "food") var food: String? = null,
+        /**
+         * What the user drank
+         */
+        @ColumnInfo(name = "drink") var drink: String? = null
 ) : Parcelable {
 
 
-    // Parcel function
+    /**
+     * Part of the Parcel API
+     */
     override fun describeContents(): Int = 0
 
-    // Parcel function
+    /**
+     * Part of the Parcel API
+     */
     // IMPORTANT: These calls need to be in the same order as in writeToParcel below!
     private constructor(parcel: Parcel) : this(
             parcel.readLong(), // timestamp
@@ -83,10 +117,15 @@ data class SugarEntry constructor(
             parcel.readString() // drink
     )
 
+    /**
+     * Creates a copy with timestamp set to now.
+     */
     fun copyToCurrent() =
             copy(timestamp = DateHandler().timestamp)
 
-    // Parcel function
+    /**
+     * Part of the Parcel API
+     */
     override fun writeToParcel(parcel: Parcel, i: Int) {
         parcel.writeLong(timestamp)
         parcel.writeNullableLong(endTimestamp)
@@ -99,26 +138,42 @@ data class SugarEntry constructor(
         parcel.writeString(drink)
     }
 
-    companion object CREATOR: Parcelable.Creator<SugarEntry> {
+    @Suppress("KDocMissingDocumentation")
+    companion object CREATOR : Parcelable.Creator<SugarEntry> {
 
-        // Parcel function
+        /**
+         * Part of the Parcel API
+         */
         override fun createFromParcel(parcel: Parcel): SugarEntry = SugarEntry(parcel)
+
+        /**
+         * Dunno. Is this even used anymore?
+         */
         override fun newArray(size: Int): Array<SugarEntry?> = arrayOfNulls(size)
     }
 
 
-    // (obsolete) Used to check for equality between SugarEntries with different UID's, which were dropped completely from the SugarEntry model.
-    // Still keeping it, in case some other "non-equality" SugarEntry member gets added
-    infix fun sameAs(other:Any?) = when(other){
+    /**
+     *
+     */
+    @Suppress("DeprecatedCallableAddReplaceWith")
+    @Deprecated(
+            "Used to check for equality between SugarEntries with different UID's, which were dropped completely from the SugarEntry model."
+    )
+    infix fun sameAs(other: Any?) = when (other) {
         is SugarEntry ->
             this.timestamp == other.timestamp
-                    && (if(this.endTimestamp!=null) this.endTimestamp == other.endTimestamp else true)
+                    && (if (this.endTimestamp != null) this.endTimestamp == other.endTimestamp else true)
                     && this sameValuesAs other
-        else ->
-                false
+        else          ->
+            false
     }
 
-    infix fun sameValuesAs(other:SugarEntry) =
+    /**
+     * Returns whether everything apart from the timestamps are equal
+     * TODO maybe add endTime comparison as well?
+     */
+    infix fun sameValuesAs(other: SugarEntry) =
             this.sugarLevel == other.sugarLevel
                     && this.extra == other.extra
                     && this.weight == other.weight
@@ -128,35 +183,54 @@ data class SugarEntry constructor(
                     && this.drink == other.drink
 
 
-
-    private fun <A>compareNullables(a: A?, b: A?, comparator: (A, A) -> Int) =
-            a ?. let { first ->
-                b ?. let { second ->
-                    comparator(first,second)
+    private fun <A> compareNullables(a: A?, b: A?, comparator: (A, A)->Int) =
+            a?.let { first ->
+                b?.let { second ->
+                    comparator(first, second)
                 } ?: 1
             } ?: -1
 
 
-    // These are for comparing in Java, since Java has no counterpart to ?.let
+    /**
+     * These are for comparing in Java, since Java has no counterpart to ?.let
+     */
     fun compareSugar(that: SugarEntry) =
-            compareNullables(this.sugarLevel,that.sugarLevel) { a, b-> a-b}
+            compareNullables(this.sugarLevel, that.sugarLevel) { a, b -> a-b }
 
+    /**
+     * These are for comparing in Java, since Java has no counterpart to ?.let
+     */
     fun compareWeight(that: SugarEntry) =
-            compareNullables(this.weight,that.weight) { a, b-> a-b}
+            compareNullables(this.weight, that.weight) { a, b -> a-b }
 
+    /**
+     * These are for comparing in Java, since Java has no counterpart to ?.let
+     */
     fun compareExtra(that: SugarEntry) =
-            compareNullables(this.extra,that.extra) { a, b-> a.compareTo(b)}
+            compareNullables(this.extra, that.extra) { a, b -> a.compareTo(b) }
 
+    /**
+     * These are for comparing in Java, since Java has no counterpart to ?.let
+     */
     fun compareTreatment(that: SugarEntry) =
-            compareNullables(this.treatment,that.treatment) {a,b -> a.compareTo(b)}
+            compareNullables(this.treatment, that.treatment) { a, b -> a.compareTo(b) }
 
+    /**
+     * These are for comparing in Java, since Java has no counterpart to ?.let
+     */
     fun compareFood(that: SugarEntry) =
-            compareNullables(this.food,that.food) {a,b -> a.compareTo(b)}
+            compareNullables(this.food, that.food) { a, b -> a.compareTo(b) }
 
+    /**
+     * These are for comparing in Java, since Java has no counterpart to ?.let
+     */
     fun compareDrink(that: SugarEntry) =
-            compareNullables(this.drink,that.drink) {a,b -> a.compareTo(b)}
+            compareNullables(this.drink, that.drink) { a, b -> a.compareTo(b) }
 
+    /**
+     * These are for comparing in Java, since Java has no counterpart to ?.let
+     */
     fun compareInsulin(that: SugarEntry) =
-            compareNullables(this.insulin,that.insulin){a,b -> a.compareTo(b)}
+            compareNullables(this.insulin, that.insulin) { a, b -> a.compareTo(b) }
 }
 
