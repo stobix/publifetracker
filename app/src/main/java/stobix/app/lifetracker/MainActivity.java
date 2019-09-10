@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity
                 ft.addToBackStack(null);
 
                 SugarEntryCreationActivity creationActivityFlupp =
-                        SugarEntryCreationActivity.newInstance(sugarEntry);
+                        SugarEntryCreationActivity.newEditInstance(sugarEntry);
                 creationActivityFlupp.show(ft, "dialog");
 
             });
@@ -239,7 +239,7 @@ public class MainActivity extends AppCompatActivity
             }
             ft.addToBackStack(null);
 
-            SugarEntryCreationActivity creationActivityFlupp = SugarEntryCreationActivity.newInstance();
+            SugarEntryCreationActivity creationActivityFlupp = SugarEntryCreationActivity.newCreationInstance();
             creationActivityFlupp.show(ft, "dialog");
 
         }

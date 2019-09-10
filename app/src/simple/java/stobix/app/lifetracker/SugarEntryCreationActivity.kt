@@ -221,27 +221,20 @@ open class SugarEntryCreationActivity
 
         R.id.entryCreatorExtraToggle to entry.extra toggling (extraView withLabel R.id.entryCreatorExtraLabel)
 
+        v.findViewById<View>(R.id.entryCreatorToggleDateTime).setOnLongClickListener {
+            setEndTimes(DateHandler())
+            onSubmitAndClose()
+            true
+        }
+
         val dateText = "%d-%02d-%02d".format(date.year, date.month + 1, date.day)
         val timeText = "%02d:%02d".format(date.hour, date.minute)
         startDateView.text = dateText
         startTimeView.text = timeText
         setEndTimes(endDate)
-        /*
-        endDate?.let {
-            val endDateText = "%d-%02d-%02d".format(it.year, it.month + 1, it.day)
-            val endTimeText = "%02d:%02d".format(it.hour, it.minute)
-            endDateView.text = endDateText
-            endTimeView.text = endTimeText
-        } ?: let {
-            endDateView.text = "---------"
-            endTimeView.text = "---------"
-        }
-        */
 
         val buttonAdd: Button = v.findViewById(R.id.entrySubmitAction2)
         val buttonAddClose: Button = v.findViewById(R.id.entrySubmitAction1)
-
-
 
         if (alreadyDefinedEntry) {
             sugarView.text = entry.sugarLevel?.toFloat()?.div(10f)?.toString()
@@ -262,13 +255,15 @@ open class SugarEntryCreationActivity
         startTimeView.setOnClickListener { (activity as MainActivity).showTimePicker(PickedType.start.ordinal, date) }
 
         endDateView.setOnClickListener {
-            (activity as MainActivity).showDatePicker(PickedType.end.ordinal, endDate
-                    ?: DateHandler())
+            (activity as MainActivity).showDatePicker(
+                    PickedType.end.ordinal,
+                    endDate ?: DateHandler())
         }
 
         endTimeView.setOnClickListener {
-            (activity as MainActivity).showTimePicker(PickedType.end.ordinal, endDate
-                    ?: DateHandler())
+            (activity as MainActivity).showTimePicker(
+                    PickedType.end.ordinal,
+                    endDate ?: DateHandler())
         }
 
         buttonAdd.setOnClickListener { onSubmit() }
@@ -305,6 +300,7 @@ open class SugarEntryCreationActivity
         R.id.entryCreatorSleepAction3.sleepStarInit(3)
         R.id.entryCreatorSleepAction4.sleepStarInit(4)
         R.id.entryCreatorSleepAction5.sleepStarInit(5)
+
 
 
         return v
@@ -380,11 +376,9 @@ open class SugarEntryCreationActivity
                 startDateView.text = dateText
             }
             PickedType.end.ordinal -> {
-                endDate = endDate ?: DateHandler()
-                endDate?.let {
-                    it.setDate(year, month, day)
-                    setEndTimes(it)
-                }
+                val date = endDate ?: DateHandler()
+                date.setDate(year, month, day)
+                setEndTimes(date)
             }
         }
     }
@@ -400,11 +394,9 @@ open class SugarEntryCreationActivity
                 startTimeView.text = timeText
             }
             PickedType.end.ordinal -> {
-                endDate = endDate ?: DateHandler()
-                endDate?.let {
-                    it.setTime(hour, minute)
-                    setEndTimes(it)
-                }
+                val date = endDate ?: DateHandler()
+                date.setTime(hour, minute)
+                setEndTimes(date)
             }
         }
     }
@@ -428,10 +420,10 @@ open class SugarEntryCreationActivity
 
     companion object Creator {
         @JvmStatic
-        fun newInstance() = newInstance(DateHandler().timestamp)
+        fun newCreationInstance() = newCreationInstance(DateHandler().timestamp)
 
         @JvmStatic
-        fun newInstance(timestamp: Long): SugarEntryCreationActivity {
+        fun newCreationInstance(timestamp: Long): SugarEntryCreationActivity {
             val s = SugarEntryCreationActivity()
             val args = Bundle()
             d("SugarEntry creation", "Called with timestamp:$timestamp")
@@ -442,7 +434,7 @@ open class SugarEntryCreationActivity
         }
 
         @JvmStatic
-        fun newInstance(sugarEntry: SugarEntry): SugarEntryCreationActivity {
+        fun newEditInstance(sugarEntry: SugarEntry): SugarEntryCreationActivity {
             val s = SugarEntryCreationActivity()
             val args = Bundle()
             d("SugarEntry edit", "Called with timestamp:${sugarEntry.timestamp}")
