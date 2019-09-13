@@ -45,7 +45,7 @@ open class SugarEntryCreationActivity
     private var date: DateHandler = DateHandler()
     private var endDate: DateHandler? = null
     private var alreadyDefinedEntry: Boolean = false
-    private var originalTimestamp: StartingTimestamp = 0
+    private var originalTimestamp: Timestamp = 0
     private lateinit var startDateView: TextView
     private lateinit var startTimeView: TextView
     private lateinit var endDateView: TextView

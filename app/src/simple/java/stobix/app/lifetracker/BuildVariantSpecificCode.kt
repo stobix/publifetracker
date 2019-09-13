@@ -18,6 +18,7 @@ import kotlin.concurrent.thread
  * Created by stobix on 2/2/18.
  */
 
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 class BuildVariantSpecificCode {
     companion object {
         /**

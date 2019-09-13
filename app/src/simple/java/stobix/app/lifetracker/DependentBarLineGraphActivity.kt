@@ -18,6 +18,7 @@ import lecho.lib.hellocharts.util.ChartUtils
 import lecho.lib.hellocharts.view.ColumnChartView
 import lecho.lib.hellocharts.view.LineChartView
 import stobix.utils.DateHandler
+import stobix.utils.kotlinExtensions.Quadruple
 import stobix.utils.kotlinExtensions.to
 import stobix.utils.kotlinExtensions.to2
 import java.util.*
@@ -28,6 +29,7 @@ import java.util.*
  * The total whatever of a week. Sum, average, what have you
  */
 typealias WeekTotal = Float
+
 /**
  * A timestamp represented by seconds since epoch
  */
@@ -37,26 +39,30 @@ typealias Timestamp = Long
  * An int representation of a year
  */
 typealias Year = Int
+
 /**
  *  An int representation of a moth
  */
 typealias Month = Int
+
 /**
  *  An int representation of a week
  */
 typealias Week = Int
+
 /**
  *  An int representation of a day
  */
 typealias Day = Int
 
 /**
- * A year-week date info
+ *
  */
 typealias DateInfo = Pair<Year, Week>
 
 //typealias WeekPerMeanStructure = List<Pair<WeekTotal, Pair<DateInfo, List<Pair<ValueEntry, DateInfo>>>>>
 typealias WeekPerMean = Pair<WeekTotal, Pair<DateInfo, List<ValueEntry>>>
+
 typealias WeekPerMeanStructure = List<WeekPerMean>
 
 data class ValueEntry(var timestamp: Timestamp, var value: Float, var original: Int)
@@ -106,7 +112,9 @@ data class DataSeries(
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
             parcel.readString()!!, // descr
-            parcel.readBundle(DataSeries::class.java.classLoader)!!.getParcelableArrayList("data")!!, // data
+            parcel.readBundle(DataSeries::class.java.classLoader)!!.getParcelableArrayList(
+                    "data"
+            )!!, // data
             parcel.readInt(), // iconRes
             SeriesType.valueOf(parcel.readString()!!), // valueType
             doubleArrayOf(), // breakpoints
@@ -217,7 +225,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
         private lateinit var lineData: LineChartData
         private var columnData: ColumnChartData? = null
         private lateinit var rawSeries: ArrayList<DataSeries>
-        private lateinit var series: List<Triple<WeekPerMeanStructure, (Float)->Int, Boolean>>
+        private lateinit var series: List<Quadruple<WeekPerMeanStructure, (Float)->Int, Boolean, String>>
         private lateinit var perWeekMean: WeekPerMeanStructure
 
         private lateinit var chartTop: LineChartView
@@ -294,7 +302,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
          * Data processing
          ******************/
 
-        private fun processDataSeries(data: DataSeries): Triple<WeekPerMeanStructure, (Float)->Int, Boolean> {
+        private fun processDataSeries(data: DataSeries): Quadruple<WeekPerMeanStructure, (Float)->Int, Boolean, String> {
             val entries0 = data.data
                     // FIXME why do these make the graphs show correctly‽ I already sorted the data and made sure there were no nulls when I accessed the database
                     .filterNotNull()
@@ -373,7 +381,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             // group by year & week
             val yearWeekGrouping = yearweekEntries.groupBy { it.second }
             // possibly further group by day
-            val perDayGrouping=yearWeekGrouping.map {
+            val perDayGrouping = yearWeekGrouping.map {
                 when (data.upperCollation) {
                     UpperCollationType.NONE       -> {
                         val retVal: Pair<DateInfo, List<ValueEntry>> = it.key to2 it.value.map { it.first }
@@ -409,7 +417,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                 val retVal: WeekPerMean = (weekTotal to it)
                 retVal
             }
-            return collationPerWeek to colorByLevel to data.keepLowZero
+            return collationPerWeek to colorByLevel to data.keepLowZero to data.description
         }
 
         /******************
@@ -424,6 +432,10 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
         }
 
         private fun switchToDataSet(index: Int) {
+            val activity = activity
+            if (activity != null)
+                activity.title = series[index].fourth
+
             perWeekMean = series[index].first
             initiateTopChart()
             refreshBottomChart(series[index].second, series[index].third)
