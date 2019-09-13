@@ -26,6 +26,7 @@ public interface SugarEntryDao {
     @Query("select sugar from sugar_entries where sugar > -1 and timestamp between :firstDate and :secondDate")
     List<Long> getAllSugarLevels(long firstDate,long secondDate);
 
+
     /*
     // This won't work since DataPoints aren't Parcelable and I need to transform them
     using Bundle inside a Message…
@@ -41,6 +42,25 @@ public interface SugarEntryDao {
 
     @Query("select timestamp, weight as value from sugar_entries where weight > 0 order by timestamp") // For some reason, "where weight != null" returned zero results always
     List<FloatyIntBucket> getAllWeightBuckets();
+
+    /*
+    @Query("select timestamp, end_timestamp as value from sugar_entries where extra like ':sleepStr%' order by timestamp")
+    List<LongBucket> getAllIntervalsStartingWith(String sleepStr);
+     */
+
+    /*
+    @Query("select timestamp, end_timestamp as value from sugar_entries where extra like \"%:sleepStr\" order by timestamp")
+    List<LongBucket> getAllIntervalsEndingWith(String str);
+    */
+
+    @Query("select timestamp, end_timestamp as endTimestamp from sugar_entries where extra like :str order by timestamp")
+    List<RangeBucketHours> getAllIntervalsLike(String str );
+
+    @Query("select timestamp, end_timestamp as endTimestamp from sugar_entries where extra like :str order by timestamp")
+    List<RangeBucketMinutes> getAllMinuteIntervalsLike(String str );
+
+    @Query("select timestamp, end_timestamp as endTimestamp from sugar_entries where extra like :str order by timestamp")
+    List<RangeBucketSeconds> getAllSecondIntervalsLike(String str );
 
     @Query("select * from sugar_entries where weight > 0 order by timestamp") // For some reason, "where weight != null" returned zero results always
     List<SugarEntry> getAllWeightPoints();
