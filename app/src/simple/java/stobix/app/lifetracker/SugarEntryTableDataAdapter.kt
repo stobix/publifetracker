@@ -33,7 +33,7 @@ class SugarEntryTableDataAdapter(
             val totSeconds = totMilSeconds / 1000
             val seconds = (totSeconds % 60).toInt()
             val minutes = ((totSeconds / 60) % 60).toInt()
-            var hours = ((totSeconds / 3600) % 60).toInt()
+            var hours = ((totSeconds / 3600) % 24).toInt()
             val days = (totSeconds / 3600 / 24).toInt()
             if (days > 0)
                 "%d:%02d:%02d:%02d".format(days, hours, minutes, seconds)
