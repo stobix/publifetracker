@@ -51,4 +51,6 @@
     <string name="input_start_date">Start</string>
     <string name="input_end_date">End</string>
     <string name="EntryCreatorSleepString">Sleep</string>
+    <string name="week_average_description">⟨W⟩</string>
+    <string name="week_sum_description">∑W</string>
 </resources>

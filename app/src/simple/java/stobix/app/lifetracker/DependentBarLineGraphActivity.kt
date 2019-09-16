@@ -1,7 +1,5 @@
 package stobix.app.lifetracker
 
-import android.graphics.Color
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
@@ -9,7 +7,7 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.*
-import kotlinx.android.synthetic.simple.activity_sugar_entry_creation.view.*
+import android.widget.TextView
 import lecho.lib.hellocharts.formatter.SimpleColumnChartValueFormatter
 import lecho.lib.hellocharts.gesture.ZoomType
 import lecho.lib.hellocharts.listener.ColumnChartOnValueSelectListener
@@ -21,6 +19,7 @@ import stobix.utils.DateHandler
 import stobix.utils.kotlinExtensions.Quadruple
 import stobix.utils.kotlinExtensions.to
 import stobix.utils.kotlinExtensions.to2
+import java.lang.Exception
 import java.util.*
 
 // Copied and modified from https://github.com/lecho/hellocharts-android/tree/master/hellocharts-samples/src/lecho/lib/hellocharts/samples/LineColumnDependencyActivity.java et al
@@ -28,7 +27,8 @@ import java.util.*
 /**
  * The total whatever of a week. Sum, average, what have you
  */
-typealias WeekTotal = Float
+// typealias WeekTotal = Float
+typealias WeekTotal = Map<LowerCollationType, Float>
 
 /**
  * A timestamp represented by seconds since epoch
@@ -60,10 +60,10 @@ typealias Day = Int
  */
 typealias DateInfo = Pair<Year, Week>
 
-//typealias WeekPerMeanStructure = List<Pair<WeekTotal, Pair<DateInfo, List<Pair<ValueEntry, DateInfo>>>>>
-typealias WeekPerMean = Pair<WeekTotal, Pair<DateInfo, List<ValueEntry>>>
+//typealias AllWeeksList = List<Pair<WeekTotal, Pair<DateInfo, List<Pair<ValueEntry, DateInfo>>>>>
+typealias WeekCollation = Pair<WeekTotal, Pair<DateInfo, List<ValueEntry>>>
 
-typealias WeekPerMeanStructure = List<WeekPerMean>
+typealias AllWeeksList = List<WeekCollation>
 
 data class ValueEntry(var timestamp: Timestamp, var value: Float, var original: Int)
 
@@ -91,6 +91,7 @@ enum class SeriesType(val divisor: Float) {
 
 enum class UpperCollationType {
     SUM_BY_DAY,
+    AVG_BY_DAY,
     NONE
 }
 
@@ -186,7 +187,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                 it.add(0, i, 0, description)
                         // Default to a red X if the caller forgot to set iconRes
                         .setIcon(if (iconRes == 0) android.R.drawable.ic_delete else iconRes)
-                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS)
             }
         }
         return super.onCreateOptionsMenu(menu)
@@ -225,8 +226,9 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
         private lateinit var lineData: LineChartData
         private var columnData: ColumnChartData? = null
         private lateinit var rawSeries: ArrayList<DataSeries>
-        private lateinit var series: List<Quadruple<WeekPerMeanStructure, (Float)->Int, Boolean, String>>
-        private lateinit var perWeekMean: WeekPerMeanStructure
+        private lateinit var series: List<Triple<AllWeeksList, (Float)->Int, DataSeries>>
+        private lateinit var selectedSeries: Triple<AllWeeksList, (Float)->Int, DataSeries>
+        private lateinit var perWeekMean: AllWeeksList
 
         private lateinit var chartTop: LineChartView
         private lateinit var chartBottom: ColumnChartView
@@ -256,10 +258,28 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             // set values for data set 0, and refresh bottom chart
             switchToDataSet(0)
 
+            // fun tv(id:Int) =requireViewById<TextView>(id)
+            fun tv(id: Int) = rootView.findViewById<TextView>(id) ?: throw Exception(
+                    "$id not found lol"
+            )
+
+            var weekAvg = tv(R.id.BarLineGraphWeekAvg)
+            var weekSum = tv(R.id.BarLineGraphWeekSum)
+            var daySplit = tv(R.id.BarLineGraphDaySplit)
+            var dayAvg = tv(R.id.BarLineGraphDayAvg)
+            var daySum = tv(R.id.BarLineGraphDaySum)
+            weekAvg.setOnClickListener { setBottomCollation(LowerCollationType.AVG) }
+            weekSum.setOnClickListener { setBottomCollation(LowerCollationType.SUM) }
+
+
+
+
             return rootView
         }
 
-        // Initiate the top chart, and draw a 0 value for each day of the week.
+        /**
+         * Initiate the top chart, and draw a 0 value for each day of the week.
+         */
         private fun initiateTopChart() {
             val numValues = 7
 
@@ -302,7 +322,8 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
          * Data processing
          ******************/
 
-        private fun processDataSeries(data: DataSeries): Quadruple<WeekPerMeanStructure, (Float)->Int, Boolean, String> {
+
+        private fun processDataSeries(data: DataSeries): Triple<AllWeeksList, (Float)->Int, DataSeries> {
             val entries0 = data.data
                     // FIXME why do these make the graphs show correctly‽ I already sorted the data and made sure there were no nulls when I accessed the database
                     .filterNotNull()
@@ -380,44 +401,73 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             }
             // group by year & week
             val yearWeekGrouping = yearweekEntries.groupBy { it.second }
+            fun groupByDay(elems: List<Triple<ValueEntry, DateInfo, Day>>) =
+                    elems
+                            .sortedBy { (first) -> first.timestamp }
+                            .groupBy { elem -> elem.third }
+
             // possibly further group by day
-            val perDayGrouping = yearWeekGrouping.map {
-                when (data.upperCollation) {
-                    UpperCollationType.NONE       -> {
-                        val retVal: Pair<DateInfo, List<ValueEntry>> = it.key to2 it.value.map { it.first }
-                        retVal
-                    }
-                    UpperCollationType.SUM_BY_DAY -> {
-                        val elems = it.value
-                        val daily = elems.sortedBy { (first) -> first.timestamp }.groupBy { elem -> elem.third }
-                        val result = daily.map { day ->
-                            val entries = day.value
-                            val sum = entries.sumByDouble { (first) -> first.value.toDouble() }
-                            ValueEntry(
-                                    entries.first().first.timestamp,
-                                    sum.toFloat(),
-                                    convertToInt(sum.toFloat())
-                            )
+            fun calculateGrouping(collationType: UpperCollationType, weekGrouping: Map<DateInfo, List<Triple<ValueEntry, DateInfo, Day>>>) =
+                    weekGrouping.map {
+                        it.key to2 when (collationType) {
+                            UpperCollationType.NONE       -> {
+                                val retVal: List<ValueEntry> = it.value.map { it.first }
+                                retVal
+                            }
+                            UpperCollationType.SUM_BY_DAY -> {
+                                val daily = groupByDay(it.value)
+                                val result = daily.map { day ->
+                                    val entries = day.value
+                                    val sum = entries.sumByDouble { (first) -> first.value.toDouble() }.toFloat()
+                                    ValueEntry(
+                                            entries.first().first.timestamp,
+                                            sum,
+                                            convertToInt(sum)
+                                    )
+                                }
+                                val retVal: List<ValueEntry> = result
+                                retVal
+                            }
+                            UpperCollationType.AVG_BY_DAY -> {
+                                val daily = groupByDay(it.value)
+                                val result = daily.map { day ->
+                                    val entries = day.value
+                                    val avg = entries.sumByDouble { (first) -> first.value.toDouble() }.div(
+                                            entries.size.toDouble()
+                                    ).toFloat()
+                                    ValueEntry(
+                                            entries.first().first.timestamp,
+                                            avg,
+                                            convertToInt(avg)
+                                    )
+                                }
+                                val retVal: List<ValueEntry> = result
+                                retVal
+                            }
                         }
-                        val retVal: Pair<DateInfo, List<ValueEntry>> = it.key to2 result
-                        retVal
                     }
-                }
-            }
+
+            val perDayGrouping = calculateGrouping(data.upperCollation, yearWeekGrouping)
             // calculate week total data for each grouping
             val collationPerWeek = perDayGrouping.map {
                 val elems = it.second
                 @Suppress("NestedLambdaShadowedImplicitParameter")
                 val weekSum = elems.sumBy { it.original }
                 val weekConverted = convertFromInt(weekSum)
-                val weekTotal: WeekTotal = when (data.lowerCollation) {
-                    LowerCollationType.AVG -> weekConverted/elems.size
-                    LowerCollationType.SUM -> weekConverted
+                val weekTotal: WeekTotal = LowerCollationType.values().fold(
+                        mutableMapOf()
+                ) { acc, type ->
+                    val tot = when (type) {
+                        LowerCollationType.AVG -> weekConverted/elems.size
+                        LowerCollationType.SUM -> weekConverted
+                    }
+                    acc[type] = tot
+                    acc
                 }
-                val retVal: WeekPerMean = (weekTotal to it)
+                val retVal: WeekCollation = (weekTotal to it)
                 retVal
             }
-            return collationPerWeek to colorByLevel to data.keepLowZero to data.description
+            return collationPerWeek to colorByLevel to data
         }
 
         /******************
@@ -432,17 +482,25 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
         }
 
         private fun switchToDataSet(index: Int) {
-            val activity = activity
-            if (activity != null)
-                activity.title = series[index].fourth
+            selectedSeries = series[index]
+            activity?.run { title = selectedSeries.third.description }
 
-            perWeekMean = series[index].first
+            perWeekMean = selectedSeries.first
             initiateTopChart()
-            refreshBottomChart(series[index].second, series[index].third)
+            initiateBottomChart()
         }
 
+        private fun initiateBottomChart() {
+            setBottomCollation(selectedSeries.third.lowerCollation)
+        }
 
-        private fun refreshBottomChart(colorByLevel: (Float)->Int, keepLowZero: Boolean) {
+        private fun setBottomCollation(lowerCollation: LowerCollationType) {
+            refreshBottomChart(
+                    selectedSeries.second, selectedSeries.third.keepLowZero, lowerCollation
+            )
+        }
+
+        private fun refreshBottomChart(colorByLevel: (Float)->Int, keepLowZero: Boolean, selectedSeries: LowerCollationType) {
 
             val axisValues = ArrayList<AxisValue>()
             val columns = ArrayList<Column>()
@@ -452,7 +510,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
                 values = ArrayList()
                 val (currentYear, currentWeek) = perWeekMean[i].second.first
-                val currentMean = perWeekMean[i].first
+                val currentMean = perWeekMean[i].first[selectedSeries] ?: 0f
 
                 values.add(SubcolumnValue(currentMean, colorByLevel(currentMean)))
 
@@ -488,10 +546,11 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             chartBottom.currentViewport.right = perWeekMean.size.toFloat()-0.5f
             chartBottom.currentViewport.left = perWeekMean.size.toFloat()-15.5f
 
-            if (!keepLowZero)
-                chartBottom.currentViewport.bottom = perWeekMean.minBy { it.first }?.first?.minus(
-                        2f
-                ) ?: 0f
+            if (!keepLowZero) {
+                val minVal = perWeekMean
+                        .map { it.first[selectedSeries] ?: 0f }.min()?.minus(2f) ?: 0f
+                chartBottom.currentViewport.bottom = minVal
+            }
 
             // TODO switch to the same week for the new data set that we had for the old iff we had an old data set and it had data the same week!
             // TODO When switching back and forth between data sets, put back the previously selected week when switching to a previously selected data set.
