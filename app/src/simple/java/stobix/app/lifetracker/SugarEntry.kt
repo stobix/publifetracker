@@ -121,7 +121,7 @@ data class SugarEntry constructor(
      * Creates a copy with timestamp set to now.
      */
     fun copyToCurrent() =
-            copy(timestamp = DateHandler().timestamp)
+            copy(timestamp = DateHandler().timestamp, endTimestamp = null)
 
     /**
      * Part of the Parcel API
