@@ -61,7 +61,7 @@ typealias Day = Int
 typealias DateInfo = Pair<Year, Week>
 
 //typealias AllWeeksList = List<Pair<WeekTotal, Pair<DateInfo, List<Pair<ValueEntry, DateInfo>>>>>
-typealias WeekCollation = Pair<WeekTotal, Pair<DateInfo, List<ValueEntry>>>
+typealias WeekCollation = Pair<WeekTotal, Pair<DateInfo, Map<UpperCollationType,List<ValueEntry>>>>
 
 typealias AllWeeksList = List<WeekCollation>
 
@@ -233,6 +233,10 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
         private lateinit var chartTop: LineChartView
         private lateinit var chartBottom: ColumnChartView
 
+        private var selectedWeek = 0
+        private lateinit var topSeriesType: UpperCollationType
+        private var topColor = 0
+
 
         /******************
          * Initiation
@@ -270,6 +274,9 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             var daySum = tv(R.id.BarLineGraphDaySum)
             weekAvg.setOnClickListener { setBottomCollation(LowerCollationType.AVG) }
             weekSum.setOnClickListener { setBottomCollation(LowerCollationType.SUM) }
+            daySplit.setOnClickListener { setTopCollation(UpperCollationType.NONE) }
+            dayAvg.setOnClickListener { setTopCollation(UpperCollationType.AVG_BY_DAY) }
+            daySum.setOnClickListener { setTopCollation(UpperCollationType.SUM_BY_DAY) }
 
 
 
@@ -447,10 +454,45 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                         }
                     }
 
+            fun calculateGroupElement(date: DateInfo, entries: List<Triple<ValueEntry, DateInfo, Day>>) =
+                        date to2 mapOf(
+                                UpperCollationType.NONE to entries.map { it.first },
+                                UpperCollationType.SUM_BY_DAY to {
+                                    val daily = groupByDay(entries)
+                                    val result = daily.map { day ->
+                                        val entries = day.value
+                                        val sum = entries.sumByDouble { (first) -> first.value.toDouble() }.toFloat()
+                                        ValueEntry(
+                                                entries.first().first.timestamp,
+                                                sum,
+                                                convertToInt(sum)
+                                        )
+                                    }
+                                    val retVal: List<ValueEntry> = result
+                                    retVal
+                                }(),
+                                UpperCollationType.AVG_BY_DAY to {
+                                            val daily = groupByDay(entries)
+                                            val result = daily.map { day ->
+                                                val entries = day.value
+                                                val avg = entries.sumByDouble { (first) -> first.value.toDouble() }.div(
+                                                        entries.size.toDouble()
+                                                ).toFloat()
+                                                ValueEntry(
+                                                        entries.first().first.timestamp,
+                                                        avg,
+                                                        convertToInt(avg)
+                                                )
+                                            }
+                                            val retVal: List<ValueEntry> = result
+                                            retVal
+                                        }()
+                        )
+            val perDayGroupings = yearWeekGrouping.map{calculateGroupElement(it.key,it.value)}
             val perDayGrouping = calculateGrouping(data.upperCollation, yearWeekGrouping)
             // calculate week total data for each grouping
-            val collationPerWeek = perDayGrouping.map {
-                val elems = it.second
+            val collationPerWeek = perDayGroupings.map {
+                val elems = it.second[data.upperCollation]!!
                 @Suppress("NestedLambdaShadowedImplicitParameter")
                 val weekSum = elems.sumBy { it.original }
                 val weekConverted = convertFromInt(weekSum)
@@ -483,6 +525,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
         private fun switchToDataSet(index: Int) {
             selectedSeries = series[index]
+            topSeriesType = selectedSeries.third.upperCollation
             activity?.run { title = selectedSeries.third.description }
 
             perWeekMean = selectedSeries.first
@@ -563,17 +606,32 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
         private inner class BottomValueSelectedListener : ColumnChartOnValueSelectListener {
 
             override fun onValueSelected(columnIndex: Int, subcolumnIndex: Int, value: SubcolumnValue) {
-                updateTopChart(value.color, columnIndex)
+                updateTopChart(value.color, topSeriesType ?: selectedSeries.third.upperCollation,columnIndex)
             }
 
             override fun onValueDeselected() {}
         }
 
-        private fun updateTopChart(color: Int, columnIndex: Int) {
-            // Cancel last animation if not finished.
+        private fun setTopCollation(collationType: UpperCollationType){
+            topSeriesType = collationType
+            updateTopChart()
+        }
+
+        private fun updateTopChart(color: Int, collationType: UpperCollationType,columnIndex: Int) {
+            selectedWeek = columnIndex
+            topColor = color
+            topSeriesType = collationType
+            updateTopChart()
+        }
+
+        private fun updateTopChart() {
+            val columnIndex = selectedWeek
+            val color= topColor
+            val collationType= topSeriesType
+                    // Cancel last animation if not finished.
             chartTop.cancelDataAnimation()
             // FIXME this is the only place outside refreshBottomChart that references perWeekMean. Can I change this to make perWeekMean not be class global?
-            val weekEntries = perWeekMean[columnIndex].second.second
+            val weekEntries = perWeekMean[columnIndex].second.second[collationType]!!
 
             // Create data points for the current week
             val newLineVals = weekEntries.mapIndexed { i, it ->
