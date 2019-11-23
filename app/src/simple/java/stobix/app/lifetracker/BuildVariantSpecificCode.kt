@@ -220,11 +220,12 @@ class BuildVariantSpecificCode {
                             // Alla viktvärden
                             val allWeightBuckets = c.dao.allWeightBuckets
                             val sleepStr = c.getString(R.string.EntryCreatorSleepString)
-                            val allSleepBuckets = c.dao.getAllIntervalsLike("$sleepStr:%")
-                            val allJobBuckets = c.dao.getAllIntervalsLike("Jobb")
+                            val allSleepBuckets = c.dao.getCompletedIntervalsLike("$sleepStr:%")
+
+                            val allJobBuckets = c.dao.getCompletedIntervalsLike("Jobb")
                             Log.d(
                                     "veckografer",
-                                    "sockervärden: ${allSugarBuckets.size} viktvärden: ${allWeightBuckets.size}"
+                                    "sockervärden: ${allSugarBuckets.size} viktvärden: ${allWeightBuckets.size} sovvänden: ${allSleepBuckets.size} jobbvärden: ${allJobBuckets.size}"
                             )
                             // Lista med dataserier
                             val a = java.util.ArrayList<DataSeries>()

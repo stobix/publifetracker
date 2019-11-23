@@ -71,7 +71,8 @@ open class SugarEntryCreationActivity
                 endDate?.timestamp = ts
             }
             originalTimestamp = entry.timestamp
-            d("SugarEntry create",
+            d(
+                    "SugarEntry create",
                     "already defined; timestamp:${entry.timestamp}, sugar: ${entry.sugarLevel}, extra: ${entry.timestamp}"
             )
         } else {
@@ -104,8 +105,18 @@ open class SugarEntryCreationActivity
 
         // Simulates a quick click on a component, e.g. for giving focus to a text field.
         fun View.click() {
-            this.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, 0f, 0f, 0))
-            this.dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, 0f, 0f, 0))
+            this.dispatchTouchEvent(
+                    MotionEvent.obtain(
+                            SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
+                            MotionEvent.ACTION_DOWN, 0f, 0f, 0
+                    )
+            )
+            this.dispatchTouchEvent(
+                    MotionEvent.obtain(
+                            SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
+                            MotionEvent.ACTION_UP, 0f, 0f, 0
+                    )
+            )
         }
 
 
@@ -117,7 +128,9 @@ open class SugarEntryCreationActivity
 
 
         fun View.toggleBackgroundImage(b: Boolean) {
-            this.setBackgroundResource(if (b) R.drawable.icon_back_circle else R.drawable.icon_back_circle_inactive)
+            this.setBackgroundResource(
+                    if (b) R.drawable.icon_back_circle else R.drawable.icon_back_circle_inactive
+            )
         }
 
         fun ResourceID.toggle() {
@@ -126,7 +139,7 @@ open class SugarEntryCreationActivity
         }
 
         // Make the resource run the listener function on each click on the resource, with a boolean toggled each time.
-        infix fun <A> Pair<ResourceID, A?>.togglingWithFun(listener: (Boolean) -> Unit) {
+        infix fun <A> Pair<ResourceID, A?>.togglingWithFun(listener: (Boolean)->Unit) {
             val view = v.findViewById<ImageView>(first)
             val truthiness = second != null
 
@@ -203,8 +216,8 @@ open class SugarEntryCreationActivity
         R.id.entryCreatorToggleDateTime to entry.endTimestamp togglingWithoutFocus (
                 // (startDateView withLabel R.id.entryCreatorDateLabel) + (startTimeView withLabel R.id.entryCreatorTimeLabel)
                 (endDateView withLabel R.id.entryCreatorEndTimeLabel)
-                        + (endTimeView withLabel R.id.entryCreatorStartTimeLabel)
-                        + buttonClearEndTime
+                        +(endTimeView withLabel R.id.entryCreatorStartTimeLabel)
+                        +buttonClearEndTime
                 )
 
         R.id.entryCreatorWeightToggle to entry.weight toggling (weightView withLabel R.id.entryCreatorWeightLabel)
@@ -227,7 +240,7 @@ open class SugarEntryCreationActivity
             true
         }
 
-        val dateText = "%d-%02d-%02d".format(date.year, date.month + 1, date.day)
+        val dateText = "%d-%02d-%02d".format(date.year, date.month+1, date.day)
         val timeText = "%02d:%02d".format(date.hour, date.minute)
         startDateView.text = dateText
         startTimeView.text = timeText
@@ -251,19 +264,29 @@ open class SugarEntryCreationActivity
             buttonAdd.visibility = View.VISIBLE
         }
 
-        startDateView.setOnClickListener { (activity as MainActivity).showDatePicker(PickedType.start.ordinal, date) }
-        startTimeView.setOnClickListener { (activity as MainActivity).showTimePicker(PickedType.start.ordinal, date) }
+        startDateView.setOnClickListener {
+            (activity as MainActivity).showDatePicker(
+                    PickedType.start.ordinal, date
+            )
+        }
+        startTimeView.setOnClickListener {
+            (activity as MainActivity).showTimePicker(
+                    PickedType.start.ordinal, date
+            )
+        }
 
         endDateView.setOnClickListener {
             (activity as MainActivity).showDatePicker(
                     PickedType.end.ordinal,
-                    endDate ?: DateHandler())
+                    endDate ?: DateHandler()
+            )
         }
 
         endTimeView.setOnClickListener {
             (activity as MainActivity).showTimePicker(
                     PickedType.end.ordinal,
-                    endDate ?: DateHandler())
+                    endDate ?: DateHandler()
+            )
         }
 
         buttonAdd.setOnClickListener { onSubmit() }
@@ -280,6 +303,7 @@ open class SugarEntryCreationActivity
             extraView.text = slepStr
             onSubmitAndClose()
         }
+
         actionSleep.visibility = if (entry.extra == null) View.VISIBLE else View.GONE
 
         fun ResourceID.sleepStarInit(n: Int) {
@@ -290,6 +314,7 @@ open class SugarEntryCreationActivity
                     setEndTimes(DateHandler())
                     onSubmitAndClose()
                 }
+                // TODO set visible also if it already has a grade.
                 it.visibility = if (entry.extra == slepStr) View.VISIBLE else View.GONE
             }
         }
@@ -301,7 +326,26 @@ open class SugarEntryCreationActivity
         R.id.entryCreatorSleepAction4.sleepStarInit(4)
         R.id.entryCreatorSleepAction5.sleepStarInit(5)
 
+        val actionJobTo: ImageView = v.findViewById(R.id.entryCreatorToJobAction)
+        actionJobTo.setOnClickListener {
+            extraView.text = "Till jobbet"
+            onSubmitAndClose()
+        }
+        actionJobTo.visibility = if (entry.extra == null) View.VISIBLE else View.GONE
 
+        val actionJob: ImageView = v.findViewById(R.id.entryCreatorJobAction)
+        actionJob.setOnClickListener {
+            extraView.text = "Jobb"
+            onSubmitAndClose()
+        }
+        actionJob.visibility = if (entry.extra == null) View.VISIBLE else View.GONE
+
+        val actionJobFrom: ImageView = v.findViewById(R.id.entryCreatorFromJobAction)
+        actionJobFrom.setOnClickListener {
+            extraView.text = "Hemgång"
+            onSubmitAndClose()
+        }
+        actionJobFrom.visibility = if (entry.extra == null) View.VISIBLE else View.GONE
 
         return v
 
@@ -332,7 +376,7 @@ open class SugarEntryCreationActivity
         } else {
             handleSubmission()
             // Ensure we don't enter two entries with the same timestamp
-            entry = SugarEntry(timestamp = entry.timestamp + 1)
+            entry = SugarEntry(timestamp = entry.timestamp+1)
         }
     }
 
@@ -355,10 +399,16 @@ open class SugarEntryCreationActivity
         entry.food = foodView.text?.toString().nullIfEmpty()
         entry.drink = drinkView.text?.toString().nullIfEmpty()
         if (alreadyDefinedEntry) {
-            d("SugarEntry update", "t ${entry.timestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} d ${entry.drink} tr ${entry.treatment} i ${entry.insulin}")
+            d(
+                    "SugarEntry update",
+                    "t ${entry.timestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} d ${entry.drink} tr ${entry.treatment} i ${entry.insulin}"
+            )
             (activity as OnSugarEntryChangedHandler).onSugarEntryChanged(entry, originalTimestamp)
         } else {
-            d("SugarEntry submit", "t ${entry.timestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} d ${entry.drink} tr ${entry.treatment} i ${entry.insulin}")
+            d(
+                    "SugarEntry submit",
+                    "t ${entry.timestamp} s ${entry.sugarLevel} w ${entry.weight} e ${entry.extra} f ${entry.food} d ${entry.drink} tr ${entry.treatment} i ${entry.insulin}"
+            )
             (activity as OnSugarEntryEnteredHandler).onSugarEntryEntered(entry)
         }
     }
@@ -372,10 +422,10 @@ open class SugarEntryCreationActivity
                 date.setDate(year, month, day)
                 // Calendars use a 0-indexed gregorian/julian month for some reason!
                 // TODO either change this or the SugarEntryTableDataAdapter way of formatting dates
-                val dateText = "%d-%02d-%02d".format(year, month + 1, day)
+                val dateText = "%d-%02d-%02d".format(year, month+1, day)
                 startDateView.text = dateText
             }
-            PickedType.end.ordinal -> {
+            PickedType.end.ordinal   -> {
                 val date = endDate ?: DateHandler()
                 date.setDate(year, month, day)
                 setEndTimes(date)
@@ -393,7 +443,7 @@ open class SugarEntryCreationActivity
                 val timeText = "%02d:%02d".format(hour, minute)
                 startTimeView.text = timeText
             }
-            PickedType.end.ordinal -> {
+            PickedType.end.ordinal   -> {
                 val date = endDate ?: DateHandler()
                 date.setTime(hour, minute)
                 setEndTimes(date)
@@ -407,7 +457,7 @@ open class SugarEntryCreationActivity
     private fun setEndTimes(d: DateHandler?) {
         endDate = d
         endDate?.let {
-            val dateText = "%d-%02d-%02d".format(it.year, it.month + 1, it.day)
+            val dateText = "%d-%02d-%02d".format(it.year, it.month+1, it.day)
             val timeText = "%02d:%02d".format(it.hour, it.minute)
             endDateView.text = dateText
             endTimeView.text = timeText
