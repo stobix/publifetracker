@@ -455,40 +455,40 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                     }
 
             fun calculateGroupElement(date: DateInfo, entries: List<Triple<ValueEntry, DateInfo, Day>>) =
-                        date to2 mapOf(
-                                UpperCollationType.NONE to entries.map { it.first },
-                                UpperCollationType.SUM_BY_DAY to {
-                                    val daily = groupByDay(entries)
-                                    val result = daily.map { day ->
-                                        val entries = day.value
-                                        val sum = entries.sumByDouble { (first) -> first.value.toDouble() }.toFloat()
-                                        ValueEntry(
-                                                entries.first().first.timestamp,
-                                                sum,
-                                                convertToInt(sum)
-                                        )
-                                    }
-                                    val retVal: List<ValueEntry> = result
-                                    retVal
-                                }(),
-                                UpperCollationType.AVG_BY_DAY to {
-                                            val daily = groupByDay(entries)
-                                            val result = daily.map { day ->
-                                                val entries = day.value
-                                                val avg = entries.sumByDouble { (first) -> first.value.toDouble() }.div(
-                                                        entries.size.toDouble()
-                                                ).toFloat()
-                                                ValueEntry(
-                                                        entries.first().first.timestamp,
-                                                        avg,
-                                                        convertToInt(avg)
-                                                )
-                                            }
-                                            val retVal: List<ValueEntry> = result
-                                            retVal
-                                        }()
-                        )
-            val perDayGroupings = yearWeekGrouping.map{calculateGroupElement(it.key,it.value)}
+                    date to2 mapOf(
+                            UpperCollationType.NONE to entries.map { it.first },
+                            UpperCollationType.SUM_BY_DAY to {
+                                val daily = groupByDay(entries)
+                                val result = daily.map { day ->
+                                    val entries = day.value
+                                    val sum = entries.sumByDouble { (first) -> first.value.toDouble() }.toFloat()
+                                    ValueEntry(
+                                            entries.first().first.timestamp,
+                                            sum,
+                                            convertToInt(sum)
+                                    )
+                                }
+                                val retVal: List<ValueEntry> = result
+                                retVal
+                            }(),
+                            UpperCollationType.AVG_BY_DAY to {
+                                val daily = groupByDay(entries)
+                                val result = daily.map { day ->
+                                    val entries = day.value
+                                    val avg = entries.sumByDouble { (first) -> first.value.toDouble() }.div(
+                                            entries.size.toDouble()
+                                    ).toFloat()
+                                    ValueEntry(
+                                            entries.first().first.timestamp,
+                                            avg,
+                                            convertToInt(avg)
+                                    )
+                                }
+                                val retVal: List<ValueEntry> = result
+                                retVal
+                            }()
+                    )
+            val perDayGroupings = yearWeekGrouping.map { calculateGroupElement(it.key, it.value) }
             val perDayGrouping = calculateGrouping(data.upperCollation, yearWeekGrouping)
             // calculate week total data for each grouping
             val collationPerWeek = perDayGroupings.map {
@@ -628,7 +628,7 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             val columnIndex = selectedWeek
             val color= topColor
             val collationType= topSeriesType
-                    // Cancel last animation if not finished.
+            // Cancel last animation if not finished.
             chartTop.cancelDataAnimation()
             // FIXME this is the only place outside refreshBottomChart that references perWeekMean. Can I change this to make perWeekMean not be class global?
             val weekEntries = perWeekMean[columnIndex].second.second[collationType]!!
@@ -636,7 +636,8 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             // Create data points for the current week
             val newLineVals = weekEntries.mapIndexed { i, it ->
                 val sugarValue = it.value
-                PointValue(i.toFloat(), sugarValue).setLabel(sugarValue.toString())
+                val date = DateHandler(it.timestamp).date
+                PointValue(i.toFloat(), sugarValue).setLabel("$date\n $sugarValue")
             }
 
             val line = lineData.lines[0]// For this example there is always only one line.
@@ -647,13 +648,11 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             lines += line
             lineData.lines = lines
 
-            lineData.axisXBottom = Axis(weekEntries.mapIndexed { i, it ->
-                val date = DateHandler(it.timestamp)
-                val hour = date.hour
-                val minute = date.minute
+            lineData.axisXBottom = Axis(weekEntries.mapIndexed { i, (timestamp) ->
+                val date = DateHandler(timestamp)
                 val day = days[date.weekDay]
                 AxisValue(i.toFloat())
-                        .setLabel("$day ${"%02d".format(hour)}:${"%02d".format(minute)}")
+                        .setLabel("$day ${"%02d".format(date.hour)}:${"%02d".format(date.minute)}")
             }
             ).setHasLines(true).setHasTiltedLabels(true)
 

@@ -216,16 +216,23 @@ class BuildVariantSpecificCode {
                         thread(start = true) {
                             val m = newGraphHandler.obtainMessage()
                             // Alla blodsockervärden
-                            val allSugarBuckets = c.dao.allSugarBuckets
+                            val starttid = DateHandler().subtractYears(2)
+                            val sluttid = DateHandler()
+                            val allSugarBuckets = c.dao.getAllSugarBuckets(starttid.timestamp, sluttid.timestamp)
                             // Alla viktvärden
-                            val allWeightBuckets = c.dao.allWeightBuckets
+                            val allWeightBuckets = c.dao.getAllWeightBuckets(starttid.timestamp, sluttid.timestamp)
                             val sleepStr = c.getString(R.string.EntryCreatorSleepString)
-                            val allSleepBuckets = c.dao.getCompletedIntervalsLike("$sleepStr:%")
+                            val allSleepBuckets = c.dao.getCompletedIntervalsLike("$sleepStr:%", starttid.timestamp, sluttid.timestamp)
 
-                            val allJobBuckets = c.dao.getCompletedIntervalsLike("Jobb")
+                            val allJobBuckets = c.dao.getCompletedIntervalsLike("Jobb", starttid.timestamp, sluttid.timestamp)
                             Log.d(
                                     "veckografer",
-                                    "sockervärden: ${allSugarBuckets.size} viktvärden: ${allWeightBuckets.size} sovvänden: ${allSleepBuckets.size} jobbvärden: ${allJobBuckets.size}"
+                                    "start: ${starttid.date} slut: ${sluttid.date}"
+                            )
+                            Log.d(
+                                    "veckografer",
+                                    "sockervärden: ${allSugarBuckets.size} viktvärden: ${allWeightBuckets.size} sovvärden: ${allSleepBuckets.size} jobbvärden: ${allJobBuckets.size}"
+                                    // "sockervärden: ${allSugarBuckets.size} viktvärden: ${allWeightBuckets.size} jobbvärden: ${allJobBuckets.size}"
                             )
                             // Lista med dataserier
                             val a = java.util.ArrayList<DataSeries>()

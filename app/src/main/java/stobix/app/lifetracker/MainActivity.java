@@ -415,16 +415,10 @@ public class MainActivity extends AppCompatActivity
 
 
         public void showDatePicker(int token, DateHandler date) {
-            showDatePicker(token,date.getYear(),date.getMonth(),date.getDay());
-        }
-
-        public void showDatePicker(int token, int year,int month,int day) {
             DatePickerFragment datePickerFragment=new DatePickerFragment();
             Bundle b = new Bundle();
-            b.putInt("year",year);
-            b.putInt("month",month);
-            b.putInt("day",day);
             b.putInt("token",token);
+            b.putParcelable("date",date);
             datePickerFragment.setArguments(b);
             datePickerFragment.show(getSupportFragmentManager(), "datePicker");
         }
@@ -448,8 +442,8 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        public void handleDate(int token, int year, int month, int day) {
-            creationActivity().handleDate(token, year,month,day);
+        public void handleDate(int token, DateHandler date) {
+            creationActivity().handleDate(token, date.getYear(),date.getMonth(),date.getDay());
         }
         @Override
         public void handleTime(int token, int hour, int minute) {

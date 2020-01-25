@@ -471,7 +471,17 @@
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorExtra">
 
         <ImageView
-            android:id="@+id/entryCreatorToJobAction"
+            android:id="@+id/entryCreatorWalkToJobAction"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_weight="1"
+            android:adjustViewBounds="false"
+            android:background="@drawable/icon_back_circle"
+            android:scaleType="fitCenter"
+            app:srcCompat="@android:drawable/ic_media_play" />
+
+        <ImageView
+            android:id="@+id/entryCreatorBikeToJobAction"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_weight="1"
@@ -491,7 +501,7 @@
             app:srcCompat="@android:drawable/checkbox_on_background" />
 
         <ImageView
-            android:id="@+id/entryCreatorFromJobAction"
+            android:id="@+id/entryCreatorBikeFromJobAction"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_weight="1"
@@ -499,6 +509,16 @@
             android:background="@drawable/icon_back_circle"
             android:scaleType="fitCenter"
             app:srcCompat="@android:drawable/ic_media_ff" />
+
+        <ImageView
+            android:id="@+id/entryCreatorWalkFromJobAction"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_weight="1"
+            android:adjustViewBounds="false"
+            android:background="@drawable/icon_back_circle"
+            android:scaleType="fitCenter"
+            app:srcCompat="@android:drawable/ic_media_play" />
 
         <ImageView
             android:id="@+id/entryCreatorSleepAction"

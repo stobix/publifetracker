@@ -122,7 +122,7 @@ open class SugarEntryCreationActivity
 
         fun vis(b: Boolean) =
                 when (b) {
-                    true -> View.VISIBLE
+                    true  -> View.VISIBLE
                     false -> View.GONE
                 }
 
@@ -240,7 +240,7 @@ open class SugarEntryCreationActivity
             true
         }
 
-        val dateText = "%d-%02d-%02d".format(date.year, date.month+1, date.day)
+        val dateText = "%d-%02d-%02d".format(date.year, date.month, date.day)
         val timeText = "%02d:%02d".format(date.hour, date.minute)
         startDateView.text = dateText
         startTimeView.text = timeText
@@ -326,26 +326,22 @@ open class SugarEntryCreationActivity
         R.id.entryCreatorSleepAction4.sleepStarInit(4)
         R.id.entryCreatorSleepAction5.sleepStarInit(5)
 
-        val actionJobTo: ImageView = v.findViewById(R.id.entryCreatorToJobAction)
-        actionJobTo.setOnClickListener {
-            extraView.text = "Till jobbet"
-            onSubmitAndClose()
-        }
-        actionJobTo.visibility = if (entry.extra == null) View.VISIBLE else View.GONE
+        fun ResourceID.actionButtonInit(s: String) =
+                v.findViewById<ImageView>(this).run {
+                    setOnClickListener {
+                        extraView.text = s
+                        onSubmitAndClose()
+                    }
+                    visibility = if (entry.extra == null) View.VISIBLE else View.GONE
+                }
 
-        val actionJob: ImageView = v.findViewById(R.id.entryCreatorJobAction)
-        actionJob.setOnClickListener {
-            extraView.text = "Jobb"
-            onSubmitAndClose()
-        }
-        actionJob.visibility = if (entry.extra == null) View.VISIBLE else View.GONE
+        R.id.entryCreatorWalkToJobAction.actionButtonInit("\uD83D\uDEB6Jobb")
+        R.id.entryCreatorBikeToJobAction.actionButtonInit("\uD83D\uDEB4Jobb")
 
-        val actionJobFrom: ImageView = v.findViewById(R.id.entryCreatorFromJobAction)
-        actionJobFrom.setOnClickListener {
-            extraView.text = "Hemgång"
-            onSubmitAndClose()
-        }
-        actionJobFrom.visibility = if (entry.extra == null) View.VISIBLE else View.GONE
+        R.id.entryCreatorJobAction.actionButtonInit("Jobb")
+
+        R.id.entryCreatorBikeFromJobAction.actionButtonInit("\uD83D\uDEB4Hem")
+        R.id.entryCreatorWalkFromJobAction.actionButtonInit("\uD83D\uDEB6Hem")
 
         return v
 
@@ -419,15 +415,13 @@ open class SugarEntryCreationActivity
     fun handleDate(token: Int, year: Int, month: Int, day: Int) {
         when (token) {
             PickedType.start.ordinal -> {
-                date.setDate(year, month, day)
-                // Calendars use a 0-indexed gregorian/julian month for some reason!
-                // TODO either change this or the SugarEntryTableDataAdapter way of formatting dates
-                val dateText = "%d-%02d-%02d".format(year, month+1, day)
+                date.date = year to month to day
+                val dateText = "%d-%02d-%02d".format(year, month, day)
                 startDateView.text = dateText
             }
             PickedType.end.ordinal   -> {
                 val date = endDate ?: DateHandler()
-                date.setDate(year, month, day)
+                date.date = year to month to day
                 setEndTimes(date)
             }
         }
@@ -457,7 +451,7 @@ open class SugarEntryCreationActivity
     private fun setEndTimes(d: DateHandler?) {
         endDate = d
         endDate?.let {
-            val dateText = "%d-%02d-%02d".format(it.year, it.month+1, it.day)
+            val dateText = "%d-%02d-%02d".format(it.year, it.month, it.day)
             val timeText = "%02d:%02d".format(it.hour, it.minute)
             endDateView.text = dateText
             endTimeView.text = timeText

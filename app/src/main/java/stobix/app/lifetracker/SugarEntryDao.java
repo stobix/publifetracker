@@ -43,6 +43,12 @@ public interface SugarEntryDao {
     @Query("select timestamp, weight as value from sugar_entries where weight is not null order by timestamp") // For some reason, "where weight != null" returned zero results always
     List<FloatyIntBucket> getAllWeightBuckets();
 
+    @Query("select timestamp, sugar as value from sugar_entries where sugar is not null and timestamp between :firstDate and :secondDate order by timestamp")
+    List<FloatyIntBucket> getAllSugarBuckets(long firstDate,long secondDate);
+
+    @Query("select timestamp, weight as value from sugar_entries where weight is not null and timestamp between :firstDate and :secondDate order by timestamp") // For some reason, "where weight != null" returned zero results always
+    List<FloatyIntBucket> getAllWeightBuckets(long firstDate,long secondDate);
+
     /*
     @Query("select timestamp, end_timestamp as value from sugar_entries where extra like ':sleepStr%' order by timestamp")
     List<LongBucket> getAllIntervalsStartingWith(String sleepStr);
@@ -55,6 +61,9 @@ public interface SugarEntryDao {
 
     @Query("select timestamp, end_timestamp as endTimestamp from sugar_entries where extra like :str and endTimestamp is not null order by timestamp")
     List<RangeBucketHours> getCompletedIntervalsLike(String str );
+
+    @Query("select timestamp, end_timestamp as endTimestamp from sugar_entries where extra like :str and endTimestamp is not null  and timestamp between :firstDate and :secondDate order by timestamp")
+    List<RangeBucketHours> getCompletedIntervalsLike(String str,long firstDate,long secondDate );
 
     @Query("select timestamp, end_timestamp as endTimestamp from sugar_entries where extra like :str order by timestamp")
     List<RangeBucketHours> getAllIntervalsLike(String str );
