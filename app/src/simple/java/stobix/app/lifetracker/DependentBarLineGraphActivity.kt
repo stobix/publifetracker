@@ -61,12 +61,15 @@ typealias Day = Int
 typealias DateInfo = Pair<Year, Week>
 
 //typealias AllWeeksList = List<Pair<WeekTotal, Pair<DateInfo, List<Pair<ValueEntry, DateInfo>>>>>
-typealias WeekCollation = Pair<WeekTotal, Pair<DateInfo, Map<UpperCollationType,List<ValueEntry>>>>
+typealias WeekCollation = Pair<WeekTotal, Pair<DateInfo, Map<UpperCollationType, List<ValueEntry>>>>
 
 typealias AllWeeksList = List<WeekCollation>
 
 data class ValueEntry(var timestamp: Timestamp, var value: Float, var original: Int)
 
+/**
+ * Determines the type of a series, together with how to convert it
+ */
 enum class SeriesType(val divisor: Float) {
     DIRECT(1f) {
         override val convert = divideBy(this)
@@ -100,14 +103,41 @@ enum class LowerCollationType {
     AVG
 }
 
+/**
+ * A data series to draw, together with various settings
+ */
 data class DataSeries(
+        /**
+         *
+         */
         var description: String,
+        /**
+         *
+         */
         var data: ArrayList<FloatyIntBucket>,
+        /**
+         * The resource id for the icon we click to show this series
+         */
         var iconRes: Int,
+        /**
+         * How to convert the FloatyIntBucket values to the kind we want to show.
+         */
         var valueType: SeriesType = SeriesType.FLOATYINT10,
+        /**
+         * A series of breakpoints for when we change color on the weekly summary
+         */
         var breakPoints: DoubleArray = doubleArrayOf(4.0, 7.0, 15.0),
+        /**
+         * Whether to have zero at the bottom of the graph (like for insulin) or have the lowest actual value there (like for weight)
+         */
         var keepLowZero: Boolean = true,
+        /**
+         * How we initially collate data on the "daily" upper view
+         */
         var upperCollation: UpperCollationType = UpperCollationType.NONE,
+        /**
+         * How we initially collate data on the "daily" upper view
+         */
         var lowerCollation: LowerCollationType = LowerCollationType.AVG
 
 ) : Parcelable {
@@ -154,6 +184,36 @@ data class DataSeries(
 
     override fun describeContents(): Int {
         return 0
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as DataSeries
+
+        if (description != other.description) return false
+        if (data != other.data) return false
+        if (iconRes != other.iconRes) return false
+        if (valueType != other.valueType) return false
+        if (!breakPoints.contentEquals(other.breakPoints)) return false
+        if (keepLowZero != other.keepLowZero) return false
+        if (upperCollation != other.upperCollation) return false
+        if (lowerCollation != other.lowerCollation) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = description.hashCode()
+        result = 31*result+data.hashCode()
+        result = 31*result+iconRes
+        result = 31*result+valueType.hashCode()
+        result = 31*result+breakPoints.contentHashCode()
+        result = 31*result+keepLowZero.hashCode()
+        result = 31*result+upperCollation.hashCode()
+        result = 31*result+lowerCollation.hashCode()
+        return result
     }
 
     companion object CREATOR : Parcelable.Creator<DataSeries> {
@@ -330,61 +390,59 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
          ******************/
 
 
+        private fun calculateColorByLevel(breakPoints: DoubleArray): (Float)->Int =
+                when (breakPoints.size) {
+                    0    -> {
+                        { ChartUtils.COLOR_GREEN }
+                    }
+                    1    -> {
+                        {
+                            when {
+                                it<breakPoints[0] -> ChartUtils.COLOR_GREEN
+                                else              -> ChartUtils.COLOR_RED
+                            }
+                        }
+                    }
+                    2    -> {
+                        {
+                            when {
+                                it<breakPoints[0] -> ChartUtils.COLOR_GREEN
+                                it<breakPoints[1] -> ChartUtils.COLOR_ORANGE
+                                else              -> ChartUtils.COLOR_RED
+                            }
+                        }
+                    }
+                    3    -> {
+                        {
+                            when {
+                                it<breakPoints[0] -> ChartUtils.COLOR_VIOLET
+                                it<breakPoints[1] -> ChartUtils.COLOR_GREEN
+                                it<breakPoints[2] -> ChartUtils.COLOR_ORANGE
+                                else              -> ChartUtils.COLOR_RED
+                            }
+                        }
+                    }
+                    // FIXME Any breakpoint above 4 is ignored for now. Maybe do this more dynamically for higher values?
+                    else -> {
+                        {
+                            when {
+                                it<breakPoints[0] -> ChartUtils.COLOR_VIOLET
+                                it<breakPoints[1] -> ChartUtils.COLOR_GREEN
+                                it<breakPoints[2] -> ChartUtils.COLOR_ORANGE
+                                it<breakPoints[3] -> ChartUtils.COLOR_RED
+                                else              -> ChartUtils.COLOR_BLUE
+                            }
+                        }
+                    }
+                }
+
         private fun processDataSeries(data: DataSeries): Triple<AllWeeksList, (Float)->Int, DataSeries> {
             val entries0 = data.data
                     // FIXME why do these make the graphs show correctly‽ I already sorted the data and made sure there were no nulls when I accessed the database
                     .filterNotNull()
                     .sortedBy { it.timestamp }
 
-            val breakPoints = data.breakPoints
-            val colorByLevel: (Float)->Int = when (breakPoints.size) {
-                0    -> {
-                    {
-                        ChartUtils.COLOR_GREEN
-                    }
-                }
-                1    -> {
-                    {
-                        when {
-                            it<breakPoints[0] -> ChartUtils.COLOR_GREEN
-                            else              -> ChartUtils.COLOR_RED
-                        }
-                    }
-
-                }
-                2    -> {
-                    {
-                        when {
-                            it<breakPoints[0] -> ChartUtils.COLOR_GREEN
-                            it<breakPoints[1] -> ChartUtils.COLOR_ORANGE
-                            else              -> ChartUtils.COLOR_RED
-                        }
-                    }
-
-                }
-                3    -> {
-                    {
-                        when {
-                            it<breakPoints[0] -> ChartUtils.COLOR_VIOLET
-                            it<breakPoints[1] -> ChartUtils.COLOR_GREEN
-                            it<breakPoints[2] -> ChartUtils.COLOR_ORANGE
-                            else              -> ChartUtils.COLOR_RED
-                        }
-                    }
-                }
-                // FIXME Any breakpoint above 4 is ignored for now. Maybe do this more dynamically for higher values?
-                else -> {
-                    {
-                        when {
-                            it<breakPoints[0] -> ChartUtils.COLOR_VIOLET
-                            it<breakPoints[1] -> ChartUtils.COLOR_GREEN
-                            it<breakPoints[2] -> ChartUtils.COLOR_ORANGE
-                            it<breakPoints[3] -> ChartUtils.COLOR_RED
-                            else              -> ChartUtils.COLOR_BLUE
-                        }
-                    }
-                }
-            }
+            val colorByLevel = calculateColorByLevel(data.breakPoints)
 
             val convertFromInt: (Int)->Float = data.valueType.convert
             val convertToInt: (Float)->Int = data.valueType.unConvert
@@ -407,89 +465,13 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
                 it to dateInfo to day
             }
             // group by year & week
-            val yearWeekGrouping = yearweekEntries.groupBy { it.second }
-            fun groupByDay(elems: List<Triple<ValueEntry, DateInfo, Day>>) =
-                    elems
-                            .sortedBy { (first) -> first.timestamp }
-                            .groupBy { elem -> elem.third }
+            val yearWeekGrouping =
+                    yearweekEntries.groupBy { it.second }
 
-            // possibly further group by day
-            fun calculateGrouping(collationType: UpperCollationType, weekGrouping: Map<DateInfo, List<Triple<ValueEntry, DateInfo, Day>>>) =
-                    weekGrouping.map {
-                        it.key to2 when (collationType) {
-                            UpperCollationType.NONE       -> {
-                                val retVal: List<ValueEntry> = it.value.map { it.first }
-                                retVal
-                            }
-                            UpperCollationType.SUM_BY_DAY -> {
-                                val daily = groupByDay(it.value)
-                                val result = daily.map { day ->
-                                    val entries = day.value
-                                    val sum = entries.sumByDouble { (first) -> first.value.toDouble() }.toFloat()
-                                    ValueEntry(
-                                            entries.first().first.timestamp,
-                                            sum,
-                                            convertToInt(sum)
-                                    )
-                                }
-                                val retVal: List<ValueEntry> = result
-                                retVal
-                            }
-                            UpperCollationType.AVG_BY_DAY -> {
-                                val daily = groupByDay(it.value)
-                                val result = daily.map { day ->
-                                    val entries = day.value
-                                    val avg = entries.sumByDouble { (first) -> first.value.toDouble() }.div(
-                                            entries.size.toDouble()
-                                    ).toFloat()
-                                    ValueEntry(
-                                            entries.first().first.timestamp,
-                                            avg,
-                                            convertToInt(avg)
-                                    )
-                                }
-                                val retVal: List<ValueEntry> = result
-                                retVal
-                            }
-                        }
-                    }
+            val perDayGroupings =
+                    yearWeekGrouping.map { calculateGroupElement(it.key, it.value, convertToInt) }
 
-            fun calculateGroupElement(date: DateInfo, entries: List<Triple<ValueEntry, DateInfo, Day>>) =
-                    date to2 mapOf(
-                            UpperCollationType.NONE to entries.map { it.first },
-                            UpperCollationType.SUM_BY_DAY to {
-                                val daily = groupByDay(entries)
-                                val result = daily.map { day ->
-                                    val entries = day.value
-                                    val sum = entries.sumByDouble { (first) -> first.value.toDouble() }.toFloat()
-                                    ValueEntry(
-                                            entries.first().first.timestamp,
-                                            sum,
-                                            convertToInt(sum)
-                                    )
-                                }
-                                val retVal: List<ValueEntry> = result
-                                retVal
-                            }(),
-                            UpperCollationType.AVG_BY_DAY to {
-                                val daily = groupByDay(entries)
-                                val result = daily.map { day ->
-                                    val entries = day.value
-                                    val avg = entries.sumByDouble { (first) -> first.value.toDouble() }.div(
-                                            entries.size.toDouble()
-                                    ).toFloat()
-                                    ValueEntry(
-                                            entries.first().first.timestamp,
-                                            avg,
-                                            convertToInt(avg)
-                                    )
-                                }
-                                val retVal: List<ValueEntry> = result
-                                retVal
-                            }()
-                    )
-            val perDayGroupings = yearWeekGrouping.map { calculateGroupElement(it.key, it.value) }
-            val perDayGrouping = calculateGrouping(data.upperCollation, yearWeekGrouping)
+
             // calculate week total data for each grouping
             val collationPerWeek = perDayGroupings.map {
                 val elems = it.second[data.upperCollation]!!
@@ -511,6 +493,56 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
             }
             return collationPerWeek to colorByLevel to data
         }
+
+        private fun groupByDay(elems: List<Triple<ValueEntry, DateInfo, Day>>) =
+                elems
+                        .sortedBy { (first) -> first.timestamp }
+                        .groupBy { elem -> elem.third }
+
+        private fun calculateDailySumEntry(entries: List<Triple<ValueEntry, DateInfo, Day>>, convertToInt: (Float)->Int) =
+                entries.sumByDouble { (first) -> first.value.toDouble() }
+                        .toFloat()
+                        .let { sum ->
+                            ValueEntry(
+                                    entries.first().first.timestamp,
+                                    sum,
+                                    convertToInt(sum)
+                            )
+                        }
+
+        private fun calculateDailyAvgEntry(entries: List<Triple<ValueEntry, DateInfo, Day>>, convertToInt: (Float)->Int) =
+                entries.sumByDouble { (first) -> first.value.toDouble() }
+                        .div(entries.size.toDouble())
+                        .toFloat()
+                        .let { avg ->
+                            ValueEntry(
+                                    entries.first().first.timestamp,
+                                    avg,
+                                    convertToInt(avg)
+                            )
+                        }
+
+        private fun calculateCollationsForEntries(entries: List<Triple<ValueEntry, DateInfo, Day>>, convertToInt: (Float)->Int) =
+                mapOf(
+                        UpperCollationType.NONE to entries.map { it.first },
+                        UpperCollationType.SUM_BY_DAY to {
+                            groupByDay(entries).map {
+                                calculateDailySumEntry(
+                                        it.value, convertToInt
+                                )
+                            }
+                        }(),
+                        UpperCollationType.AVG_BY_DAY to {
+                            groupByDay(entries).map {
+                                calculateDailyAvgEntry(
+                                        it.value, convertToInt
+                                )
+                            }
+                        }()
+                )
+
+        private fun calculateGroupElement(date: DateInfo, entries: List<Triple<ValueEntry, DateInfo, Day>>, convertToInt: (Float)->Int) =
+                date to2 calculateCollationsForEntries(entries, convertToInt)
 
         /******************
          * Menu Click Handling / Data Switching
@@ -606,18 +638,21 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
         private inner class BottomValueSelectedListener : ColumnChartOnValueSelectListener {
 
             override fun onValueSelected(columnIndex: Int, subcolumnIndex: Int, value: SubcolumnValue) {
-                updateTopChart(value.color, topSeriesType ?: selectedSeries.third.upperCollation,columnIndex)
+                updateTopChart(
+                        value.color, topSeriesType ?: selectedSeries.third.upperCollation,
+                        columnIndex
+                )
             }
 
             override fun onValueDeselected() {}
         }
 
-        private fun setTopCollation(collationType: UpperCollationType){
+        private fun setTopCollation(collationType: UpperCollationType) {
             topSeriesType = collationType
             updateTopChart()
         }
 
-        private fun updateTopChart(color: Int, collationType: UpperCollationType,columnIndex: Int) {
+        private fun updateTopChart(color: Int, collationType: UpperCollationType, columnIndex: Int) {
             selectedWeek = columnIndex
             topColor = color
             topSeriesType = collationType
@@ -626,8 +661,8 @@ class DependentBarLineGraphActivity : AppCompatActivity() {
 
         private fun updateTopChart() {
             val columnIndex = selectedWeek
-            val color= topColor
-            val collationType= topSeriesType
+            val color = topColor
+            val collationType = topSeriesType
             // Cancel last animation if not finished.
             chartTop.cancelDataAnimation()
             // FIXME this is the only place outside refreshBottomChart that references perWeekMean. Can I change this to make perWeekMean not be class global?
