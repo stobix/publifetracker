@@ -216,7 +216,7 @@ class BuildVariantSpecificCode {
                         thread(start = true) {
                             val m = newGraphHandler.obtainMessage()
                             // Alla blodsockervärden
-                            val starttid = DateHandler().subtractYears(2)
+                            val starttid = DateHandler().subtractYears(1)
                             val sluttid = DateHandler()
                             val allSugarBuckets = c.dao.getAllSugarBuckets(starttid.timestamp, sluttid.timestamp)
                             // Alla viktvärden
