@@ -15,6 +15,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import stobix.utils.DateHandler
 import stobix.utils.kotlinExtensions.to
+import java.lang.NumberFormatException
 
 
 /**
@@ -57,6 +58,7 @@ open class SugarEntryCreationActivity
     private lateinit var insulinView: TextView
     private lateinit var drinkView: TextView
     private lateinit var extraView: TextView
+    private lateinit var categoryView: TextView
     private lateinit var pillsView: TextView
 
 
@@ -98,6 +100,7 @@ open class SugarEntryCreationActivity
         insulinView = v.findViewById(R.id.entryCreatorInsulin)
         pillsView = v.findViewById(R.id.entryCreatorPills)
         drinkView = v.findViewById(R.id.entryCreatorDrink)
+        categoryView = v.findViewById(R.id.entryCreatorCategory)
         extraView = v.findViewById(R.id.entryCreatorExtra)
 
         val stateArray: MutableMap<Int, Boolean> = mutableMapOf()
@@ -232,6 +235,8 @@ open class SugarEntryCreationActivity
 
         R.id.entryCreatorSugarToggle to entry.sugarLevel toggling (sugarView withLabel R.id.entryCreatorSugarLabel)
 
+        // R.id.entryCreatorExtraToggle to entry.extra toggling (extraView withLabel R.id.entryCreatorExtraLabel)
+
         R.id.entryCreatorExtraToggle to entry.extra toggling (extraView withLabel R.id.entryCreatorExtraLabel)
 
         v.findViewById<View>(R.id.entryCreatorToggleDateTime).setOnLongClickListener {
@@ -253,6 +258,7 @@ open class SugarEntryCreationActivity
             sugarView.text = entry.sugarLevel?.toFloat()?.div(10f)?.toString()
             weightView.text = entry.weight?.toFloat()?.div(10f)?.toString()
             extraView.text = entry.extra
+            categoryView.text = entry.category
             foodView.text = entry.food
             insulinView.text = entry.insulin?.toString()
             pillsView.text = entry.treatment
@@ -300,22 +306,38 @@ open class SugarEntryCreationActivity
 
         actionSleep.setOnClickListener {
             val slepStr = getString(R.string.EntryCreatorSleepString)
-            extraView.text = slepStr
+            categoryView.text = slepStr
             onSubmitAndClose()
         }
 
-        actionSleep.visibility = if (entry.extra == null) View.VISIBLE else View.GONE
+        actionSleep.visibility = when {
+            entry.category == null -> View.VISIBLE
+            entry.category != getString(R.string.EntryCreatorSleepString) -> View.VISIBLE
+            else -> View.GONE
+        }
 
         fun ResourceID.sleepStarInit(n: Int) {
             v.findViewById<ImageView>(this).also {
                 val slepStr = getString(R.string.EntryCreatorSleepString)
                 it.setOnClickListener {
-                    extraView.text = "$slepStr: $n"
+                    // If text is a number, replace it
+                    var mebbehParsed = extraView.text?.toString()?.let{
+                        try{
+                            it.toInt()
+                        } catch (e: NumberFormatException){
+                            null
+                        }
+                    }
+                    when {
+                        mebbehParsed != null -> extraView.text = "$n"
+                        extraView.text.isNullOrBlank() -> extraView.text = "$n"
+                        else  -> extraView.text = "$n, ${extraView.text}"
+                    }
                     setEndTimes(DateHandler())
                     onSubmitAndClose()
                 }
                 // TODO set visible also if it already has a grade.
-                it.visibility = if (entry.extra == slepStr) View.VISIBLE else View.GONE
+                it.visibility = if (entry.category == slepStr) View.VISIBLE else View.GONE
             }
         }
 
@@ -329,10 +351,10 @@ open class SugarEntryCreationActivity
         fun ResourceID.actionButtonInit(s: String) =
                 v.findViewById<ImageView>(this).run {
                     setOnClickListener {
-                        extraView.text = s
+                        categoryView.text = s
                         onSubmitAndClose()
                     }
-                    visibility = if (entry.extra == null) View.VISIBLE else View.GONE
+                    visibility = if (entry.category?.let { it != s } ?: true)  View.VISIBLE else View.GONE
                 }
 
         R.id.entryCreatorWalkToJobAction.actionButtonInit("\uD83D\uDEB6Jobb")
@@ -390,6 +412,7 @@ open class SugarEntryCreationActivity
         entry.sugarLevel = sugarView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt()
         entry.weight = weightView.text?.toString()?.toFloatOrNull()?.times(10)?.toInt()
         entry.extra = extraView.text?.toString().nullIfEmpty()
+        entry.category = categoryView.text?.toString().nullIfEmpty()
         entry.insulin = insulinView.text?.toString()?.toDoubleOrNull()
         entry.treatment = pillsView.text?.toString().nullIfEmpty()
         entry.food = foodView.text?.toString().nullIfEmpty()

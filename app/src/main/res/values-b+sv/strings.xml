@@ -54,4 +54,5 @@
     <string name="EntryCreatorSleepString">Sömn</string>
     <string name="week_average_description">⟨W⟩</string>
     <string name="week_sum_description">&#120506;W</string>
+    <string name="input_category">Kategori</string>
 </resources>

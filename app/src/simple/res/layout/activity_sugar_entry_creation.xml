@@ -70,6 +70,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorEndDate" />
 
+    <ImageView
+        android:id="@+id/entryCreatorEndDateDelete"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:layout_constraintEnd_toEndOf="@+id/entryCreatorEndTime"
+        app:layout_constraintTop_toTopOf="@+id/entryCreatorEndDate"
+        app:srcCompat="@android:drawable/ic_menu_delete"
+        tools:ignore="ContentDescription" />
+
     <EditText
         android:id="@+id/entryCreatorEndDate"
         android:layout_width="0dp"
@@ -293,13 +302,43 @@
         android:layout_marginEnd="16dp"
         android:ems="10"
         android:inputType="text"
-        android:nextFocusForward="@+id/entryCreatorExtra"
+        android:nextFocusForward="@+id/entryCreatorCategory"
         android:selectAllOnFocus="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/entryCreatorDrinkLabel"
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorFood"
         tools:clickable="false"
         tools:text="@string/input_drink" />
+
+    <!-- category -->
+
+    <TextView
+        android:id="@+id/entryCreatorCategoryLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:labelFor="@+id/entryCreatorCategory"
+        android:text="@string/input_category"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/entryCreatorCategory" />
+
+    <EditText
+        android:id="@+id/entryCreatorCategory"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="text"
+        android:imeOptions="actionDone"
+        android:selectAllOnFocus="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/entryCreatorCategoryLabel"
+        app:layout_constraintTop_toBottomOf="@+id/entryCreatorDrink"
+        tools:clickable="false"
+        tools:text="@string/input_category" />
+
 
     <!-- extra -->
 
@@ -314,15 +353,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/entryCreatorExtra" />
 
-    <ImageView
-        android:id="@+id/entryCreatorEndDateDelete"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        app:layout_constraintEnd_toEndOf="@+id/entryCreatorEndTime"
-        app:layout_constraintTop_toTopOf="@+id/entryCreatorEndDate"
-        app:srcCompat="@android:drawable/ic_menu_delete"
-        tools:ignore="ContentDescription" />
-
     <EditText
         android:id="@+id/entryCreatorExtra"
         android:layout_width="0dp"
@@ -335,7 +365,7 @@
         android:selectAllOnFocus="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/entryCreatorExtraLabel"
-        app:layout_constraintTop_toBottomOf="@+id/entryCreatorDrink"
+        app:layout_constraintTop_toBottomOf="@+id/entryCreatorCategory"
         tools:clickable="false"
         tools:text="@string/input_extra" />
 
@@ -461,14 +491,67 @@
     <!-- Quick actions -->
 
     <LinearLayout
-        android:id="@+id/entryCreationQuickActions"
+        android:id="@+id/entryCreationSleepGrades"
         android:layout_width="wrap_content"
-        android:layout_height="28dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_weight="1"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/entryCreatorExtra">
+
+        <ImageView
+            android:id="@+id/entryCreatorSleepAction0"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:srcCompat="@android:drawable/ic_delete" />
+
+        <ImageView
+            android:id="@+id/entryCreatorSleepAction1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:srcCompat="@android:drawable/btn_star_big_on" />
+
+        <ImageView
+            android:id="@+id/entryCreatorSleepAction2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:srcCompat="@android:drawable/btn_star_big_on" />
+
+        <ImageView
+            android:id="@+id/entryCreatorSleepAction3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:srcCompat="@android:drawable/btn_star_big_on" />
+
+        <ImageView
+            android:id="@+id/entryCreatorSleepAction4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:srcCompat="@android:drawable/btn_star_big_on" />
+
+        <ImageView
+            android:id="@+id/entryCreatorSleepAction5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:srcCompat="@android:drawable/btn_star_big_on" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/entryCreationQuickActions"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/entryCreationSleepGrades">
 
         <ImageView
             android:id="@+id/entryCreatorWalkToJobAction"
@@ -530,47 +613,6 @@
             android:scaleType="fitCenter"
             app:srcCompat="@drawable/zzz_icon" />
 
-        <ImageView
-            android:id="@+id/entryCreatorSleepAction0"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            app:srcCompat="@android:drawable/ic_delete" />
-
-        <ImageView
-            android:id="@+id/entryCreatorSleepAction1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:srcCompat="@android:drawable/btn_star_big_on" />
-
-        <ImageView
-            android:id="@+id/entryCreatorSleepAction2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:srcCompat="@android:drawable/btn_star_big_on" />
-
-        <ImageView
-            android:id="@+id/entryCreatorSleepAction3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:srcCompat="@android:drawable/btn_star_big_on" />
-
-        <ImageView
-            android:id="@+id/entryCreatorSleepAction4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:srcCompat="@android:drawable/btn_star_big_on" />
-
-        <ImageView
-            android:id="@+id/entryCreatorSleepAction5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:srcCompat="@android:drawable/btn_star_big_on" />
     </LinearLayout>
 
     <!-- submit buttons -->

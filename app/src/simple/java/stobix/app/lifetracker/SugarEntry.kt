@@ -74,6 +74,10 @@ data class SugarEntry constructor(
          */
         @ColumnInfo(name = "extra") var extra: String? = null,
         /**
+         * An optional 'category' for graphs and the likes
+         */
+        @ColumnInfo(name = "category") var category: String? = null,
+        /**
          * Current weight
          */
         @ColumnInfo(name = "weight") var weight: Int? = null,
@@ -110,6 +114,7 @@ data class SugarEntry constructor(
             parcel.readNullableLong(), // end timestamp
             parcel.readNullableInt(), // sugar
             parcel.readString(), // extra
+            parcel.readString(), // category
             parcel.readNullableInt(), // weight
             parcel.readNullableDouble(),//insulin
             parcel.readString(), // treatment
@@ -131,6 +136,7 @@ data class SugarEntry constructor(
         parcel.writeNullableLong(endTimestamp)
         parcel.writeNullableInt(sugarLevel)
         parcel.writeString(extra)
+        parcel.writeString(category)
         parcel.writeNullableInt(weight)
         parcel.writeNullableDouble(insulin)
         parcel.writeString(treatment)
@@ -176,6 +182,7 @@ data class SugarEntry constructor(
     infix fun sameValuesAs(other: SugarEntry) =
             this.sugarLevel == other.sugarLevel
                     && this.extra == other.extra
+                    && this.category == other.category
                     && this.weight == other.weight
                     && this.treatment == other.treatment
                     && this.insulin == other.insulin
@@ -208,6 +215,12 @@ data class SugarEntry constructor(
      */
     fun compareExtra(that: SugarEntry) =
             compareNullables(this.extra, that.extra) { a, b -> a.compareTo(b) }
+
+    /**
+     * These are for comparing in Java, since Java has no counterpart to ?.let
+     */
+    fun compareCategory(that: SugarEntry) =
+            compareNullables(this.category, that.category) { a, b -> a.compareTo(b) }
 
     /**
      * These are for comparing in Java, since Java has no counterpart to ?.let

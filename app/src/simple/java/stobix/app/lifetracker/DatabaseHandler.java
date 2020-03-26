@@ -145,6 +145,52 @@ public class DatabaseHandler {
         }
     };
 
+    // 8->9:
+
+    final static Migration sugarMig8_9 = new Migration(8,9) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.beginTransaction();
+            try{
+                database.execSQL("alter table sugar_entries add column category text default null");
+                Cursor jobsToConvert =
+                        database.query("select * from sugar_entries where extra like 'Jobb %'");
+                while(jobsToConvert.moveToNext()){
+                    long timestamp = jobsToConvert.getShort(jobsToConvert.getColumnIndex("timestamp"));
+                    String extra = jobsToConvert.getString(jobsToConvert.getColumnIndex("extra"));
+                    String jobbExtra = extra.substring(5);
+                    database.execSQL("update sugar_entries set extra="+jobbExtra+", category='Jobb' where timestamp="+timestamp);
+                }
+                jobsToConvert =
+                        database.query("select * from sugar_entries where extra like 'Jobb'");
+                while(jobsToConvert.moveToNext()){
+                    long timestamp = jobsToConvert.getShort(jobsToConvert.getColumnIndex("timestamp"));
+                    String extra = jobsToConvert.getString(jobsToConvert.getColumnIndex("extra"));
+                    database.execSQL("update sugar_entries set extra=null, category='Jobb' where timestamp="+timestamp);
+                }
+                Cursor sleepToConvert =
+                        database.query("select * from sugar_entries where extra like 'Sömn: %'");
+                while(sleepToConvert.moveToNext()){
+                    long timestamp = jobsToConvert.getShort(jobsToConvert.getColumnIndex("timestamp"));
+                    String extra = jobsToConvert.getString(jobsToConvert.getColumnIndex("extra"));
+                    String sovExtra = extra.substring(6);
+                    database.execSQL("update sugar_entries set extra="+sovExtra+", category='Sömn' where timestamp="+timestamp);
+                }
+                sleepToConvert =
+                        database.query("select * from sugar_entries where extra like 'Sleep: %'");
+                while(sleepToConvert.moveToNext()){
+                    long timestamp = jobsToConvert.getShort(jobsToConvert.getColumnIndex("timestamp"));
+                    String extra = jobsToConvert.getString(jobsToConvert.getColumnIndex("extra"));
+                    String sovExtra = extra.substring(7);
+                    database.execSQL("update sugar_entries set extra="+sovExtra+", category='Sleep' where timestamp="+timestamp);
+                }
+                database.setTransactionSuccessful();
+            } finally {
+                database.endTransaction();
+            }
+        }
+    };
+
     public static SugarEntryDatabase buildSugarDatabase(Context ctx){
         return Room.databaseBuilder(
                 ctx,
@@ -157,6 +203,7 @@ public class DatabaseHandler {
                 .addMigrations(sugarMig5_6)
                 .addMigrations(sugarMig6_7)
                 .addMigrations(sugarMig7_8)
+                .addMigrations(sugarMig8_9)
                 .build();
     }
 }

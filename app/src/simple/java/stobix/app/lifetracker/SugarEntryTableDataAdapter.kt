@@ -52,7 +52,8 @@ class SugarEntryTableDataAdapter(
                 val startString = DateFormat.format(formatString, startDate).toString()
                 val totalString = currRow.endTimestamp?.let {
                     val date = Date(it)
-                    "$startString -\n" + DateFormat.format(formatString, date).toString()
+                    val endString = DateFormat.format(formatString, date).toString()
+                    "$endString -\n $startString"
                 } ?: startString
                 renderString(totalString)
             }
@@ -77,13 +78,16 @@ class SugarEntryTableDataAdapter(
                             ,
                             R.drawable.pills_icon pairedIfDefined currRow.treatment
                             ,
+                            R.drawable.extra_icon pairedIfDefined currRow.category
+                            ,
                             R.drawable.extra_icon pairedIfDefined currRow.extra
                             ,
                             R.drawable.datetime_icon pairedIfDefined endTimeFormat()
 
                     )
                 else
-                    renderStrings(parentView,
+                    renderStrings(
+                            parentView,
                             currRow.sugarLevel?.let { String.format("%.1f mmol/l", it / 10f) }
                             ,
                             currRow.weight?.let { String.format("%.1f kg", it / 10f) }
@@ -95,6 +99,10 @@ class SugarEntryTableDataAdapter(
                             currRow.insulin?.let { String.format("%.1f insulin", it) }
                             ,
                             currRow.treatment
+                            ,
+                            currRow.category?.let { that ->
+                                currRow.extra?.let { "$that:" } ?: that
+                            }
                             ,
                             currRow.extra
                             ,

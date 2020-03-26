@@ -29,7 +29,7 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
             }
 
         // Increase this each time the JSON generating algorithm gets updated.
-        val currentVersion = 7
+        val currentVersion = 8
 
         val sugarEntryListTypeToken = object: TypeToken<List<SugarEntry>>() {}
 
@@ -59,6 +59,7 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                                 out.name("tr").value(treatment)
                                 out.name("f").value(food)
                                 out.name("d").value(drink)
+                                out.name("c").value(category)
                                 out.name("e").value(extra)
                             }
                             out.endObject()
@@ -215,6 +216,21 @@ class SugarEntryAdapterFactory : TypeAdapterFactory {
                                                     "tr" -> entry.treatment = reader.nextString()
                                                     "f" -> entry.food = reader.nextString()
                                                     "d" -> entry.drink = reader.nextString()
+                                                    "e" -> entry.extra = reader.nextString()
+                                                }
+                                            }
+                                            8 -> readObjectArray(reader){
+                                                name,entry ->
+                                                when(name) {
+                                                    "t" -> entry.timestamp = reader.nextLong()
+                                                    "te" -> entry.endTimestamp = reader.nextLong()
+                                                    "s" -> entry.sugarLevel = reader.nextInt()
+                                                    "w" -> entry.weight = reader.nextInt()
+                                                    "i" -> entry.insulin = reader.nextDouble()
+                                                    "tr" -> entry.treatment = reader.nextString()
+                                                    "f" -> entry.food = reader.nextString()
+                                                    "d" -> entry.drink = reader.nextString()
+                                                    "c" -> entry.category = reader.nextString()
                                                     "e" -> entry.extra = reader.nextString()
                                                 }
                                             }
