@@ -33,6 +33,10 @@
             android:title="@string/action_export_db" />
     </group>
     <item
+        android:id="@+id/action_convert_to_category"
+        android:title="@string/convert_extra_to_category"
+        />
+    <item
         android:id="@+id/action_toggle_list_icons"
         android:checkable="true"
         android:title="@string/show_hide_icons" />

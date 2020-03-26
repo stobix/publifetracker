@@ -65,6 +65,9 @@ public interface SugarEntryDao {
     @Query("select timestamp, end_timestamp as endTimestamp from sugar_entries where extra like :str and endTimestamp is not null  and timestamp between :firstDate and :secondDate order by timestamp")
     List<RangeBucketHours> getCompletedIntervalsLike(String str,long firstDate,long secondDate );
 
+    @Query("select timestamp, end_timestamp as endTimestamp from sugar_entries where category like :str and endTimestamp is not null  and timestamp between :firstDate and :secondDate order by timestamp")
+    List<RangeBucketHours> getCompletedCategoriesLike(String str,long firstDate,long secondDate );
+
     @Query("select timestamp, end_timestamp as endTimestamp from sugar_entries where extra like :str order by timestamp")
     List<RangeBucketHours> getAllIntervalsLike(String str );
 

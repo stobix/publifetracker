@@ -10,6 +10,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -23,7 +25,10 @@ import android.view.MenuItem;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -321,6 +326,60 @@ public class MainActivity extends AppCompatActivity
 
         kaka.accept(s);
         */
+
+        public void convertExtrasToCategory(){
+            TableDataAdapter<SugarEntry> x = tableView.getDataAdapter();
+            List<SugarEntry> y = x.getData();
+
+            Log.d("convert", "Have "+y.size()+" elements before");
+            for(int i = 0; i<y.size();i++) {
+                SugarEntry data = y.get(i);
+                String extra = data.getExtra();
+                String category = data.getCategory();
+                if(extra == null) {
+                    Log.d("convert","empty extra");
+                    continue;
+                }
+                if(category != null && !data.getCategory().isEmpty()) {
+                    Log.d("convert","non-empty cat: "+data.getCategory());
+                    continue;
+                }
+                String sleepstr = getString(R.string.EntryCreatorSleepString);
+
+                String catstr="";
+                if(category != null)
+                    catstr=category;
+                if(extra.equals("Jobb") || extra.equals("jobb")){
+                    Log.d("convert","cat jobb");
+                    data.setCategory("Jobb");
+                    data.setExtra(null);
+                } else if(extra.startsWith("Jobb ")){
+                    Log.d("convert","cat jobb extra");
+                    data.setCategory("Jobb");
+                    String jobbextra = extra.substring(5);
+                    if(jobbextra.equals(""))
+                        jobbextra=null;
+                    data.setExtra(jobbextra);
+                } else if (extra.equals(sleepstr)){
+                    Log.d("convert","cat sleep ");
+                   data.setCategory(sleepstr);
+                } else if(extra.startsWith(sleepstr+": ")){
+                    Log.d("convert","cat sleep extra");
+                    data.setCategory(sleepstr);
+                    String sömnextra = extra.substring(sleepstr.length()+2);
+                    if(sömnextra.equals(""))
+                        sömnextra=null;
+                    data.setExtra(sömnextra);
+                } else {
+                    Log.d("convert", "meh: ("+ catstr + ") " + extra);
+                }
+                onSugarEntryChanged(data,data.getTimestamp());
+                // y.set(i,data);
+            }
+            Log.d("convert", "Have "+y.size()+" elements after");
+            // x.clear();
+            //x.addAll(y);
+        }
 
         // An abstraction of all data base followed by table adapter related consumer
         // actions that can be performed on a SugarEntry.

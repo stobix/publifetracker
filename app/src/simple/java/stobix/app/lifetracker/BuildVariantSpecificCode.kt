@@ -222,9 +222,9 @@ class BuildVariantSpecificCode {
                             // Alla viktvärden
                             val allWeightBuckets = c.dao.getAllWeightBuckets(starttid.timestamp, sluttid.timestamp)
                             val sleepStr = c.getString(R.string.EntryCreatorSleepString)
-                            val allSleepBuckets = c.dao.getCompletedIntervalsLike("$sleepStr:%", starttid.timestamp, sluttid.timestamp)
+                            val allSleepBuckets = c.dao.getCompletedCategoriesLike(sleepStr, starttid.timestamp, sluttid.timestamp)
 
-                            val allJobBuckets = c.dao.getCompletedIntervalsLike("Jobb", starttid.timestamp, sluttid.timestamp)
+                            val allJobBuckets = c.dao.getCompletedCategoriesLike("Jobb", starttid.timestamp, sluttid.timestamp)
                             Log.d(
                                     "veckografer",
                                     "start: ${starttid.date} slut: ${sluttid.date}"
@@ -304,6 +304,11 @@ class BuildVariantSpecificCode {
 
                     R.id.action_switch_theme      -> {
                         ThemePickerDialog(c, COLOR_THEMES).show()
+                        true to true
+                    }
+
+                    R.id.action_convert_to_category -> {
+                        c.convertExtrasToCategory()
                         true to true
                     }
 

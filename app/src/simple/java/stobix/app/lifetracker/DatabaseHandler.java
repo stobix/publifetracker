@@ -159,7 +159,7 @@ public class DatabaseHandler {
                     long timestamp = jobsToConvert.getShort(jobsToConvert.getColumnIndex("timestamp"));
                     String extra = jobsToConvert.getString(jobsToConvert.getColumnIndex("extra"));
                     String jobbExtra = extra.substring(5);
-                    database.execSQL("update sugar_entries set extra="+jobbExtra+", category='Jobb' where timestamp="+timestamp);
+                    database.execSQL("update sugar_entries set extra='"+jobbExtra+"', category='Jobb' where timestamp="+timestamp);
                 }
                 jobsToConvert =
                         database.query("select * from sugar_entries where extra like 'Jobb'");
@@ -171,16 +171,16 @@ public class DatabaseHandler {
                 Cursor sleepToConvert =
                         database.query("select * from sugar_entries where extra like 'Sömn: %'");
                 while(sleepToConvert.moveToNext()){
-                    long timestamp = jobsToConvert.getShort(jobsToConvert.getColumnIndex("timestamp"));
-                    String extra = jobsToConvert.getString(jobsToConvert.getColumnIndex("extra"));
+                    long timestamp = sleepToConvert.getShort(sleepToConvert.getColumnIndex("timestamp"));
+                    String extra = sleepToConvert.getString(sleepToConvert.getColumnIndex("extra"));
                     String sovExtra = extra.substring(6);
                     database.execSQL("update sugar_entries set extra="+sovExtra+", category='Sömn' where timestamp="+timestamp);
                 }
                 sleepToConvert =
                         database.query("select * from sugar_entries where extra like 'Sleep: %'");
                 while(sleepToConvert.moveToNext()){
-                    long timestamp = jobsToConvert.getShort(jobsToConvert.getColumnIndex("timestamp"));
-                    String extra = jobsToConvert.getString(jobsToConvert.getColumnIndex("extra"));
+                    long timestamp = sleepToConvert.getShort(sleepToConvert.getColumnIndex("timestamp"));
+                    String extra = sleepToConvert.getString(sleepToConvert.getColumnIndex("extra"));
                     String sovExtra = extra.substring(7);
                     database.execSQL("update sugar_entries set extra="+sovExtra+", category='Sleep' where timestamp="+timestamp);
                 }

@@ -55,4 +55,5 @@
     <!--<string name="week_sum_description">∑W</string>-->
     <string name="week_sum_description">&#120506;W</string>
     <string name="input_category">Category</string>
+    <string name="convert_extra_to_category">Convert extra to category</string>
 </resources>
