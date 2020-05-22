@@ -33,7 +33,7 @@ class SugarEntryTableDataAdapter(
             val totSeconds = totMilSeconds / 1000
             val seconds = (totSeconds % 60).toInt()
             val minutes = ((totSeconds / 60) % 60).toInt()
-            var hours = ((totSeconds / 3600) % 24).toInt()
+            val hours = ((totSeconds / 3600) % 24).toInt()
             val days = (totSeconds / 3600 / 24).toInt()
             if (days > 0)
                 "%d:%02d:%02d:%02d".format(days, hours, minutes, seconds)
@@ -66,6 +66,8 @@ class SugarEntryTableDataAdapter(
                                 DateFormat.format(formatString,date).toString()
                             }
                             ,*/
+                            R.drawable.extra_icon pairedIfDefined currRow.category
+                            ,
                             R.drawable.blood_sugar_icon pairedIfDefined currRow.sugarLevel?.let { String.format("%.1f mmol/l", it / 10f) }
                             ,
                             R.drawable.weight_icon pairedIfDefined currRow.weight?.let { String.format("%.1f kg", it / 10f) }
@@ -78,8 +80,6 @@ class SugarEntryTableDataAdapter(
                             ,
                             R.drawable.pills_icon pairedIfDefined currRow.treatment
                             ,
-                            R.drawable.extra_icon pairedIfDefined currRow.category
-                            ,
                             R.drawable.extra_icon pairedIfDefined currRow.extra
                             ,
                             R.drawable.datetime_icon pairedIfDefined endTimeFormat()
@@ -88,6 +88,12 @@ class SugarEntryTableDataAdapter(
                 else
                     renderStrings(
                             parentView,
+                            currRow.category?.let { cat -> when {
+                                currRow.extra != null -> "$cat: ${currRow.extra}"
+                                currRow.containsOtherThanCategory() -> "$cat:"
+                                else -> cat
+                            }}
+                            ,
                             currRow.sugarLevel?.let { String.format("%.1f mmol/l", it / 10f) }
                             ,
                             currRow.weight?.let { String.format("%.1f kg", it / 10f) }
@@ -100,11 +106,14 @@ class SugarEntryTableDataAdapter(
                             ,
                             currRow.treatment
                             ,
-                            currRow.category?.let { that ->
+                          /*  currRow.category?.let { that ->
                                 currRow.extra?.let { "$that:" } ?: that
                             }
-                            ,
-                            currRow.extra
+                            , */
+                            when (currRow.category) {
+                                null -> currRow.extra
+                                else -> null
+                            }
                             ,
                             endTimeFormat()?.let { "($it)" }
                     )

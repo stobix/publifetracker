@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import stobix.utils.DateHandler
+import stobix.utils.kotlinExtensions.to
 
 /**
  * A dialog for creating an entry to the blood sugar database
@@ -90,11 +91,11 @@ open class SugarEntryCreationActivity
             buttonAdd.text=getString(R.string.edit_dialog_button_delete)
         } else {
             buttonAddClose.text=getString(R.string.creation_dialog_button_add_close)
-            buttonAdd.visibility=View.VISIBLE
+            buttonAdd.visibility= View.VISIBLE
         }
 
-        dateView.setOnClickListener { (activity as MainActivity).showDatePicker(date.year,date.month,date.day) }
-        timeView.setOnClickListener { (activity as MainActivity).showTimePicker(date.hour,date.minute) }
+        dateView.setOnClickListener { (activity as MainActivity).showDatePicker(0, date) }
+        timeView.setOnClickListener { (activity as MainActivity).showTimePicker(0, date) }
         /*
         sugarView.setOnClickListener {
             val sugarLevel = sugarLevel
@@ -176,7 +177,7 @@ open class SugarEntryCreationActivity
     }
 
     fun handleDate(year: Int, month: Int, day: Int) {
-        date.setDate(year,month,day)
+        date.date=year to month to day
         // Calendars use a 0-indexed gregorian/julian month for some reason!
         val dateText="%d-%02d-%02d".format(year,month+1,day)
         dateView.text=dateText

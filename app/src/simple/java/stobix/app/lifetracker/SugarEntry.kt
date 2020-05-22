@@ -198,6 +198,8 @@ data class SugarEntry constructor(
             } ?: -1
 
 
+    fun containsOtherThanCategory() =
+            extra ?: weight ?: treatment ?: insulin ?: food ?: drink != null
     /**
      * These are for comparing in Java, since Java has no counterpart to ?.let
      */
